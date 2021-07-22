@@ -15,8 +15,19 @@ limitations under the License.
 */
 package main
 
-import "github.com/RasaHQ/rasaxctl/cmd"
+import (
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/RasaHQ/rasaxctl/cmd"
+)
 
 func main() {
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	go cmd.HandleSignals(sigs)
+
 	cmd.Execute()
 }

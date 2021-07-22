@@ -3,6 +3,9 @@ package helm
 import (
 	"fmt"
 
+	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
@@ -44,6 +47,24 @@ func (h *Helm) Install() error {
 		if err := action.CheckDependencies(helmChart, req); err != nil {
 			return err
 		}
+	}
+
+	// Add additional values
+	if viper.GetString("project-path") != "" {
+		h.values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.values)
+		h.log.V(1).Info("Merging values", "result", h.values)
+	}
+
+	if h.KubernetesBackendType == types.KubernetesBackendLocal {
+		host := fmt.Sprintf("%s.rasaxctl.local.io", h.Namespace)
+		ip := "127.0.0.1"
+		h.values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.values)
+		h.log.V(1).Info("Merging values", "result", h.values)
+
+		if err := utils.AddHostToEtcHosts(host, ip); err != nil {
+			return err
+		}
+		h.log.V(1).Info("Added host", "host", host, "ip", ip)
 	}
 
 	// install the chart

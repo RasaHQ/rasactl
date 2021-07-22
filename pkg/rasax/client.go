@@ -31,8 +31,8 @@ func (r *RasaX) New() {
 		Timeout: time.Second * 120,
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
-				Timeout:   30 * time.Second,
-				KeepAlive: 30 * time.Second,
+				Timeout:   20 * time.Second,
+				KeepAlive: 20 * time.Second,
 			}).Dial,
 		},
 	}

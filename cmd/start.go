@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/RasaHQ/rasaxctl/pkg/helm"
 	"github.com/RasaHQ/rasaxctl/pkg/k8s"
@@ -29,6 +30,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -54,15 +56,6 @@ func startCmd() *cobra.Command {
 			log = logger.New()
 			spinnerMessage = &status.SpinnerMessage{}
 			spinnerMessage.New()
-			helmClient, err = helm.New(
-				log,
-				spinnerMessage,
-				helmConfiguration,
-				namespace,
-			)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
 			kubernetesClient = &k8s.Kubernetes{
 				Namespace: namespace,
 				Log:       log,
@@ -73,6 +66,24 @@ func startCmd() *cobra.Command {
 			if err = kubernetesClient.New(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+
+			if kubernetesClient.BackendType == types.KubernetesBackendLocal {
+				if os.Getuid() != 0 {
+					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))
+				}
+			}
+
+			helmClient, err = helm.New(
+				log,
+				spinnerMessage,
+				helmConfiguration,
+				namespace,
+			)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+			helmClient.KubernetesBackendType = kubernetesClient.BackendType
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -96,6 +107,14 @@ func startCmd() *cobra.Command {
 			// Install Rasa X
 			if !isDeployed && !isRasaXRunning {
 				spinnerMessage.Message("Deploying Rasa X")
+				if viper.GetString("project-path") != "" {
+					volume, err := kubernetesClient.CreateVolume(viper.GetString("project-path"))
+					if err != nil {
+						return errors.Errorf(errorPrint.Sprintf("%s", err))
+					}
+					helmClient.PVCName = volume
+				}
+
 				err = helmClient.Install()
 				if err != nil {
 					return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -114,6 +133,7 @@ func startCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+			log.V(1).Info("Get Rasa X URL", "url", url)
 
 			token, err := kubernetesClient.GetRasaXToken()
 			if err != nil {
@@ -130,7 +150,6 @@ func startCmd() *cobra.Command {
 			}
 			rasaX.New()
 			err = rasaX.WaitForRasaX()
-			utils.CheckNetworkError(err)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
@@ -155,6 +174,7 @@ func startCmd() *cobra.Command {
 		},
 	}
 
+	addStartUpgradeFlags(cmd)
 	addStartFlags(cmd)
 
 	return cmd

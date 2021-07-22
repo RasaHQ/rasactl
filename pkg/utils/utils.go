@@ -3,7 +3,10 @@ package utils
 import (
 	"net/url"
 
+	"github.com/imdario/mergo"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/txn2/txeh"
 )
 
 type NetworkError string
@@ -28,4 +31,28 @@ func CheckNetworkError(err error) (NetworkError, error) {
 		}
 	}
 	return "", err
+}
+
+func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
+
+	result := make(map[string]interface{})
+	for _, m := range maps {
+		mergo.Map(&result, m, mergo.WithOverride)
+	}
+	return result
+}
+
+func AddHostToEtcHosts(host, ip string) error {
+	hosts, err := txeh.NewHostsDefault()
+	if err != nil {
+		return err
+	}
+
+	hosts.AddHost(ip, host)
+
+	if err := hosts.Save(); err != nil {
+		return errors.Errorf("Can't add a host, try to run the command as administrator, error: %s", err)
+	}
+
+	return nil
 }

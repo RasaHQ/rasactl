@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,11 +16,12 @@ import (
 )
 
 type Kubernetes struct {
-	kubeconfig string
-	clientset  *kubernetes.Clientset
-	Namespace  string
-	Helm       HelmSpec
-	Log        logr.Logger
+	kubeconfig  string
+	clientset   *kubernetes.Clientset
+	Namespace   string
+	Helm        HelmSpec
+	Log         logr.Logger
+	BackendType types.KubernetesBackendType
 }
 
 type HelmSpec struct {
@@ -41,6 +43,12 @@ func (k *Kubernetes) New() error {
 	}
 	k.clientset = clientset
 
+	backendType, err := k.detectBackend()
+	if err != nil {
+		return err
+	}
+	k.BackendType = backendType
+
 	return nil
 }
 
@@ -54,7 +62,7 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	rasaXScheme := k.Helm.Values["rasax"].(map[string]interface{})["scheme"].(string)
 	url := "UNKNOWN"
 
-	if nginxServiceType == "LoadBalancer" && nginxIsEnabled {
+	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && k.BackendType != types.KubernetesBackendLocal {
 		serviceName := fmt.Sprintf("%s-nginx", k.Helm.ReleaseName)
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
@@ -128,7 +136,7 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 	return true, nil
 }
 
-/*func (k *Kubernetes) ScaleUp() error {
+/*func (k *Kubernetes) ScaleDown() error {
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err

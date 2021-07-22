@@ -18,18 +18,20 @@ import (
 )
 
 type Helm struct {
-	settings       *cli.EnvSettings
-	ActionConfig   *action.Configuration
-	Namespace      string
-	Repositories   []types.RepositorySpec
-	Configuration  types.ConfigurationSpec
-	spinnerMessage *status.SpinnerMessage
-	log            logr.Logger
-	driver         string
-	debugLog       func(format string, v ...interface{})
-	rasaXChartName string
-	kubeConfig     string
-	values         map[string]interface{}
+	settings              *cli.EnvSettings
+	ActionConfig          *action.Configuration
+	Namespace             string
+	PVCName               string
+	KubernetesBackendType types.KubernetesBackendType
+	Repositories          []types.RepositorySpec
+	Configuration         types.ConfigurationSpec
+	spinnerMessage        *status.SpinnerMessage
+	log                   logr.Logger
+	driver                string
+	debugLog              func(format string, v ...interface{})
+	rasaXChartName        string
+	kubeConfig            string
+	values                map[string]interface{}
 }
 
 func New(log logr.Logger, spinnerMessage *status.SpinnerMessage, configuration types.ConfigurationSpec, namespace string) (*Helm, error) {

@@ -22,6 +22,9 @@ func (h *Helm) ReadValuesFile() error {
 		if err != nil {
 			return err
 		}
+		h.log.V(1).Info("Read values from the file",
+			"file", file, "values", h.values,
+		)
 	}
 	return nil
 }
@@ -32,6 +35,10 @@ func (h *Helm) GetValues() (map[string]interface{}, error) {
 
 	values, err := client.Run(h.Configuration.ReleaseName)
 	if err != nil {
+		h.log.V(1).Error(err, "Getting all values",
+			"releaseName", h.Configuration.ReleaseName,
+			"namespace", h.Namespace,
+		)
 		return values, err
 	}
 	h.log.V(1).Info("Getting all values",

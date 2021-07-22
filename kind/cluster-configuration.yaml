@@ -1,0 +1,28 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+nodes:
+- role: control-plane
+  extraMounts:
+    - hostPath: /Users/tczekajlo/lab/rasa_projects
+      containerPath: /rasa_projects
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+- role: worker
+  extraMounts:
+    - hostPath: /Users/tczekajlo/lab/rasa_projects
+      containerPath: /rasa_projects
+- role: worker
+  extraMounts:
+    - hostPath: /Users/tczekajlo/lab/rasa_projects
+      containerPath: /rasa_projects
