@@ -28,8 +28,9 @@ func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) 
 
 	pvSpec := &apiv1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("rasaxctl-pv-%s", k.Namespace),
-			Annotations: map[string]string{
+			Name:      fmt.Sprintf("rasaxctl-pv-%s", k.Namespace),
+			Namespace: k.Namespace,
+			Labels: map[string]string{
 				"rasaxctl": "true",
 			},
 		},
@@ -62,8 +63,9 @@ func (k *Kubernetes) createPVC(pv *apiv1.PersistentVolume) (*apiv1.PersistentVol
 
 	pvcSpec := &apiv1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: fmt.Sprintf("rasaxctl-pvc-%s", k.Namespace),
-			Annotations: map[string]string{
+			Name:      fmt.Sprintf("rasaxctl-pvc-%s", k.Namespace),
+			Namespace: k.Namespace,
+			Labels: map[string]string{
 				"rasaxctl": "true",
 			},
 		},

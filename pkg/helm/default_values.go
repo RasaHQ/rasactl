@@ -37,3 +37,15 @@ func valuesSetupLocalIngress(host string) map[string]interface{} {
 
 	return values
 }
+
+func valuesSetRasaXPassword(password string) map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"initialUser": map[string]interface{}{
+				"password": password,
+			},
+		},
+	}
+
+	return values
+}

@@ -30,7 +30,7 @@ func (r *RasaX) WaitForDatabaseMigration() error {
 		if datadabaseStatus.Status != "completed" {
 			msg := "Waiting for database migration to be completed"
 			r.Log.Info(msg, "health", healthStatus)
-			r.SpinnerMessage.Message(fmt.Sprintf("%s...%f", msg, datadabaseStatus.ProgressInPercent))
+			r.SpinnerMessage.Message(fmt.Sprintf("%s...%.2f", msg, datadabaseStatus.ProgressInPercent))
 		} else {
 			msg := "Database migration is completed"
 			r.Log.Info(msg)

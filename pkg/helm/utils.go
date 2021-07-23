@@ -13,7 +13,7 @@ func (h *Helm) ReadValuesFile() error {
 	file := viper.GetString("values-file")
 
 	if file != "" {
-		h.log.V(1).Info("Reading the values file", "file", file)
+		h.Log.V(1).Info("Reading the values file", "file", file)
 		valuesFile, err := ioutil.ReadFile(file)
 		if err != nil {
 			return err
@@ -22,7 +22,7 @@ func (h *Helm) ReadValuesFile() error {
 		if err != nil {
 			return err
 		}
-		h.log.V(1).Info("Read values from the file",
+		h.Log.V(1).Info("Read values from the file",
 			"file", file, "values", h.values,
 		)
 	}
@@ -35,13 +35,13 @@ func (h *Helm) GetValues() (map[string]interface{}, error) {
 
 	values, err := client.Run(h.Configuration.ReleaseName)
 	if err != nil {
-		h.log.V(1).Error(err, "Getting all values",
+		h.Log.V(1).Error(err, "Getting all values",
 			"releaseName", h.Configuration.ReleaseName,
 			"namespace", h.Namespace,
 		)
 		return values, err
 	}
-	h.log.V(1).Info("Getting all values",
+	h.Log.V(1).Info("Getting all values",
 		"releaseName", h.Configuration.ReleaseName,
 		"namespace", h.Namespace,
 		"values", values,

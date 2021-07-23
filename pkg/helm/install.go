@@ -36,7 +36,7 @@ func (h *Helm) Install() error {
 	client.DryRun = false
 	client.Timeout = h.Configuration.Timeout
 
-	h.log.V(1).Info("Helm client settings", "settings", client)
+	h.Log.V(1).Info("Helm client settings", "settings", client)
 
 	helmChart, err := loader.Load(chartPath)
 	if err != nil {
@@ -49,23 +49,29 @@ func (h *Helm) Install() error {
 		}
 	}
 
-	// Add additional values
+	// Add additional values for local PVC
 	if viper.GetString("project-path") != "" {
 		h.values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.values)
-		h.log.V(1).Info("Merging values", "result", h.values)
+		h.Log.V(1).Info("Merging values", "result", h.values)
 	}
 
+	// Configure ingress to use local hostname if Kubernetes backend is on a local machine
 	if h.KubernetesBackendType == types.KubernetesBackendLocal {
 		host := fmt.Sprintf("%s.rasaxctl.local.io", h.Namespace)
 		ip := "127.0.0.1"
 		h.values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.values)
-		h.log.V(1).Info("Merging values", "result", h.values)
+		h.Log.V(1).Info("Merging values", "result", h.values)
 
+		// Add host to /etc/hosts - required sudo
 		if err := utils.AddHostToEtcHosts(host, ip); err != nil {
 			return err
 		}
-		h.log.V(1).Info("Added host", "host", host, "ip", ip)
+		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
 	}
+
+	// Set Rasa X password
+	h.values = utils.MergeMaps(valuesSetRasaXPassword(viper.GetString("rasa-x-password")), h.values)
+	h.Log.V(1).Info("Merging values", "result", h.values)
 
 	// install the chart
 	rel, err := client.Run(helmChart, h.values)
@@ -74,9 +80,9 @@ func (h *Helm) Install() error {
 	}
 
 	msg := fmt.Sprintf("Installation has beed finished, status: %s", rel.Info.Status)
-	h.log.Info(msg, "releaseName", client.ReleaseName, "namespace", client.Namespace)
-	h.log.V(1).Info(msg, "values", h.values)
-	h.spinnerMessage.Message(msg)
+	h.Log.Info(msg, "releaseName", client.ReleaseName, "namespace", client.Namespace)
+	h.Log.V(1).Info(msg, "values", h.values)
+	h.Spinner.Message(msg)
 
 	return nil
 }

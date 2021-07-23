@@ -8,7 +8,9 @@ type RepositorySpec struct {
 }
 
 type ConfigurationSpec struct {
-	Timeout     time.Duration
-	ReleaseName string
-	Version     string
+	Timeout      time.Duration
+	ReleaseName  string
+	Version      string
+	ReuseValues  bool
+	StartProject bool
 }

@@ -20,13 +20,21 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
+	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile           string
+	helmConfiguration *types.ConfigurationSpec = &types.ConfigurationSpec{}
+	errorPrint        *color.Color             = color.New(color.FgRed)
+	rasaXCTL          *rasaxctl.RasaXCTL
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

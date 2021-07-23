@@ -24,9 +24,9 @@ type Helm struct {
 	PVCName               string
 	KubernetesBackendType types.KubernetesBackendType
 	Repositories          []types.RepositorySpec
-	Configuration         types.ConfigurationSpec
-	spinnerMessage        *status.SpinnerMessage
-	log                   logr.Logger
+	Configuration         *types.ConfigurationSpec
+	Spinner               *status.SpinnerMessage
+	Log                   logr.Logger
 	driver                string
 	debugLog              func(format string, v ...interface{})
 	rasaXChartName        string
@@ -34,50 +34,45 @@ type Helm struct {
 	values                map[string]interface{}
 }
 
-func New(log logr.Logger, spinnerMessage *status.SpinnerMessage, configuration types.ConfigurationSpec, namespace string) (*Helm, error) {
+func (h *Helm) New() error {
 	var driverIsSet bool
 
-	helmClient := &Helm{}
-	helmClient.settings = cli.New()
-	helmClient.log = log
-	helmClient.spinnerMessage = spinnerMessage
-	helmClient.rasaXChartName = "rasa-x"
-	helmClient.kubeConfig = viper.GetString("kubeconfig")
-	helmClient.Namespace = namespace
-	helmClient.Configuration = configuration
+	h.settings = cli.New()
+	h.rasaXChartName = "rasa-x"
+	h.kubeConfig = viper.GetString("kubeconfig")
 
-	if err := helmClient.ReadValuesFile(); err != nil {
-		return helmClient, err
+	if err := h.ReadValuesFile(); err != nil {
+		return err
 	}
 
-	helmClient.Repositories = append(helmClient.Repositories, types.RepositorySpec{
+	h.Repositories = append(h.Repositories, types.RepositorySpec{
 		Name: "rasa-x",
 		URL:  "https://rasahq.github.io/rasa-x-helm",
 	})
 
-	helmClient.ActionConfig = new(action.Configuration)
+	h.ActionConfig = new(action.Configuration)
 
-	helmClient.driver, driverIsSet = os.LookupEnv("HELM_DRIVER")
+	h.driver, driverIsSet = os.LookupEnv("HELM_DRIVER")
 	if !driverIsSet {
-		helmClient.driver = "secrets"
+		h.driver = "secrets"
 	}
 
-	helmClient.debugLog = func(format string, v ...interface{}) {
-		log.Info(fmt.Sprintf(format, v...))
+	h.debugLog = func(format string, v ...interface{}) {
+		h.Log.Info(fmt.Sprintf(format, v...))
 	}
 
 	genericcliopts := &genericclioptions.ConfigFlags{
-		Namespace:  &helmClient.Namespace,
-		KubeConfig: &helmClient.kubeConfig,
+		Namespace:  &h.Namespace,
+		KubeConfig: &h.kubeConfig,
 	}
 
-	if err := helmClient.ActionConfig.Init(genericcliopts, helmClient.Namespace, helmClient.driver, helmClient.debugLog); err != nil {
-		return helmClient, err
+	if err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog); err != nil {
+		return err
 	}
 
-	log.Info("Initializing helm client")
+	h.Log.Info("Initializing helm client")
 
-	return helmClient, nil
+	return nil
 }
 
 func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {

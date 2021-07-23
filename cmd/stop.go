@@ -17,22 +17,19 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-func startCmd() *cobra.Command {
+func stopCmd() *cobra.Command {
 
-	// cmd represents the start command
+	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:          "start [PROJECT NAME]",
-		Short:        "Run Rasa X deployment",
-		Args:         cobra.MinimumNArgs(1),
-		SilenceUsage: true,
+		Use:   "stop [PROJECT NAME]",
+		Short: "Stop Rasa X deployment",
+		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]
 
@@ -42,13 +39,6 @@ func startCmd() *cobra.Command {
 			if err := rasaXCTL.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-
-			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
-				if os.Getuid() != 0 {
-					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))
-				}
-			}
-
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
@@ -56,18 +46,28 @@ func startCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isProjectExist {
+				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				return nil
+			}
+
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			if isRunning {
-				fmt.Printf("Rasa X for the %s project is running.\n", rasaXCTL.HelmClient.Namespace)
+			if !isRunning {
+				fmt.Printf("Rasa X for the %s project is not running.\n", rasaXCTL.Namespace)
 				return nil
 			}
 
-			if err := rasaXCTL.Start(); err != nil {
+			if err := rasaXCTL.Stop(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
@@ -75,14 +75,11 @@ func startCmd() *cobra.Command {
 		},
 	}
 
-	addStartUpgradeFlags(cmd)
-	addStartFlags(cmd)
-
 	return cmd
 }
 
 func init() {
 
-	startCmd := startCmd()
-	rootCmd.AddCommand(startCmd)
+	stopCmd := stopCmd()
+	rootCmd.AddCommand(stopCmd)
 }

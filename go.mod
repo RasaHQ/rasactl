@@ -11,6 +11,7 @@ require (
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/pkg/browser v0.0.0-20210706143420-7d21f8c997e2
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5 // indirect

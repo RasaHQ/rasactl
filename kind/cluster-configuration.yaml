@@ -18,11 +18,11 @@ nodes:
   - containerPort: 443
     hostPort: 443
     protocol: TCP
-- role: worker
-  extraMounts:
-    - hostPath: /Users/tczekajlo/lab/rasa_projects
-      containerPath: /rasa_projects
-- role: worker
-  extraMounts:
-    - hostPath: /Users/tczekajlo/lab/rasa_projects
-      containerPath: /rasa_projects
+#- role: worker
+#  extraMounts:
+#    - hostPath: /Users/tczekajlo/lab/rasa_projects
+#      containerPath: /rasa_projects
+#- role: worker
+#  extraMounts:
+#    - hostPath: /Users/tczekajlo/lab/rasa_projects
+#      containerPath: /rasa_projects

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"time"
 
@@ -29,12 +28,12 @@ func (r *RasaX) New() {
 			return http.ErrUseLastResponse
 		},
 		Timeout: time.Second * 120,
-		Transport: &http.Transport{
+		/*Transport: &http.Transport{
 			Dial: (&net.Dialer{
 				Timeout:   20 * time.Second,
 				KeepAlive: 20 * time.Second,
 			}).Dial,
-		},
+		},*/
 	}
 }
 

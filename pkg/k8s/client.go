@@ -7,6 +7,9 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
+	autoscalingv1 "k8s.io/api/autoscaling/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -48,6 +51,8 @@ func (k *Kubernetes) New() error {
 		return err
 	}
 	k.BackendType = backendType
+
+	k.Log.Info("Initializing Kubernetes client")
 
 	return nil
 }
@@ -114,6 +119,8 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 
 	for _, deployment := range deployments.Items {
 		if deployment.Status.Replicas == 0 || deployment.Status.ReadyReplicas == 0 {
+			k.Log.V(1).Info("Deployment has replica number set to 0",
+				"statefulset", deployment.Name, "replicas", deployment.Status.Replicas, "readyReplicas", deployment.Status.ReadyReplicas)
 			return false, nil
 		}
 	}
@@ -129,6 +136,8 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 
 	for _, statefulset := range statefulsets.Items {
 		if statefulset.Status.Replicas == 0 || statefulset.Status.ReadyReplicas == 0 {
+			k.Log.V(1).Info("Statefulset has replica number set to 0",
+				"statefulset", statefulset.Name, "replicas", statefulset.Status.Replicas, "readyReplicas", statefulset.Status.ReadyReplicas)
 			return false, nil
 		}
 	}
@@ -136,15 +145,71 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 	return true, nil
 }
 
-/*func (k *Kubernetes) ScaleDown() error {
+func (k *Kubernetes) CreateNamespace() error {
+	namespace := &v1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: k.Namespace,
+			Labels: map[string]string{
+				"rasaxctl": "true",
+			},
+		},
+	}
+	_, err := k.clientset.CoreV1().Namespaces().Create(context.TODO(), namespace, metav1.CreateOptions{})
+	switch t := err.(type) {
+	case *errors.StatusError:
+		if t.ErrStatus.Code == 409 {
+			k.Log.V(1).Info("Namespace already exists", "namespace", k.Namespace)
+			return nil
+		}
+		return err
+	}
+
+	k.Log.V(1).Info("Create namespace", "namespace", k.Namespace)
+	return nil
+}
+
+func (k *Kubernetes) ScaleDown() error {
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return err
 	}
 
 	for _, deployment := range deployments.Items {
-		deployment.GetScale
+		var err error
+		var scale *autoscalingv1.Scale
+
+		k.Log.V(1).Info("Scaling down", "deployment", deployment.Name)
+		scale, err = k.clientset.AppsV1().Deployments(k.Namespace).GetScale(context.TODO(), deployment.Name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		scale.Spec.Replicas = 0
+		_, err = k.clientset.AppsV1().Deployments(k.Namespace).UpdateScale(context.TODO(), deployment.Name, scale, metav1.UpdateOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, statefulsets := range statefulsets.Items {
+		var err error
+		var scale *autoscalingv1.Scale
+
+		k.Log.V(1).Info("Scaling down", "statefulsets", statefulsets.Name)
+		scale, err = k.clientset.AppsV1().StatefulSets(k.Namespace).GetScale(context.TODO(), statefulsets.Name, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+		scale.Spec.Replicas = 0
+		_, err = k.clientset.AppsV1().StatefulSets(k.Namespace).UpdateScale(context.TODO(), statefulsets.Name, scale, metav1.UpdateOptions{})
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
-}*/
+}

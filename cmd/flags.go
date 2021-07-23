@@ -8,7 +8,7 @@ import (
 )
 
 func addStartUpgradeFlags(cmd *cobra.Command) {
-	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*5, "time to wait for Rasa X to be ready")
+	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*10, "time to wait for Rasa X to be ready")
 	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
 
@@ -18,7 +18,9 @@ func addStartUpgradeFlags(cmd *cobra.Command) {
 }
 
 func addStartFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().String("project-path", "", "absolute path to the project directory")
+	cmd.PersistentFlags().String("project-path", "", "absolute path to the project directory directory mounted in kind")
+	cmd.PersistentFlags().String("rasa-x-password", "rasaxlocal", "Rasa X password")
 
 	viper.BindPFlag("project-path", cmd.PersistentFlags().Lookup("project-path"))
+	viper.BindPFlag("rasa-x-password", cmd.PersistentFlags().Lookup("rasa-x-password"))
 }
