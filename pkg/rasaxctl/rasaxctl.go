@@ -3,6 +3,7 @@ package rasaxctl
 import (
 	"fmt"
 
+	"github.com/RasaHQ/rasaxctl/pkg/docker"
 	"github.com/RasaHQ/rasaxctl/pkg/helm"
 	"github.com/RasaHQ/rasaxctl/pkg/k8s"
 	"github.com/RasaHQ/rasaxctl/pkg/logger"
@@ -17,6 +18,7 @@ type RasaXCTL struct {
 	KubernetesClient *k8s.Kubernetes
 	HelmClient       *helm.Helm
 	RasaXClient      *rasax.RasaX
+	DockerClient     *docker.Docker
 	Log              logr.Logger
 	Spinner          *status.SpinnerMessage
 	Namespace        string
@@ -46,6 +48,13 @@ func (r *RasaXCTL) InitClients() error {
 		return err
 	}
 	r.HelmClient.KubernetesBackendType = r.KubernetesClient.BackendType
+
+	r.DockerClient = &docker.Docker{
+		Namespace: r.Namespace,
+	}
+	if err := r.DockerClient.New(); err != nil {
+		return err
+	}
 
 	return nil
 }

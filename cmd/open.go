@@ -47,6 +47,11 @@ func openCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			err := rasaXCTL.CreateAndJoinKindNode()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
 			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
