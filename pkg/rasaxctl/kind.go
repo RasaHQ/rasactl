@@ -2,8 +2,6 @@ package rasaxctl
 
 import (
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 func (r *RasaXCTL) CreateAndJoinKindNode() error {
@@ -21,10 +19,11 @@ func (r *RasaXCTL) GetKindControlPlaneNodeInfo() error {
 	}
 
 	if node.Name == "" {
-		return errors.Errorf("Can't find kind control plane. Are you sure that the current Kubernetes context is kind?")
+		r.Log.Info("Can't find kind control plane. Are you sure that the current Kubernetes context is kind?")
 	}
 
 	r.DockerClient.Kind.ControlPlaneHost = node.Name
 	r.DockerClient.Kind.Version = node.Status.NodeInfo.KubeletVersion
+
 	return nil
 }

@@ -60,6 +60,10 @@ func (r *RasaXCTL) InitClients() error {
 		return err
 	}
 
+	if err := r.GetKindControlPlaneNodeInfo(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -132,7 +136,7 @@ func (r *RasaXCTL) Stop() error {
 		return err
 	}
 
-	if err := r.GetKindControlPlaneNodeInfo(); err == nil && string(state["project-path"]) != "" {
+	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state["project-path"]) != "" {
 		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
 			return err
@@ -144,11 +148,11 @@ func (r *RasaXCTL) Stop() error {
 }
 
 func (r *RasaXCTL) startOrInstall() error {
+	projectPath := viper.GetString("project-path")
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
-		projectPath := viper.GetString("project-path")
 		if projectPath != "" {
-			if err := r.GetKindControlPlaneNodeInfo(); err == nil {
+			if r.DockerClient.Kind.ControlPlaneHost != "" {
 
 				// check if the project path exists
 
@@ -190,11 +194,12 @@ func (r *RasaXCTL) startOrInstall() error {
 		msg := "Starting Rasa X"
 		r.Spinner.Message(msg)
 		r.Log.Info(msg)
-
-		if err := r.GetKindControlPlaneNodeInfo(); err == nil {
-			nodeName := fmt.Sprintf("kind-%s", r.Namespace)
-			if err := r.DockerClient.StartKindNode(nodeName); err != nil {
-				return err
+		if projectPath != "" {
+			if r.DockerClient.Kind.ControlPlaneHost != "" {
+				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+				if err := r.DockerClient.StartKindNode(nodeName); err != nil {
+					return err
+				}
 			}
 		}
 		// Set configuration used for starting a stopped project.
