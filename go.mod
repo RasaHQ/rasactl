@@ -7,7 +7,7 @@ require (
 	github.com/briandowns/spinner v1.16.0
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200618181300-9dc6525e6118+incompatible
 	github.com/fatih/color v1.12.0
-	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
 	github.com/imdario/mergo v0.3.12
 	github.com/kyokomi/emoji v2.2.4+incompatible
@@ -18,7 +18,6 @@ require (
 	github.com/spf13/viper v1.8.1
 	github.com/txn2/txeh v1.3.0
 	go.uber.org/zap v1.17.0
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	helm.sh/helm/v3 v3.6.3
 	k8s.io/api v0.21.3
 	k8s.io/apimachinery v0.21.3

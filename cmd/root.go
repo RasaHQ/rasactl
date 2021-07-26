@@ -31,8 +31,8 @@ import (
 
 var (
 	cfgFile           string
-	helmConfiguration *types.ConfigurationSpec = &types.ConfigurationSpec{}
-	errorPrint        *color.Color             = color.New(color.FgRed)
+	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
+	errorPrint        *color.Color                 = color.New(color.FgRed)
 	rasaXCTL          *rasaxctl.RasaXCTL
 )
 

@@ -19,18 +19,18 @@ import (
 	"fmt"
 
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
-	"github.com/pkg/browser"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-func openCmd() *cobra.Command {
+func upgradeCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the upgrade command
 	cmd := &cobra.Command{
-		Use:   "open [PROJECT NAME]",
-		Short: "Open Rasa X in a web browser",
-		Args:  cobra.MinimumNArgs(1),
+		Use:          "upgrade [PROJECT NAME]",
+		Short:        "Upgrade/update Rasa X deployment",
+		Args:         cobra.MinimumNArgs(1),
+		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]
 
@@ -40,13 +40,13 @@ func openCmd() *cobra.Command {
 			if err := rasaXCTL.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -68,30 +68,22 @@ func openCmd() *cobra.Command {
 				return nil
 			}
 
-			if err := rasaXCTL.GetAllHelmValues(); err != nil {
+			if err := rasaXCTL.Upgrade(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-
-			url, err := rasaXCTL.GetRasaXURL()
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if err := browser.OpenURL(url); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("Can't open the URL %s in your web browser: %s", url, err))
-			}
-
-			fmt.Printf("The URL %s has been opened in your web browser\n", url)
 
 			return nil
 		},
 	}
+
+	addStartUpgradeFlags(cmd)
+	addUpgradeFlags(cmd)
 
 	return cmd
 }
 
 func init() {
 
-	openCmd := openCmd()
-	rootCmd.AddCommand(openCmd)
+	upgradeCmd := upgradeCmd()
+	rootCmd.AddCommand(upgradeCmd)
 }

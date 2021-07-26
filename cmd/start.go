@@ -55,7 +55,6 @@ func startCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {

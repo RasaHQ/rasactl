@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -9,25 +10,38 @@ import (
 	"strings"
 	"time"
 
+	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/ghodss/yaml"
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha4"
 )
 
 type Docker struct {
-	Client    *client.Client
-	ctx       context.Context
-	Namespace string
+	Client       *client.Client
+	ctx          context.Context
+	Namespace    string
+	Log          logr.Logger
+	Spinner      *status.SpinnerMessage
+	ProjectPath  string
+	kubeadmToken string
+	Kind         KindSpec
+}
+
+type KindSpec struct {
+	ControlPlaneHost string
+	Version          string
 }
 
 const (
-	kindImage   string = "kindest/node:v1.20.2"
-	kindNetwork string = "kind"
+	kindImagePrefix string = "kindest/node:"
 )
 
 func (d *Docker) New() error {
@@ -37,6 +51,9 @@ func (d *Docker) New() error {
 		return err
 	}
 	d.Client = cli
+
+	d.Log.Info("Initializing Docker client")
+
 	return nil
 }
 
@@ -46,6 +63,7 @@ func (d *Docker) prepareKindJoinConfiguration() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	d.kubeadmToken = token
 
 	file := fmt.Sprintf("/tmp/rasaxctl-kind-joinconfig-%s.yaml", d.Namespace)
 
@@ -57,19 +75,22 @@ func (d *Docker) prepareKindJoinConfiguration() (string, error) {
 		Discovery: bootstrapv1.Discovery{
 			BootstrapToken: &bootstrapv1.BootstrapTokenDiscovery{
 				Token:                    token,
-				APIServerEndpoint:        "kind-control-plane:6443",
+				APIServerEndpoint:        fmt.Sprintf("%s:6443", d.Kind.ControlPlaneHost),
 				UnsafeSkipCAVerification: true,
 			},
-			Timeout:           &metav1.Duration{time.Minute * 5},
+			Timeout:           &metav1.Duration{Duration: time.Minute * 5},
 			TLSBootstrapToken: token,
 		},
 		NodeRegistration: bootstrapv1.NodeRegistrationOptions{
-			CRISocket:        "unix:///run/containerd/containerd.sock",
-			KubeletExtraArgs: map[string]string{"fail-swap-on": "false"},
-			Name:             fmt.Sprintf("kind-%s", d.Namespace),
+			CRISocket: "unix:///run/containerd/containerd.sock",
+			KubeletExtraArgs: map[string]string{
+				"fail-swap-on": "false",
+				"node-labels":  fmt.Sprintf("rasaxctl-project=%s", d.Namespace),
+			},
+			Name: fmt.Sprintf("kind-%s", d.Namespace),
 			Taints: []v1.Taint{{
-				Key:    "rasaxctl-project",
-				Value:  d.Namespace,
+				Key:    "rasaxctl",
+				Value:  "true",
 				Effect: v1.TaintEffectNoSchedule,
 			}},
 		},
@@ -82,6 +103,9 @@ func (d *Docker) prepareKindJoinConfiguration() (string, error) {
 	if err := ioutil.WriteFile(file, config, 0644); err != nil {
 		return "", nil
 	}
+
+	d.Log.V(1).Info("Creating a kubeadm join configuration", "configuration", joinConfiguration)
+
 	return file, nil
 }
 
@@ -117,13 +141,13 @@ func (d *Docker) copyJoinConfigurationToContainer(container container.ContainerC
 
 	os.Remove(joinConfig)
 
+	d.Log.Info("Copying join configuration to a kind container", "container", container.ID)
 	return nil
 }
 
 func (d *Docker) getKubeadmToken() (string, error) {
-	container := "kind-control-plane"
 	token := new(bytes.Buffer)
-	execSpec, err := d.Client.ContainerExecCreate(d.ctx, container, types.ExecConfig{
+	execSpec, err := d.Client.ContainerExecCreate(d.ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
 		WorkingDir:   "/",
 		Cmd:          []string{"kubeadm", "token", "create", "--ttl", "180s"},
 		AttachStdout: true,
@@ -141,15 +165,17 @@ func (d *Docker) getKubeadmToken() (string, error) {
 
 	r := strings.TrimSuffix(string(bytes.Trim(token.Bytes(), "\x01\x00\x00\x00\x00\x00\x00\x18")), "\n")
 
+	d.Log.Info("Getting join token", "token", r)
+
 	return r, nil
 }
 
-func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCreateCreatedBody) error {
-	execSpec, err := d.Client.ContainerExecCreate(d.ctx, container.ID, types.ExecConfig{
-		WorkingDir: "/",
-		Cmd:        []string{"kubeadm", "join", "--config", "config.yaml", "--skip-phases=preflight", "-v", "6"},
-		//AttachStdout: true,
-		//AttachStderr: true,
+func (d *Docker) deleteKubeadmToken() error {
+	execSpec, err := d.Client.ContainerExecCreate(d.ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
+		WorkingDir:   "/",
+		Cmd:          []string{"kubeadm", "token", "delete", d.kubeadmToken},
+		AttachStdout: true,
+		AttachStderr: true,
 	})
 	if err != nil {
 		return err
@@ -158,12 +184,48 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 		return err
 	}
 
+	d.Log.Info("Removing kubeadm join token", "token", d.kubeadmToken)
+
+	return nil
+}
+
+func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCreateCreatedBody) error {
+	execSpec, err := d.Client.ContainerExecCreate(d.ctx, container.ID, types.ExecConfig{
+		WorkingDir:   "/",
+		Cmd:          []string{"kubeadm", "join", "--config", "config.yaml", "--skip-phases=preflight", "-v", "6"},
+		AttachStdout: true,
+		AttachStderr: true,
+	})
+	if err != nil {
+		return err
+	}
+	cmdReader, err := d.Client.ContainerExecAttach(d.ctx, execSpec.ID, types.ExecStartCheck{})
+	if err != nil {
+		return err
+	}
+
+	cmdLogs := bufio.NewReader(cmdReader.Reader)
+	for {
+		line, _, err := cmdLogs.ReadLine()
+		if len(line) > 0 {
+			d.Log.V(1).Info("Joining a kind node to the cluster", "details", string(line))
+		}
+		if err != nil {
+			break
+		}
+	}
+	cmdReader.Close()
+
+	d.Spinner.Message("Waiting for kind node to join to the cluster")
 	for {
 		status, err := d.Client.ContainerExecInspect(d.ctx, execSpec.ID)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(status.ExitCode, status.Running)
+		d.Log.Info("Waiting for kind node to join to the cluster", "container", container.ID, "running", status.Running, "exitCode", status.ExitCode)
+		if status.ExitCode != 0 {
+			return errors.Errorf("Can't join kind node to the cluster")
+		}
 		if !status.Running {
 			break
 		}
@@ -173,8 +235,62 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 	return nil
 }
 
+func (d *Docker) getKindNetwork() (string, error) {
+
+	inspect, err := d.Client.ContainerInspect(d.ctx, d.Kind.ControlPlaneHost)
+	if err != nil {
+		return "", err
+	}
+
+	return inspect.HostConfig.NetworkMode.NetworkName(), nil
+}
+
 func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreatedBody, error) {
-	d.Client.ImagePull(d.ctx, kindImage, types.ImagePullOptions{})
+	kindImage := fmt.Sprintf("%s%s", kindImagePrefix, d.Kind.Version)
+
+	d.Log.Info("Pulling image", "image", kindImage)
+	imagePull, err := d.Client.ImagePull(d.ctx, kindImage, types.ImagePullOptions{})
+	if err != nil {
+		return container.ContainerCreateCreatedBody{}, err
+	}
+
+	imagePullLogs := bufio.NewReader(imagePull)
+	for {
+		line, _, err := imagePullLogs.ReadLine()
+		if len(line) > 0 {
+			d.Log.V(1).Info("Pulling image", "details", string(line))
+		}
+		if err != nil {
+			break
+		}
+	}
+	imagePull.Close()
+
+	d.Log.Info("Creating a kind node", "node", hostname, "image", kindImage)
+
+	hostConfig := &container.HostConfig{
+		Privileged:  true,
+		SecurityOpt: []string{"apparmor=unconfined", "seccomp=unconfined"},
+		Tmpfs:       map[string]string{"/run": "", "/tmp": ""},
+	}
+
+	hostConfig.Mounts = []mount.Mount{
+		{
+			Source:   "/lib/modules",
+			Target:   "/lib/modules",
+			Type:     mount.TypeBind,
+			ReadOnly: true,
+		},
+	}
+
+	if d.ProjectPath != "" {
+		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
+			Source: d.ProjectPath,
+			Target: d.ProjectPath,
+			Type:   mount.TypeBind,
+		})
+
+	}
 
 	resp, err := d.Client.ContainerCreate(d.ctx,
 		&container.Config{
@@ -182,16 +298,23 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 			Tty:      false,
 			Hostname: hostname,
 			Volumes:  map[string]struct{}{"/var": {}},
+			Env:      []string{"container=docker"},
 		},
-		&container.HostConfig{
-			Privileged:  true,
-			SecurityOpt: []string{"apparmor=unconfined", "seccomp=unconfined"},
-			Tmpfs:       map[string]string{"/run": "", "/tmp": ""},
-		}, nil, hostname)
+		hostConfig, nil, hostname)
 	if err != nil {
 		return resp, err
 	}
+
+	kindNetwork, err := d.getKindNetwork()
+	if err != nil {
+		return resp, err
+	}
+
 	if err := d.Client.NetworkConnect(d.ctx, kindNetwork, resp.ID, nil); err != nil {
+		return resp, err
+	}
+
+	if err := d.Client.NetworkDisconnect(d.ctx, "bridge", resp.ID, true); err != nil {
 		return resp, err
 	}
 
@@ -200,12 +323,30 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 	}
 
 	if err := d.copyJoinConfigurationToContainer(resp); err != nil {
-		return resp, nil
+		return resp, err
 	}
 
 	if err := d.joinKindNodeToKubernetesCluster(resp); err != nil {
-		return resp, nil
+		return resp, err
 	}
 
+	if err := d.deleteKubeadmToken(); err != nil {
+		return resp, err
+	}
 	return resp, nil
+}
+
+func (d *Docker) StopKindNode(hostname string) error {
+	timeout := time.Minute * 1
+	if err := d.Client.ContainerStop(d.ctx, hostname, &timeout); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *Docker) StartKindNode(hostname string) error {
+	if err := d.Client.ContainerStart(d.ctx, hostname, types.ContainerStartOptions{}); err != nil {
+		return err
+	}
+	return nil
 }

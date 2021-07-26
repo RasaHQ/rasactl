@@ -24,7 +24,7 @@ type Helm struct {
 	PVCName               string
 	KubernetesBackendType types.KubernetesBackendType
 	Repositories          []types.RepositorySpec
-	Configuration         *types.ConfigurationSpec
+	Configuration         *types.HelmConfigurationSpec
 	Spinner               *status.SpinnerMessage
 	Log                   logr.Logger
 	driver                string

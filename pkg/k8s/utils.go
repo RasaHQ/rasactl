@@ -6,6 +6,7 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -44,4 +45,18 @@ func (k *Kubernetes) IsNamespaceExist(namespace string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (k *Kubernetes) GetKindControlPlaneNode() (v1.Node, error) {
+
+	nodes, err := k.clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{LabelSelector: "node-role.kubernetes.io/control-plane="})
+	if err != nil {
+		return v1.Node{}, err
+	}
+
+	for _, node := range nodes.Items {
+		return node, nil
+	}
+
+	return v1.Node{}, nil
 }

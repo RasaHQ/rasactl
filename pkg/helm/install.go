@@ -52,6 +52,8 @@ func (h *Helm) Install() error {
 	// Add additional values for local PVC
 	if viper.GetString("project-path") != "" {
 		h.values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.values)
+		h.values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.values)
+		h.values = utils.MergeMaps(valuesDisableRasaProduction(), h.values)
 		h.Log.V(1).Info("Merging values", "result", h.values)
 	}
 

@@ -7,10 +7,11 @@ type RepositorySpec struct {
 	URL  string
 }
 
-type ConfigurationSpec struct {
+type HelmConfigurationSpec struct {
 	Timeout      time.Duration
 	ReleaseName  string
 	Version      string
 	ReuseValues  bool
 	StartProject bool
+	Atomic       bool
 }

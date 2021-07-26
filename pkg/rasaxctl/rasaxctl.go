@@ -2,6 +2,7 @@ package rasaxctl
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/RasaHQ/rasaxctl/pkg/docker"
 	"github.com/RasaHQ/rasaxctl/pkg/helm"
@@ -11,6 +12,7 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
 
@@ -51,6 +53,8 @@ func (r *RasaXCTL) InitClients() error {
 
 	r.DockerClient = &docker.Docker{
 		Namespace: r.Namespace,
+		Log:       r.Log,
+		Spinner:   r.Spinner,
 	}
 	if err := r.DockerClient.New(); err != nil {
 		return err
@@ -122,6 +126,12 @@ func (r *RasaXCTL) Stop() error {
 	if err := r.KubernetesClient.ScaleDown(); err != nil {
 		return err
 	}
+	if err := r.GetKindControlPlaneNodeInfo(); err == nil {
+		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
+			return err
+		}
+	}
 	r.Spinner.Message(fmt.Sprintf("Rasa X for the %s project has been stopped", r.Namespace))
 	r.Spinner.Stop()
 	return nil
@@ -130,17 +140,38 @@ func (r *RasaXCTL) Stop() error {
 func (r *RasaXCTL) startOrInstall() error {
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
-		r.Spinner.Message("Deploying Rasa X")
-		if viper.GetString("project-path") != "" {
-			volume, err := r.KubernetesClient.CreateVolume(viper.GetString("project-path"))
-			if err != nil {
-				return err
+		projectPath := viper.GetString("project-path")
+		if projectPath != "" {
+			if err := r.GetKindControlPlaneNodeInfo(); err == nil {
+
+				// check if the project path exists
+
+				if path, err := os.Stat(projectPath); err != nil {
+					if os.IsNotExist(err) {
+						return err
+					} else if !path.IsDir() {
+						return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
+					}
+					return err
+				}
+				r.DockerClient.ProjectPath = projectPath
+
+				r.Spinner.Message("Creating and joining a kind node")
+				if err := r.CreateAndJoinKindNode(); err != nil {
+					return err
+				}
+				volume, err := r.KubernetesClient.CreateVolume(projectPath)
+				if err != nil {
+					return err
+				}
+				r.HelmClient.PVCName = volume
+			} else {
+				return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
 			}
-			r.HelmClient.PVCName = volume
 		}
 
-		err := r.HelmClient.Install()
-		if err != nil {
+		r.Spinner.Message("Deploying Rasa X")
+		if err := r.HelmClient.Install(); err != nil {
 			return err
 		}
 	} else if !r.isRasaXRunning {
@@ -149,11 +180,21 @@ func (r *RasaXCTL) startOrInstall() error {
 		r.Spinner.Message(msg)
 		r.Log.Info(msg)
 
+		if err := r.GetKindControlPlaneNodeInfo(); err == nil {
+			nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+			if err := r.DockerClient.StartKindNode(nodeName); err != nil {
+				return err
+			}
+		}
 		// Set configuration used for starting a stopped project.
 		r.HelmClient.Configuration.StartProject = true
 
 		err := r.HelmClient.Upgrade()
 		if err != nil {
+			return err
+		}
+
+		if err := r.KubernetesClient.ScaleUp(); err != nil {
 			return err
 		}
 	}
@@ -218,5 +259,24 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 		// Print the status box only if it's a new Rasa X deployment
 		status.PrintRasaXStatus(rasaXVersion, r.RasaXClient.URL)
 	}
+	return nil
+}
+
+func (r *RasaXCTL) Upgrade() error {
+
+	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {
+		return err
+	}
+
+	// Init Rasa X client
+	r.initRasaXClient()
+
+	r.Spinner.Message("Upgrading Rasa X")
+	if err := r.HelmClient.Upgrade(); err != nil {
+		return err
+	}
+
+	r.Spinner.Message("Ready!")
+	r.Spinner.Stop()
 	return nil
 }

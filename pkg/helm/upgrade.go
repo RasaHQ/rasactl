@@ -29,8 +29,9 @@ func (h *Helm) Upgrade() error {
 	client.Namespace = h.Namespace
 	client.Description = "rasaxctl"
 	client.Wait = true
-	client.DryRun = false
 	client.Timeout = h.Configuration.Timeout
+	client.Atomic = h.Configuration.Atomic
+	client.ReuseValues = h.Configuration.ReuseValues
 
 	if h.Configuration.StartProject {
 		client.ReuseValues = true
@@ -59,7 +60,7 @@ func (h *Helm) Upgrade() error {
 	if h.Configuration.StartProject {
 		msg = fmt.Sprintf("Upgrade has beed finished, status: %s", rel.Info.Status)
 	} else {
-		msg = fmt.Sprintf("Rasa X for the %s project has been started", h.Namespace)
+		msg = fmt.Sprintf("Rasa X for the %s project is ready", h.Namespace)
 	}
 	h.Log.Info(msg, "releaseName", rel.Name, "namespace", client.Namespace)
 	h.Log.V(1).Info(msg, "values", h.values)

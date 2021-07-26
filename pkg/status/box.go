@@ -2,6 +2,7 @@ package status
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/Delta456/box-cli-maker/v2"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
@@ -32,10 +33,17 @@ func RedBox(tittle string, msg string) {
 func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 
+		msg := []string{fmt.Sprintf("URL: %s", url)}
+
+		if version.Rasa.Production != "0.0.0" {
+			msg = append(msg, fmt.Sprintf("Rasa production version: %s", version.Rasa.Production))
+		}
+
+		msg = append(msg, fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s", version.Rasa.Worker, version.RasaX, viper.GetString("rasa-x-password")))
+
 		GreenBox(
 			"Rasa X",
-			fmt.Sprintf("URL: %s\nRasa production version: %s\nRasa worker version: %s\nRasa X version: %s\nRasa X password: %s",
-				url, version.Rasa.Production, version.Rasa.Worker, version.RasaX, viper.GetString("rasa-x-password")),
+			strings.Join(msg, "\n"),
 		)
 	}
 }

@@ -24,3 +24,8 @@ func addStartFlags(cmd *cobra.Command) {
 	viper.BindPFlag("project-path", cmd.PersistentFlags().Lookup("project-path"))
 	viper.BindPFlag("rasa-x-password", cmd.PersistentFlags().Lookup("rasa-x-password"))
 }
+
+func addUpgradeFlags(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&helmConfiguration.Atomic, "atomic", false, "if set, upgrade process rolls back changes made in case of failed upgrade")
+	cmd.Flags().BoolVar(&helmConfiguration.ReuseValues, "reuse-values", true, "when upgrading, reuse the last release's values and merge in any overrides")
+}

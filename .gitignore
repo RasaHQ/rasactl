@@ -5,6 +5,7 @@
 *.so
 *.dylib
 rasaxctl
+rasaxctl_*
 !pkg/rasaxctl
 
 # Test binary, built with `go test -c`
