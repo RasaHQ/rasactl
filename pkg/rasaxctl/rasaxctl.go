@@ -126,7 +126,13 @@ func (r *RasaXCTL) Stop() error {
 	if err := r.KubernetesClient.ScaleDown(); err != nil {
 		return err
 	}
-	if err := r.GetKindControlPlaneNodeInfo(); err == nil {
+
+	state, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+
+	if err := r.GetKindControlPlaneNodeInfo(); err == nil && string(state["project-path"]) != "" {
 		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
 			return err
@@ -165,9 +171,14 @@ func (r *RasaXCTL) startOrInstall() error {
 					return err
 				}
 				r.HelmClient.PVCName = volume
+
 			} else {
 				return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
 			}
+		}
+
+		if err := r.KubernetesClient.SaveSecretWithState(); err != nil {
+			return err
 		}
 
 		r.Spinner.Message("Deploying Rasa X")
