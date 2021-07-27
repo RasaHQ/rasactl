@@ -69,16 +69,17 @@ func (r *RasaX) WaitForRasaXWorker() error {
 }
 
 func (r *RasaX) WaitForRasaX() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*120)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*360)
 	defer cancel()
 
 	ticker := time.NewTicker(time.Second * 5)
 	ready := make(chan bool)
 	var returnErr error
 	var wg sync.WaitGroup
-	wg.Add(1)
 
-	go func() {
+	wg.Add(1)
+	go func(ctx context.Context) {
+		defer wg.Done()
 		for {
 			select {
 			case <-ticker.C:
@@ -99,7 +100,6 @@ func (r *RasaX) WaitForRasaX() error {
 
 				if networkErrorWaitForRasaXWorker != utils.NetworkErrorConnectionRefused && networkErrorerrWaitForDatabaseMigration != utils.NetworkErrorConnectionRefused && returnErr == nil {
 					ready <- true
-					return
 				} else {
 					msg := "Waiting for the Rasa X health endpoint to be reachable"
 					r.Log.Info(msg)
@@ -111,9 +111,8 @@ func (r *RasaX) WaitForRasaX() error {
 				return
 			}
 		}
-	}()
+	}(ctx)
 	<-ready
-	close(ready)
 	wg.Wait()
 
 	r.Log.Info("Rasa X is healthy")
