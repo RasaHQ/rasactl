@@ -69,6 +69,8 @@ func (h *Helm) Install() error {
 			return err
 		}
 		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
+	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider != types.CloudProviderUnknown {
+		h.values = utils.MergeMaps(valuesNginxNodePort(), h.values)
 	}
 
 	// Set Rasa X password

@@ -57,6 +57,19 @@ func valuesDisableNginx() map[string]interface{} {
 	return values
 }
 
+func valuesNginxNodePort() map[string]interface{} {
+
+	values := map[string]interface{}{
+		"nginx": map[string]interface{}{
+			"service": map[string]interface{}{
+				"type": "NodePort",
+			},
+		},
+	}
+
+	return values
+}
+
 func valuesSetupLocalIngress(host string) map[string]interface{} {
 	values := map[string]interface{}{
 		"ingress": map[string]interface{}{

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
@@ -66,11 +67,12 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	ingressIsEnabled := ingressValues.(map[string]interface{})["enabled"].(bool)
 	nginxServiceType := nginxValues.(map[string]interface{})["service"].(map[string]interface{})["type"].(string)
 	rasaXScheme := k.Helm.Values["rasax"].(map[string]interface{})["scheme"].(string)
+	serviceName := fmt.Sprintf("%s-nginx", k.Helm.ReleaseName)
 
 	url := "UNKNOWN"
 
 	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider != types.CloudProviderUnknown) {
-		serviceName := fmt.Sprintf("%s-nginx", k.Helm.ReleaseName)
+
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
 			return url, err
@@ -81,6 +83,18 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ipAddress, port)
 
 		return url, nil
+	} else if nginxServiceType == "NodePort" && nginxIsEnabled && k.BackendType == types.KubernetesBackendLocal && k.CloudProvider != types.CloudProviderUnknown {
+		provider := cloud.Provider{}
+		provider.New()
+
+		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
+		if err != nil {
+			return url, err
+		}
+		ipAddress := provider.ExternalIP
+		port := service.Spec.Ports[0].NodePort
+
+		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ipAddress, port)
 	} else if ingressIsEnabled {
 		ingress, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).Get(context.TODO(), k.Helm.ReleaseName, metav1.GetOptions{})
 		if err != nil {

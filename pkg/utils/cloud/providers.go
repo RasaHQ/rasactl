@@ -7,12 +7,12 @@ import (
 )
 
 type Provider struct {
-	Name types.CloudProvider
-	Log  logr.Logger
+	Name       types.CloudProvider
+	Log        logr.Logger
+	ExternalIP string
 }
 
 func (p *Provider) New() types.CloudProvider {
-
 	provider := p.detect(
 		providers.Google(),
 		providers.Amazon(),
@@ -23,7 +23,15 @@ func (p *Provider) New() types.CloudProvider {
 	)
 
 	p.Name = provider
-	p.Log.Info("Detecting cloud provider", "provider", string(provider))
+
+	switch provider {
+	case types.CloudProviderGoogle:
+		p.ExternalIP = providers.GoogleGetExternalIP()
+	default:
+		p.ExternalIP = "0.0.0.0"
+	}
+
+	p.Log.Info("Detecting cloud provider", "provider", string(provider), "externalIP", p.ExternalIP)
 
 	return provider
 }
