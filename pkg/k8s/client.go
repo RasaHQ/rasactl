@@ -19,12 +19,13 @@ import (
 )
 
 type Kubernetes struct {
-	kubeconfig  string
-	clientset   *kubernetes.Clientset
-	Namespace   string
-	Helm        HelmSpec
-	Log         logr.Logger
-	BackendType types.KubernetesBackendType
+	kubeconfig    string
+	clientset     *kubernetes.Clientset
+	Namespace     string
+	Helm          HelmSpec
+	Log           logr.Logger
+	BackendType   types.KubernetesBackendType
+	CloudProvider types.CloudProvider
 }
 
 type HelmSpec struct {
@@ -65,9 +66,10 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	ingressIsEnabled := ingressValues.(map[string]interface{})["enabled"].(bool)
 	nginxServiceType := nginxValues.(map[string]interface{})["service"].(map[string]interface{})["type"].(string)
 	rasaXScheme := k.Helm.Values["rasax"].(map[string]interface{})["scheme"].(string)
+
 	url := "UNKNOWN"
 
-	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && k.BackendType != types.KubernetesBackendLocal {
+	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider != types.CloudProviderUnknown) {
 		serviceName := fmt.Sprintf("%s-nginx", k.Helm.ReleaseName)
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {

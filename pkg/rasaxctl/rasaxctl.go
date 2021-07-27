@@ -10,7 +10,9 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/logger"
 	"github.com/RasaHQ/rasaxctl/pkg/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/status"
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -26,6 +28,7 @@ type RasaXCTL struct {
 	Namespace        string
 	isRasaXRunning   bool
 	isRasaXDeployed  bool
+	CloudProvider    types.CloudProvider
 }
 
 func (r *RasaXCTL) InitClients() error {
@@ -33,18 +36,23 @@ func (r *RasaXCTL) InitClients() error {
 	r.Spinner = &status.SpinnerMessage{}
 	r.Spinner.New()
 
+	cloudProvider := cloud.Provider{Log: r.Log}
+	r.CloudProvider = cloudProvider.New()
+
 	r.KubernetesClient = &k8s.Kubernetes{
-		Namespace: r.Namespace,
-		Log:       r.Log,
+		Namespace:     r.Namespace,
+		Log:           r.Log,
+		CloudProvider: r.CloudProvider,
 	}
 	if err := r.KubernetesClient.New(); err != nil {
 		return err
 	}
 
 	r.HelmClient = &helm.Helm{
-		Log:       r.Log,
-		Namespace: r.Namespace,
-		Spinner:   r.Spinner,
+		Log:           r.Log,
+		Namespace:     r.Namespace,
+		Spinner:       r.Spinner,
+		CloudProvider: r.CloudProvider,
 	}
 	if err := r.HelmClient.New(); err != nil {
 		return err
@@ -190,11 +198,16 @@ func (r *RasaXCTL) startOrInstall() error {
 			return err
 		}
 	} else if !r.isRasaXRunning {
+		state, err := r.KubernetesClient.ReadSecretWithState()
+		if err != nil {
+			return err
+		}
 		// Start Rasa X if deployments are scaled down to 0
 		msg := "Starting Rasa X"
 		r.Spinner.Message(msg)
 		r.Log.Info(msg)
-		if projectPath != "" {
+
+		if string(state["project-path"]) != "" {
 			if r.DockerClient.Kind.ControlPlaneHost != "" {
 				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 				if err := r.DockerClient.StartKindNode(nodeName); err != nil {
@@ -205,8 +218,7 @@ func (r *RasaXCTL) startOrInstall() error {
 		// Set configuration used for starting a stopped project.
 		r.HelmClient.Configuration.StartProject = true
 
-		err := r.HelmClient.Upgrade()
-		if err != nil {
+		if err := r.HelmClient.Upgrade(); err != nil {
 			return err
 		}
 

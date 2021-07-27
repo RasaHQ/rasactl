@@ -32,6 +32,7 @@ type Helm struct {
 	rasaXChartName        string
 	kubeConfig            string
 	values                map[string]interface{}
+	CloudProvider         types.CloudProvider
 }
 
 func (h *Helm) New() error {
