@@ -45,11 +45,11 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 	if !utils.IsURLAccessible(urlAddress) {
 		parsedURL, _ := url.Parse(urlAddress)
 
-		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Hostname())
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
-		r.Log.Info("The URL is not accessable, using internal address", "url", r.URL, "internalURL", urlAddress)
+		r.Log.Info("The URL is not accessible for the health endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/health", urlAddress), nil)
@@ -82,11 +82,11 @@ func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
 	if !utils.IsURLAccessible(urlAddress) {
 		parsedURL, _ := url.Parse(urlAddress)
 
-		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host)
+		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Hostname())
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
-		r.Log.Info("The URL is not accessable, using internal address", "url", r.URL, "internalURL", urlAddress)
+		r.Log.Info("The URL is not accessible fot the version endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
 	}
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/version", urlAddress), nil)
 	if err != nil {
