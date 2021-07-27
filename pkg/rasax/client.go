@@ -51,7 +51,7 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
-		r.Log.Info("The URL is not accessible for the health endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
+		r.Log.V(1).Info("The URL is not accessible for the health endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/health", urlAddress), nil)
@@ -88,7 +88,7 @@ func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
-		r.Log.Info("The URL is not accessible fot the version endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
+		r.Log.V(1).Info("The URL is not accessible fot the version endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
 	}
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/version", urlAddress), nil)
 	if err != nil {

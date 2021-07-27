@@ -3,6 +3,7 @@ package rasax
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
@@ -74,6 +75,8 @@ func (r *RasaX) WaitForRasaX() error {
 	ticker := time.NewTicker(time.Second * 5)
 	ready := make(chan bool)
 	var returnErr error
+	var wg sync.WaitGroup
+	wg.Add(1)
 
 	go func() {
 		for {
@@ -96,6 +99,7 @@ func (r *RasaX) WaitForRasaX() error {
 
 				if networkErrorWaitForRasaXWorker != utils.NetworkErrorConnectionRefused && networkErrorerrWaitForDatabaseMigration != utils.NetworkErrorConnectionRefused && returnErr == nil {
 					ready <- true
+					return
 				} else {
 					msg := "Waiting for the Rasa X health endpoint to be reachable"
 					r.Log.Info(msg)
@@ -104,10 +108,13 @@ func (r *RasaX) WaitForRasaX() error {
 				r.mutex.Unlock()
 			case <-ctx.Done():
 				returnErr = errors.Errorf("Error while waiting for Rasa X, error: %s", ctx.Err())
+				return
 			}
 		}
 	}()
 	<-ready
+	close(ready)
+	wg.Wait()
 
 	r.Log.Info("Rasa X is healthy")
 	return returnErr
