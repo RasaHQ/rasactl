@@ -102,6 +102,12 @@ func IsURLAccessible(address string) bool {
 			return http.ErrUseLastResponse
 		},
 		Timeout: time.Second * 3,
+		Transport: &http.Transport{
+			Dial: (&net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 3 * time.Second,
+			}).Dial,
+		},
 	}
 	req, _ := http.NewRequest("GET", address, nil)
 	if _, err := client.Do(req); err != nil {

@@ -31,7 +31,7 @@ func (r *RasaX) New() {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
-		Timeout: time.Second * 60,
+		Timeout: time.Second * 5,
 		/*Transport: &http.Transport{
 			Dial: (&net.Dialer{
 				Timeout:   20 * time.Second,

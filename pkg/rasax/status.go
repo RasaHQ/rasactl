@@ -10,7 +10,6 @@ import (
 )
 
 func (r *RasaX) WaitForDatabaseMigration() error {
-
 	healthStatus, err := r.GetHealthEndpoint()
 	if err != nil {
 		return err
