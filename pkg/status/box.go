@@ -30,11 +30,11 @@ func RedBox(tittle string, msg string) {
 	}
 }
 
-func OrangeBox(tittle string, msg string) {
+func YellowBox(tittle string, msg string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 		b := box.New(box.Config{Py: 1, Px: 4, Type: "Round", TitlePos: "Top"})
 
-		b.Config.Color = "Orange"
+		b.Config.Color = "Yellow"
 
 		b.Println(tittle, msg)
 	}
@@ -58,7 +58,7 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 
 		// Check the URL
 		if !utils.IsURLAccessible(url) {
-			OrangeBox(
+			YellowBox(
 				"Hint",
 				fmt.Sprintf("Looks like the %s URL is not accessible, check if all needed firewall rules are in place", url),
 			)

@@ -85,6 +85,7 @@ func (r *RasaX) WaitForRasaX() error {
 		for {
 			select {
 			case <-ticker.C:
+				r.mutex.Lock()
 				err := r.WaitForDatabaseMigration()
 				networkError, _ := utils.CheckNetworkError(err)
 				if err != nil && networkError != utils.NetworkErrorConnectionRefused {
@@ -102,6 +103,7 @@ func (r *RasaX) WaitForRasaX() error {
 					r.Log.Info(msg)
 					r.SpinnerMessage.Message(msg)
 				}
+				r.mutex.Unlock()
 			case <-ctx.Done():
 				returnErr = errors.Errorf("Error while waiting for Rasa X, error: %s", ctx.Err())
 			}

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
@@ -22,6 +23,7 @@ type RasaX struct {
 	SpinnerMessage *status.SpinnerMessage
 	WaitTimeout    time.Duration
 	client         *http.Client
+	mutex          sync.Mutex
 }
 
 func (r *RasaX) New() {
@@ -29,7 +31,7 @@ func (r *RasaX) New() {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
-		Timeout: time.Second * 120,
+		Timeout: time.Second * 60,
 		/*Transport: &http.Transport{
 			Dial: (&net.Dialer{
 				Timeout:   20 * time.Second,
