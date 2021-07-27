@@ -57,7 +57,7 @@ func (h *Helm) Upgrade() error {
 	}
 
 	var msg string
-	if h.Configuration.StartProject {
+	if !h.Configuration.StartProject {
 		msg = fmt.Sprintf("Upgrade has beed finished, status: %s", rel.Info.Status)
 	} else {
 		msg = fmt.Sprintf("Rasa X for the %s project is ready", h.Namespace)

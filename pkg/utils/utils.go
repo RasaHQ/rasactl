@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"time"
 
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
@@ -96,7 +97,14 @@ func ValidateName(name string) error {
 }
 
 func IsURLAccessible(address string) bool {
-	if _, err := http.Get(address); err != nil {
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Timeout: time.Second * 3,
+	}
+	req, _ := http.NewRequest("GET", address, nil)
+	if _, err := client.Do(req); err != nil {
 		return false
 	}
 	return true

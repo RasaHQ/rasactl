@@ -82,7 +82,7 @@ func openCmd() *cobra.Command {
 			}
 
 			fmt.Printf("The URL %s has been opened in your web browser\n", url)
-
+			rasaXCTL.Spinner.Stop()
 			return nil
 		},
 	}

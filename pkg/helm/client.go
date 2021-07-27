@@ -72,7 +72,7 @@ func (h *Helm) New() error {
 		return err
 	}
 
-	h.Log.Info("Initializing helm client")
+	h.Log.Info("Initializing Helm client")
 
 	return nil
 }
