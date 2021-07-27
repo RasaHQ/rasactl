@@ -10,7 +10,6 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/logger"
 	"github.com/RasaHQ/rasaxctl/pkg/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/status"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
@@ -28,7 +27,7 @@ type RasaXCTL struct {
 	Namespace        string
 	isRasaXRunning   bool
 	isRasaXDeployed  bool
-	CloudProvider    types.CloudProvider
+	CloudProvider    *cloud.Provider
 }
 
 func (r *RasaXCTL) InitClients() error {
@@ -36,8 +35,9 @@ func (r *RasaXCTL) InitClients() error {
 	r.Spinner = &status.SpinnerMessage{}
 	r.Spinner.New()
 
-	cloudProvider := cloud.Provider{Log: r.Log}
-	r.CloudProvider = cloudProvider.New()
+	cloudProvider := &cloud.Provider{Log: r.Log}
+	cloudProvider.New()
+	r.CloudProvider = cloudProvider
 
 	r.KubernetesClient = &k8s.Kubernetes{
 		Namespace:     r.Namespace,

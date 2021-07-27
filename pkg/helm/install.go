@@ -58,7 +58,7 @@ func (h *Helm) Install() error {
 	}
 
 	// Configure ingress to use local hostname if Kubernetes backend is on a local machine
-	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider == types.CloudProviderUnknown {
+	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.rasaxctl.local.io", h.Namespace)
 		ip := "127.0.0.1"
 		h.values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.values)
@@ -69,7 +69,7 @@ func (h *Helm) Install() error {
 			return err
 		}
 		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
-	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider != types.CloudProviderUnknown {
+	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name != types.CloudProviderUnknown {
 		h.values = utils.MergeMaps(valuesNginxNodePort(), h.values)
 	}
 

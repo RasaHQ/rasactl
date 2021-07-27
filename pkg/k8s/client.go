@@ -26,7 +26,7 @@ type Kubernetes struct {
 	Helm          HelmSpec
 	Log           logr.Logger
 	BackendType   types.KubernetesBackendType
-	CloudProvider types.CloudProvider
+	CloudProvider *cloud.Provider
 }
 
 type HelmSpec struct {
@@ -71,7 +71,7 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 
 	url := "UNKNOWN"
 
-	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider != types.CloudProviderUnknown) {
+	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider.Name != types.CloudProviderUnknown) {
 
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
@@ -83,18 +83,15 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ipAddress, port)
 
 		return url, nil
-	} else if nginxServiceType == "NodePort" && nginxIsEnabled && k.BackendType == types.KubernetesBackendLocal && k.CloudProvider != types.CloudProviderUnknown {
-		provider := cloud.Provider{}
-		provider.New()
+	} else if nginxServiceType == "NodePort" && nginxIsEnabled && k.BackendType == types.KubernetesBackendLocal && k.CloudProvider.Name != types.CloudProviderUnknown {
 
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
 			return url, err
 		}
-		ipAddress := provider.ExternalIP
 		port := service.Spec.Ports[0].NodePort
 
-		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ipAddress, port)
+		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, k.CloudProvider.ExternalIP, port)
 	} else if ingressIsEnabled {
 		ingress, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).Get(context.TODO(), k.Helm.ReleaseName, metav1.GetOptions{})
 		if err != nil {

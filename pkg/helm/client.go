@@ -7,6 +7,7 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -32,7 +33,7 @@ type Helm struct {
 	rasaXChartName        string
 	kubeConfig            string
 	values                map[string]interface{}
-	CloudProvider         types.CloudProvider
+	CloudProvider         *cloud.Provider
 }
 
 func (h *Helm) New() error {
