@@ -30,6 +30,16 @@ func RedBox(tittle string, msg string) {
 	}
 }
 
+func OrangeBox(tittle string, msg string) {
+	if !utils.IsDebugOrVerboseEnabled() {
+		b := box.New(box.Config{Py: 1, Px: 4, Type: "Round", TitlePos: "Top"})
+
+		b.Config.Color = "Orange"
+
+		b.Println(tittle, msg)
+	}
+}
+
 func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 
@@ -45,5 +55,13 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 			"Rasa X",
 			strings.Join(msg, "\n"),
 		)
+
+		// Check the URL
+		if !utils.IsURLAccessible(url) {
+			OrangeBox(
+				"Hint",
+				fmt.Sprintf("Looks like the %s URL is not accessible, check if all needed firewall rules are in place", url),
+			)
+		}
 	}
 }

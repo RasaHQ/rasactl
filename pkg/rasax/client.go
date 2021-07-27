@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 )
@@ -38,7 +40,16 @@ func (r *RasaX) New() {
 }
 
 func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/health", r.URL), nil)
+	urlAddress := r.URL
+
+	if !utils.IsURLAccessible(urlAddress) {
+		parsedURL, _ := url.Parse(urlAddress)
+
+		urlAddress = fmt.Sprintf("%s://%s:%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Port())
+		r.Log.Info("The URL is not accessable, using internal address", "url", r.URL, "internalURL", urlAddress)
+	}
+
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/health", urlAddress), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +74,15 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 }
 
 func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/version", r.URL), nil)
+	urlAddress := r.URL
+
+	if !utils.IsURLAccessible(urlAddress) {
+		parsedURL, _ := url.Parse(urlAddress)
+
+		urlAddress = fmt.Sprintf("%s://%s:%s", parsedURL.Scheme, parsedURL.Host, parsedURL.Port())
+		r.Log.Info("The URL is not accessable, using internal address", "url", r.URL, "internalURL", urlAddress)
+	}
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/version", urlAddress), nil)
 	if err != nil {
 		return nil, err
 	}

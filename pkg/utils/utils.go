@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"regexp"
@@ -92,4 +93,16 @@ func ValidateName(name string) error {
 	}
 
 	return nil
+}
+
+func IsURLAccessible(address string) bool {
+	ipPort, err := url.Parse(address)
+	if err != nil {
+		return false
+	}
+	if _, err := net.Dial("tcp", fmt.Sprintf("%s:%s", ipPort.Host, ipPort.Port())); err != nil {
+		return false
+	}
+
+	return true
 }

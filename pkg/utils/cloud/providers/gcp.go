@@ -38,5 +38,4 @@ func GoogleGetExternalIP() string {
 		body = bodyData
 	}
 	return string(body)
-
 }

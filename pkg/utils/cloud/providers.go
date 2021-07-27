@@ -27,6 +27,14 @@ func (p *Provider) New() types.CloudProvider {
 	switch provider {
 	case types.CloudProviderGoogle:
 		p.ExternalIP = providers.GoogleGetExternalIP()
+	case types.CloudProviderAmazon:
+		p.ExternalIP = providers.AmazonGetExternalIP()
+	case types.CloudProviderAzure:
+		p.ExternalIP = providers.AzureGetExternalIP()
+	case types.CloudProviderDigitalOcean:
+		p.ExternalIP = providers.DigitalOceanGetExternalIP()
+	case types.CloudProviderAlibaba:
+		p.ExternalIP = providers.AlibabaGetExternalIP()
 	default:
 		p.ExternalIP = "0.0.0.0"
 	}
