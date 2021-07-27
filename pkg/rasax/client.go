@@ -45,7 +45,7 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 	if !utils.IsURLAccessible(urlAddress) {
 		parsedURL, _ := url.Parse(urlAddress)
 
-		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Hostname())
+		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, "127.0.0.1")
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
@@ -82,7 +82,7 @@ func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
 	if !utils.IsURLAccessible(urlAddress) {
 		parsedURL, _ := url.Parse(urlAddress)
 
-		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Hostname())
+		urlAddress = fmt.Sprintf("%s://%s", parsedURL.Scheme, "127.0.0.1")
 		if parsedURL.Port() != "" {
 			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
 		}
