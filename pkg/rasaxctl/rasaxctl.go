@@ -14,6 +14,7 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
+	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
@@ -368,6 +369,10 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 		return err
 	}
 
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion); err != nil {
+		return err
+	}
+
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		// Print the status box only if it's a new Rasa X deployment
 		status.PrintRasaXStatus(rasaXVersion, r.RasaXClient.URL)
@@ -388,5 +393,74 @@ func (r *RasaXCTL) Upgrade() error {
 	if err := r.HelmClient.Upgrade(); err != nil {
 		return err
 	}
+
+	url, err := r.GetRasaXURL()
+	if err != nil {
+		return err
+	}
+	r.RasaXClient.URL = url
+
+	if err := r.RasaXClient.WaitForRasaX(); err != nil {
+		return err
+	}
+
+	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *RasaXCTL) List() error {
+	data := [][]string{}
+	namespaces, err := r.KubernetesClient.GetNamespaces()
+	if err != nil {
+		return err
+	}
+
+	if len(namespaces) == 0 {
+		fmt.Println("Nothing to show, use the start command to create a new project")
+		return nil
+	}
+
+	for _, namespace := range namespaces {
+		r.KubernetesClient.Namespace = namespace
+		isRunning, err := r.KubernetesClient.IsRasaXRunning()
+		if err != nil {
+			return err
+		}
+		status := "Stopped"
+		if isRunning {
+			status = "Running"
+		}
+
+		stateData, err := r.KubernetesClient.ReadSecretWithState()
+		if err != nil {
+			return err
+		}
+
+		data = append(data, []string{namespace, status, string(stateData["rasa-worker-version"]), string(stateData["enterprise"]), string(stateData["rasa-x-version"])})
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name", "Status", "Rasa worker", "Enterprise", "Version"})
+	table.SetAutoWrapText(false)
+	table.SetAutoFormatHeaders(true)
+	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
+	table.SetAlignment(tablewriter.ALIGN_LEFT)
+	table.SetCenterSeparator("")
+	table.SetColumnSeparator("")
+	table.SetRowSeparator("")
+	table.SetHeaderLine(false)
+	table.SetBorder(false)
+	table.SetTablePadding("\t") // pad with tabs
+	table.SetNoWhiteSpace(true)
+	table.AppendBulk(data) // Add Bulk Data
+	table.Render()
 	return nil
 }

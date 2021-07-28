@@ -127,3 +127,17 @@ func (k *Kubernetes) DeleteNamespace() error {
 	}
 	return nil
 }
+
+func (k *Kubernetes) GetNamespaces() ([]string, error) {
+	result := []string{}
+	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{LabelSelector: "rasaxctl=true"})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, namespace := range namespaces.Items {
+		result = append(result, namespace.Name)
+	}
+
+	return result, nil
+}

@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/spf13/viper"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -25,6 +26,32 @@ func (k *Kubernetes) SaveSecretWithState() error {
 
 	_, err := k.clientset.CoreV1().Secrets(k.Namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (k *Kubernetes) UpdateSecretWithState(data interface{}) error {
+	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	switch t := data.(type) {
+	case *types.VersionEndpointResponse:
+		secret.Data["rasa-x-version"] = []byte(t.RasaX)
+		secret.Data["rasa-worker-version"] = []byte(t.Rasa.Worker)
+
+		enterprise := "inactive"
+		if t.Enterprise {
+			enterprise = "active"
+		}
+		secret.Data["enterprise"] = []byte(enterprise)
+	}
+
+	k.Log.Info("Updating secret with the project state", "secret", secret.Name, "namespace", k.Namespace, "data", data)
+
+	if _, err := k.clientset.CoreV1().Secrets(k.Namespace).Update(context.TODO(), secret, metav1.UpdateOptions{}); err != nil {
 		return err
 	}
 

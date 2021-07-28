@@ -28,7 +28,7 @@ func upgradeCmd() *cobra.Command {
 	// cmd represents the upgrade command
 	cmd := &cobra.Command{
 		Use:          "upgrade [PROJECT NAME]",
-		Short:        "Upgrade/update Rasa X deployment",
+		Short:        "upgrade/update Rasa X deployment",
 		Args:         cobra.MinimumNArgs(1),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
