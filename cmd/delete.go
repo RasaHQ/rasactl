@@ -23,16 +23,16 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-func startCmd() *cobra.Command {
+func deleteCmd() *cobra.Command {
 
-	// cmd represents the start command
+	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:          "start [PROJECT NAME]",
-		Short:        "start Rasa X deployment",
-		Args:         cobra.MinimumNArgs(1),
-		SilenceUsage: true,
+		Use:   "delete [PROJECT NAME]",
+		Short: "delete Rasa X deployment",
+		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]
 
@@ -42,6 +42,8 @@ func startCmd() *cobra.Command {
 			if err := rasaXCTL.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
 			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
 				if os.Getuid() != 0 {
@@ -49,24 +51,25 @@ func startCmd() *cobra.Command {
 				}
 			}
 
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
-
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Check if a Rasa X deployment is already installed and running
-			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+
+			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			if isRunning {
-				fmt.Printf("Rasa X for the %s project is running.\n", rasaXCTL.HelmClient.Namespace)
+			if !isProjectExist {
+				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
 				return nil
 			}
 
-			if err := rasaXCTL.Start(); err != nil {
+			if !rasaXCTL.KubernetesClient.IsNamespaceManageable() && !viper.GetBool("force") {
+				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasaxctl, can't continue :(", rasaXCTL.Namespace))
+			}
+
+			if err := rasaXCTL.Delete(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			defer rasaXCTL.Spinner.Stop()
@@ -74,14 +77,13 @@ func startCmd() *cobra.Command {
 		},
 	}
 
-	addStartUpgradeFlags(cmd)
-	addStartFlags(cmd)
+	addDeleteFlags(cmd)
 
 	return cmd
 }
 
 func init() {
 
-	startCmd := startCmd()
-	rootCmd.AddCommand(startCmd)
+	deleteCmd := deleteCmd()
+	rootCmd.AddCommand(deleteCmd)
 }

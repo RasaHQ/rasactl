@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"encoding/json"
 	"net"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
@@ -9,6 +10,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	ktypes "k8s.io/apimachinery/pkg/types"
 )
 
 func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
@@ -59,4 +61,69 @@ func (k *Kubernetes) GetKindControlPlaneNode() (v1.Node, error) {
 	}
 
 	return v1.Node{}, nil
+}
+
+func (k *Kubernetes) IsNamespaceManageable() bool {
+	namespace, err := k.clientset.CoreV1().Namespaces().Get(context.TODO(), k.Namespace, metav1.GetOptions{})
+	if err != nil {
+		return false
+	}
+	if namespace.Labels["rasaxctl"] == "true" {
+		return true
+	}
+	return false
+}
+
+func (k *Kubernetes) AddNamespaceLabel() error {
+	type patch struct {
+		Op    string `json:"op"`
+		Path  string `json:"path"`
+		Value string `json:"value"`
+	}
+
+	payload := []patch{{
+		Op:    "add",
+		Path:  "/metadata/labels/rasaxctl",
+		Value: "true",
+	}}
+
+	payloadBytes, _ := json.Marshal(payload)
+	k.Log.V(1).Info("Adding label", "namespace", k.Namespace, "payload", string(payloadBytes))
+	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace, ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k *Kubernetes) DeleteNamespaceLabel() error {
+	type patch struct {
+		Op   string `json:"op"`
+		Path string `json:"path"`
+	}
+
+	payload := []patch{{
+		Op:   "remove",
+		Path: "/metadata/labels/rasaxctl",
+	}}
+
+	payloadBytes, _ := json.Marshal(payload)
+	k.Log.V(1).Info("Deleting label", "namespace", k.Namespace, "payload", string(payloadBytes))
+	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace, ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k *Kubernetes) DeleteNode(node string) error {
+	if err := k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (k *Kubernetes) DeleteNamespace() error {
+	if err := k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+	return nil
 }

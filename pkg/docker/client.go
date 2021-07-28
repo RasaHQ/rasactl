@@ -350,3 +350,13 @@ func (d *Docker) StartKindNode(hostname string) error {
 	}
 	return nil
 }
+
+func (d *Docker) DeleteKindNode(hostname string) error {
+	if err := d.Client.ContainerRemove(d.ctx, hostname, types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+	}); err != nil {
+		return err
+	}
+	return nil
+}

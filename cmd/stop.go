@@ -28,7 +28,7 @@ func stopCmd() *cobra.Command {
 	// cmd represents the open command
 	cmd := &cobra.Command{
 		Use:   "stop [PROJECT NAME]",
-		Short: "Stop Rasa X deployment",
+		Short: "stop Rasa X deployment",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]

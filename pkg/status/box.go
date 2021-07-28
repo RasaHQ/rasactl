@@ -60,7 +60,7 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 		if !utils.IsURLAccessible(url) {
 			YellowBox(
 				"Hint",
-				fmt.Sprintf("Looks like the %s URL is not accessible, check if all needed firewall rules are in place", url),
+				fmt.Sprintf("It looks like the %s URL is not accessible, check if all needed firewall rules are in place", url),
 			)
 		}
 	}

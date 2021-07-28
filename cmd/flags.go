@@ -29,3 +29,11 @@ func addUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&helmConfiguration.Atomic, "atomic", false, "if set, upgrade process rolls back changes made in case of failed upgrade")
 	cmd.Flags().BoolVar(&helmConfiguration.ReuseValues, "reuse-values", true, "when upgrading, reuse the last release's values and merge in any overrides")
 }
+
+func addDeleteFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().Bool("force", false, "if true, delete resources and ignore errors")
+	cmd.PersistentFlags().Bool("prune", false, "if true, delete a namespace with a project")
+
+	viper.BindPFlag("force", cmd.PersistentFlags().Lookup("force"))
+	viper.BindPFlag("prune", cmd.PersistentFlags().Lookup("prune"))
+}

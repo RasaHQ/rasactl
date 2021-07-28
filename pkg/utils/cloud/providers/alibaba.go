@@ -25,7 +25,7 @@ func AlibabaGetExternalIP() string {
 		},
 		Timeout: time.Second * 20,
 	}
-	req, _ := http.NewRequest("GET", "http://169.254.169.254/metadata/v1/interfaces/public/0/ipv4/address", nil)
+	req, _ := http.NewRequest("GET", "http://100.100.100.200/latest/meta-data/eipv4", nil)
 	resp, err := client.Do(req)
 	if err != nil {
 		return ""

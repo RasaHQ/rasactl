@@ -29,7 +29,7 @@ func openCmd() *cobra.Command {
 	// cmd represents the open command
 	cmd := &cobra.Command{
 		Use:   "open [PROJECT NAME]",
-		Short: "Open Rasa X in a web browser",
+		Short: "open Rasa X in a web browser",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]

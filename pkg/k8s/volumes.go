@@ -24,6 +24,20 @@ func (k *Kubernetes) CreateVolume(hostPath string) (string, error) {
 	return pvc.Name, nil
 }
 
+func (k *Kubernetes) DeleteVolume() error {
+	pvc := fmt.Sprintf("rasaxctl-pvc-%s", k.Namespace)
+	if err := k.deletePVC(pvc); err != nil {
+		return err
+	}
+
+	pv := fmt.Sprintf("rasaxctl-pv-%s", k.Namespace)
+	if err := k.deletePV(pv); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) {
 
 	pvSpec := &apiv1.PersistentVolume{
@@ -86,4 +100,26 @@ func (k *Kubernetes) createPVC(pv *apiv1.PersistentVolume) (*apiv1.PersistentVol
 	}
 	k.Log.V(1).Info("Persistent Volume Claim has been created", "name", pvc.Name, "namespace", pvc.Namespace)
 	return pvc, nil
+}
+
+func (k *Kubernetes) deletePV(name string) error {
+
+	if err := k.clientset.CoreV1().PersistentVolumes().Delete(context.TODO(), name, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+
+	k.Log.V(1).Info("Persistent Volume has been deleted",
+		"name", name, "namespace", k.Namespace)
+	return nil
+}
+
+func (k *Kubernetes) deletePVC(name string) error {
+
+	if err := k.clientset.CoreV1().PersistentVolumeClaims(k.Namespace).Delete(context.TODO(), name, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+
+	k.Log.V(1).Info("Persistent Volume Claim has been deleted",
+		"name", name, "namespace", k.Namespace)
+	return nil
 }

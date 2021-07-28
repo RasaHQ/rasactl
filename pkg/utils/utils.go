@@ -65,6 +65,21 @@ func AddHostToEtcHosts(host, ip string) error {
 	return nil
 }
 
+func DeleteHostToEtcHosts(host string) error {
+	hosts, err := txeh.NewHostsDefault()
+	if err != nil {
+		return err
+	}
+
+	hosts.RemoveHost(host)
+
+	if err := hosts.Save(); err != nil {
+		return errors.Errorf("Can't remove a host, try to run the command as administrator, error: %s", err)
+	}
+
+	return nil
+}
+
 // Source: https://cs.opensource.google/go/go/+/master:src/net/ip.go;l=133
 // This function can be deleted after Go 1.17 is released.
 // IsPrivate reports whether ip is a private address, according to

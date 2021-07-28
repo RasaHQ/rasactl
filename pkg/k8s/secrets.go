@@ -21,12 +21,12 @@ func (k *Kubernetes) SaveSecretWithState() error {
 		},
 	}
 
+	k.Log.Info("Saving secret with the project state", "secret", secret.Name, "namespace", k.Namespace)
+
 	_, err := k.clientset.CoreV1().Secrets(k.Namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
-
-	k.Log.Info("Saving secret with the project state", "secret", secret.Name, "namespace", k.Namespace)
 
 	return nil
 }
@@ -39,4 +39,11 @@ func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 	}
 
 	return secret.Data, nil
+}
+
+func (k *Kubernetes) DeleteSecretWithState() error {
+	if err := k.clientset.CoreV1().Secrets(k.Namespace).Delete(context.TODO(), secretName, metav1.DeleteOptions{}); err != nil {
+		return err
+	}
+	return nil
 }
