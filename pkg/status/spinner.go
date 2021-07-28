@@ -22,8 +22,9 @@ func (s *SpinnerMessage) Message(msg string) {
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
 		if !s.spinner.Active() {
 			s.spinner.Start()
+			time.Sleep(200 * time.Millisecond)
 		} else {
-			time.Sleep(1 * time.Second)
+			time.Sleep(200 * time.Millisecond)
 			s.spinner.Restart()
 		}
 	}

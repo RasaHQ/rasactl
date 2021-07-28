@@ -71,7 +71,8 @@ func upgradeCmd() *cobra.Command {
 			if err := rasaXCTL.Upgrade(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaXCTL.Spinner.Stop()
+			rasaXCTL.Spinner.Message("Ready!")
+			defer rasaXCTL.Spinner.Stop()
 			return nil
 		},
 	}

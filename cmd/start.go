@@ -69,7 +69,7 @@ func startCmd() *cobra.Command {
 			if err := rasaXCTL.Start(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaXCTL.Spinner.Stop()
+			defer rasaXCTL.Spinner.Stop()
 			return nil
 		},
 	}

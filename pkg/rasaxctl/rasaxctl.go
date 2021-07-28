@@ -226,7 +226,6 @@ func (r *RasaXCTL) startOrInstall() error {
 			return err
 		}
 	}
-	r.Spinner.Message("Ready!")
 	return nil
 }
 
@@ -273,9 +272,8 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 		return err
 	}
 
-	if utils.IsDebugOrVerboseEnabled() {
-		r.Log.Info("Rasa X is ready", "url", r.RasaXClient.URL)
-	}
+	r.Log.Info("Rasa X is ready", "url", r.RasaXClient.URL)
+	r.Spinner.Message("Ready!")
 
 	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {
@@ -302,7 +300,5 @@ func (r *RasaXCTL) Upgrade() error {
 	if err := r.HelmClient.Upgrade(); err != nil {
 		return err
 	}
-
-	r.Spinner.Message("Ready!")
 	return nil
 }
