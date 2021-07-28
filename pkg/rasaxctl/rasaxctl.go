@@ -173,14 +173,14 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
-	r.Spinner.Message("Deleting persistent volume")
-	if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
-		return err
-	} else if err != nil && force {
-		r.Log.Info("Can't delete persistent volume", "error", err)
-	}
-
 	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state["project-path"]) != "" || force {
+		r.Spinner.Message("Deleting persistent volume")
+		if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
+			return err
+		} else if err != nil && force {
+			r.Log.Info("Can't delete persistent volume", "error", err)
+		}
+
 		r.Spinner.Message("Deleting a kind node")
 		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 		r.Log.Info("Deleting a kind node", "node", nodeName)
