@@ -21,6 +21,7 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -29,12 +30,14 @@ func startCmd() *cobra.Command {
 
 	// cmd represents the start command
 	cmd := &cobra.Command{
-		Use:          "start [PROJECT NAME]",
+		Use:          "start [DEPLOYMENT NAME]",
 		Short:        "start Rasa X deployment",
-		Args:         cobra.MinimumNArgs(1),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace := args[0]
+			namespace := uuid.New().String()
+			if len(args) != 0 {
+				namespace = args[0]
+			}
 
 			rasaXCTL = &rasaxctl.RasaXCTL{
 				Namespace: namespace,

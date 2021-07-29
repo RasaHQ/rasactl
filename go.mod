@@ -9,6 +9,7 @@ require (
 	github.com/fatih/color v1.12.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/imdario/mergo v0.3.12
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
