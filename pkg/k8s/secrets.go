@@ -51,7 +51,7 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 			secret.Data[types.StateSecretEnterprise] = []byte(enterprise)
 
 		case *release.Release:
-			secret.Data[types.StateSecretHelmChartName] = []byte(t.Chart.Metadata.Name)
+			secret.Data[types.StateSecretHelmChartName] = []byte(t.Chart.Name())
 			secret.Data[types.StateSecretHelmChartVersion] = []byte(t.Chart.Metadata.Version)
 			secret.Data[types.StateSecretHelmReleaseName] = []byte(t.Name)
 			secret.Data[types.StateSecretHelmReleaseStatus] = []byte(t.Info.Status)

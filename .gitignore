@@ -7,6 +7,7 @@
 rasaxctl
 rasaxctl_*
 !pkg/rasaxctl
+.rasaxctl
 
 # Test binary, built with `go test -c`
 *.test

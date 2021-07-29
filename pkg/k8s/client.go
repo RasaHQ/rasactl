@@ -122,7 +122,6 @@ func (k *Kubernetes) GetRasaXToken() (string, error) {
 }
 
 func (k *Kubernetes) IsRasaXRunning() (bool, error) {
-
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return false, err

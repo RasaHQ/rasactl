@@ -32,7 +32,7 @@ func (r *RasaXCTL) List() error {
 
 		stateData, err := r.KubernetesClient.ReadSecretWithState()
 		if err != nil {
-			return err
+			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
 		}
 
 		data = append(data, []string{namespace, status,

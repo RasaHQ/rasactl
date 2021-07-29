@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -27,14 +26,6 @@ func listCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "list projects",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			rasaXCTL = &rasaxctl.RasaXCTL{}
-			if err := rasaXCTL.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			return nil
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := rasaXCTL.List(); err != nil {

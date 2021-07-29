@@ -27,7 +27,6 @@ func (h *Helm) Install() error {
 	if err != nil {
 		return err
 	}
-
 	client := action.NewInstall(h.ActionConfig)
 	client.Namespace = h.Namespace
 	client.ReleaseName = h.Configuration.ReleaseName

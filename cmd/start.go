@@ -20,7 +20,6 @@ import (
 	"os"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -33,12 +32,6 @@ func startCmd() *cobra.Command {
 		Short:        "start Rasa X deployment",
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace = uuid.New().String()
-			if len(args) != 0 {
-				namespace = args[0]
-			}
-
-			rasaXCTL.Namespace = namespace
 			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
 				if os.Getuid() != 0 {
 					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))

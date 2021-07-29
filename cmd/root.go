@@ -23,6 +23,7 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/fatih/color"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -35,7 +36,7 @@ var (
 	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
 	errorPrint        *color.Color                 = color.New(color.FgRed)
 	rasaXCTL          *rasaxctl.RasaXCTL
-	namespace         string
+	namespace         string = uuid.New().String()
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -44,7 +45,9 @@ var rootCmd = &cobra.Command{
 	Short: "A tools to manage Rasa X deployments",
 	Long:  `rasaxctl helps you to manage Rasa X deployments.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		rasaXCTL = &rasaxctl.RasaXCTL{}
+		rasaXCTL = &rasaxctl.RasaXCTL{
+			Namespace: namespace,
+		}
 
 		if err := rasaXCTL.InitClients(); err != nil {
 			return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -56,6 +59,9 @@ var rootCmd = &cobra.Command{
 		}
 		namespace = ns
 
+		if len(args) != 0 {
+			namespace = args[0]
+		}
 		return nil
 	},
 }

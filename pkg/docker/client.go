@@ -14,6 +14,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
 	"github.com/ghodss/yaml"
@@ -292,6 +293,11 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 
 	}
 
+	kindNetwork, err := d.getKindNetwork()
+	if err != nil {
+		return container.ContainerCreateCreatedBody{}, err
+	}
+
 	resp, err := d.Client.ContainerCreate(d.ctx,
 		&container.Config{
 			Image:    kindImage,
@@ -300,21 +306,10 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 			Volumes:  map[string]struct{}{"/var": {}},
 			Env:      []string{"container=docker"},
 		},
-		hostConfig, nil, hostname)
+		hostConfig, &network.NetworkingConfig{
+			EndpointsConfig: map[string]*network.EndpointSettings{kindNetwork: {}},
+		}, hostname)
 	if err != nil {
-		return resp, err
-	}
-
-	kindNetwork, err := d.getKindNetwork()
-	if err != nil {
-		return resp, err
-	}
-
-	if err := d.Client.NetworkConnect(d.ctx, kindNetwork, resp.ID, nil); err != nil {
-		return resp, err
-	}
-
-	if err := d.Client.NetworkDisconnect(d.ctx, "bridge", resp.ID, true); err != nil {
 		return resp, err
 	}
 

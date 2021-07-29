@@ -98,7 +98,6 @@ func (r *RasaXCTL) startOrInstall() error {
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		if projectPath != "" {
 			if r.DockerClient.Kind.ControlPlaneHost != "" {
-
 				// check if the project path exists
 
 				if path, err := os.Stat(projectPath); err != nil {
