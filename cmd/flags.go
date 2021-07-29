@@ -43,3 +43,7 @@ func addStatusFlags(cmd *cobra.Command) {
 
 	viper.BindPFlag("details", cmd.PersistentFlags().Lookup("details"))
 }
+
+func addAddFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
+}

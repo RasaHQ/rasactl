@@ -23,12 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func statusCmd() *cobra.Command {
+func addCmd() *cobra.Command {
 
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "status PROJECT-NAME",
-		Short: "show status of project",
+		Use:   "add NAMESPACE",
+		Short: "add existing Rasa X deployment",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			namespace := args[0]
@@ -40,7 +40,8 @@ func statusCmd() *cobra.Command {
 			if err := rasaXCTL.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-
+			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaXCTL.HelmClient.Configuration = helmConfiguration
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -50,15 +51,11 @@ func statusCmd() *cobra.Command {
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s namespace doesn't exist.\n", rasaXCTL.Namespace)
 				return nil
 			}
 
-			if !rasaXCTL.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasaxctl, can't continue :(", rasaXCTL.Namespace))
-			}
-
-			if err := rasaXCTL.Status(); err != nil {
+			if err := rasaXCTL.Add(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
@@ -66,13 +63,13 @@ func statusCmd() *cobra.Command {
 		},
 	}
 
-	addStatusFlags(cmd)
+	addAddFlags(cmd)
 
 	return cmd
 }
 
 func init() {
 
-	statusCmd := statusCmd()
-	rootCmd.AddCommand(statusCmd)
+	addCmd := addCmd()
+	rootCmd.AddCommand(addCmd)
 }
