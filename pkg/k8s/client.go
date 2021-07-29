@@ -280,3 +280,11 @@ func (k *Kubernetes) ScaleUp() error {
 
 	return nil
 }
+
+func (k *Kubernetes) GetPods() (*v1.PodList, error) {
+	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	return pods, nil
+}

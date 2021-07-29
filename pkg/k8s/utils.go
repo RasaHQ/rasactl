@@ -141,3 +141,13 @@ func (k *Kubernetes) GetNamespaces() ([]string, error) {
 
 	return result, nil
 }
+
+func (k *Kubernetes) PodStatus(conditions []v1.PodCondition) string {
+	for _, c := range conditions {
+		if c.Status != v1.ConditionTrue {
+			return "NotReady"
+		}
+	}
+
+	return "Ready"
+}

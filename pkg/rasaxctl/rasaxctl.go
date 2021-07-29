@@ -14,7 +14,6 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
-	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 )
@@ -369,7 +368,12 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 		return err
 	}
 
-	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion); err != nil {
+	helmRelease, err := r.HelmClient.GetStatus()
+	if err != nil {
+		return err
+	}
+
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, helmRelease); err != nil {
 		return err
 	}
 
@@ -409,7 +413,12 @@ func (r *RasaXCTL) Upgrade() error {
 		return err
 	}
 
-	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion); err != nil {
+	helmRelease, err := r.HelmClient.GetStatus()
+	if err != nil {
+		return err
+	}
+
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, helmRelease); err != nil {
 		return err
 	}
 
@@ -444,23 +453,98 @@ func (r *RasaXCTL) List() error {
 			return err
 		}
 
-		data = append(data, []string{namespace, status, string(stateData["rasa-worker-version"]), string(stateData["enterprise"]), string(stateData["rasa-x-version"])})
+		data = append(data, []string{namespace, status,
+			string(stateData[types.StateSecretRasaWorkerVersion]),
+			string(stateData[types.StateSecretEnterprise]),
+			string(stateData[types.StateSecretRasaXVersion]),
+		},
+		)
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Name", "Status", "Rasa worker", "Enterprise", "Version"})
-	table.SetAutoWrapText(false)
-	table.SetAutoFormatHeaders(true)
-	table.SetHeaderAlignment(tablewriter.ALIGN_LEFT)
-	table.SetAlignment(tablewriter.ALIGN_LEFT)
-	table.SetCenterSeparator("")
-	table.SetColumnSeparator("")
-	table.SetRowSeparator("")
-	table.SetHeaderLine(false)
-	table.SetBorder(false)
-	table.SetTablePadding("\t") // pad with tabs
-	table.SetNoWhiteSpace(true)
-	table.AppendBulk(data) // Add Bulk Data
-	table.Render()
+	status.PrintTable(
+		[]string{"Name", "Status", "Rasa worker", "Enterprise", "Version"},
+		data,
+	)
+	return nil
+}
+
+func (r *RasaXCTL) Status() error {
+	namespaces, err := r.KubernetesClient.GetNamespaces()
+	if err != nil {
+		return err
+	}
+
+	if len(namespaces) == 0 {
+		fmt.Println("Nothing to show, use the start command to create a new project")
+		return nil
+	}
+
+	isRunning, err := r.KubernetesClient.IsRasaXRunning()
+	if err != nil {
+		return err
+	}
+	statusProject := "Stopped"
+	if isRunning {
+		statusProject = "Running"
+	}
+
+	stateData, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Name: %s\n", r.Namespace)
+	fmt.Printf("Status: %s\n", statusProject)
+	fmt.Printf("Version: %s\n", stateData[types.StateSecretRasaXVersion])
+	fmt.Printf("Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
+
+	projectPath := "not defined"
+	if string(stateData[types.StateSecretProjectPath]) != "" {
+		projectPath = string(stateData[types.StateSecretProjectPath])
+	}
+	fmt.Printf("Project path: %s\n", projectPath)
+
+	if viper.GetBool("details") {
+		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
+			ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+		}
+		release, err := r.HelmClient.GetStatus()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Helm chart: %s-%s\n", release.Chart.Name(), release.Chart.Metadata.Version)
+		fmt.Printf("Helm release: %s\n", release.Name)
+		fmt.Printf("Helm release status: %s\n", release.Info.Status)
+
+		fmt.Println()
+
+		pods, err := r.KubernetesClient.GetPods()
+		if err != nil {
+			return err
+		}
+
+		data := [][]string{}
+		for _, pod := range pods.Items {
+			data = append(data,
+				[]string{
+					pod.Name,
+					r.KubernetesClient.PodStatus(pod.Status.Conditions),
+					string(pod.Status.Phase),
+				},
+			)
+		}
+
+		if len(pods.Items) != 0 {
+			fmt.Print("Pod details:\n\n")
+		}
+
+		status.PrintTable(
+			[]string{"Name", "Condition", "Status"},
+			data,
+		)
+	}
+
+	fmt.Println()
+
 	return nil
 }

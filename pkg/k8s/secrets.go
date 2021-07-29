@@ -5,6 +5,7 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/spf13/viper"
+	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -18,7 +19,7 @@ func (k *Kubernetes) SaveSecretWithState() error {
 		},
 		Type: "rasa.com/rasaxctl.state",
 		Data: map[string][]byte{
-			"project-path": []byte(viper.GetString("project-path")),
+			types.StateSecretProjectPath: []byte(viper.GetString("project-path")),
 		},
 	}
 
@@ -32,23 +33,30 @@ func (k *Kubernetes) SaveSecretWithState() error {
 	return nil
 }
 
-func (k *Kubernetes) UpdateSecretWithState(data interface{}) error {
+func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
-	switch t := data.(type) {
-	case *types.VersionEndpointResponse:
-		secret.Data["rasa-x-version"] = []byte(t.RasaX)
-		secret.Data["rasa-worker-version"] = []byte(t.Rasa.Worker)
+	for _, d := range data {
+		switch t := d.(type) {
+		case *types.VersionEndpointResponse:
+			secret.Data[types.StateSecretRasaXVersion] = []byte(t.RasaX)
+			secret.Data[types.StateSecretRasaWorkerVersion] = []byte(t.Rasa.Worker)
 
-		enterprise := "inactive"
-		if t.Enterprise {
-			enterprise = "active"
+			enterprise := "inactive"
+			if t.Enterprise {
+				enterprise = "active"
+			}
+			secret.Data[types.StateSecretEnterprise] = []byte(enterprise)
+
+		case *release.Release:
+			secret.Data[types.StateSecretHelmChartName] = []byte(t.Chart.Name())
+			secret.Data[types.StateSecretHelmChartVersion] = []byte(t.Chart.Metadata.Version)
+			secret.Data[types.StateSecretHelmReleaseName] = []byte(t.Name)
+			secret.Data[types.StateSecretHelmReleaseStatus] = []byte(t.Info.Status)
 		}
-		secret.Data["enterprise"] = []byte(enterprise)
 	}
-
 	k.Log.Info("Updating secret with the project state", "secret", secret.Name, "namespace", k.Namespace, "data", data)
 
 	if _, err := k.clientset.CoreV1().Secrets(k.Namespace).Update(context.TODO(), secret, metav1.UpdateOptions{}); err != nil {

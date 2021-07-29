@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/action"
+	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
 	"sigs.k8s.io/yaml"
 )
@@ -61,4 +62,14 @@ func (h *Helm) IsDeployed() (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (h *Helm) GetStatus() (*release.Release, error) {
+	client := action.NewStatus(h.ActionConfig)
+	release, err := client.Run(h.Configuration.ReleaseName)
+	if err != nil {
+		return nil, err
+	}
+
+	return release, nil
 }

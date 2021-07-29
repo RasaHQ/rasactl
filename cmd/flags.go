@@ -37,3 +37,9 @@ func addDeleteFlags(cmd *cobra.Command) {
 	viper.BindPFlag("force", cmd.PersistentFlags().Lookup("force"))
 	viper.BindPFlag("prune", cmd.PersistentFlags().Lookup("prune"))
 }
+
+func addStatusFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolP("details", "d", false, "show detailed information, such as running pods, helm chart status")
+
+	viper.BindPFlag("details", cmd.PersistentFlags().Lookup("details"))
+}
