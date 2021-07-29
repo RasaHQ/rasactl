@@ -124,6 +124,10 @@ func (r *RasaXCTL) startOrInstall() error {
 			} else {
 				return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
 			}
+
+			if err := r.writeStatusFile(projectPath); err != nil {
+				return err
+			}
 		}
 
 		if err := r.KubernetesClient.SaveSecretWithState(); err != nil {

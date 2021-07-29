@@ -18,7 +18,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -31,15 +30,9 @@ func addCmd() *cobra.Command {
 		Short: "add existing Rasa X deployment",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace := args[0]
+			namespace = args[0]
 
-			rasaXCTL = &rasaxctl.RasaXCTL{
-				Namespace: namespace,
-			}
-
-			if err := rasaXCTL.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
+			rasaXCTL.Namespace = namespace
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 			return nil

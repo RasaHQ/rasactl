@@ -18,7 +18,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -31,12 +30,9 @@ func statusCmd() *cobra.Command {
 		Short: "show status of project",
 		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace := args[0]
+			namespace = args[0]
 
-			rasaXCTL = &rasaxctl.RasaXCTL{
-				Namespace: namespace,
-			}
-
+			rasaXCTL.Namespace = namespace
 			if err := rasaXCTL.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}

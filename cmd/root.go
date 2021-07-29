@@ -23,6 +23,7 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/fatih/color"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -34,6 +35,7 @@ var (
 	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
 	errorPrint        *color.Color                 = color.New(color.FgRed)
 	rasaXCTL          *rasaxctl.RasaXCTL
+	namespace         string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -41,6 +43,21 @@ var rootCmd = &cobra.Command{
 	Use:   "rasaxctl",
 	Short: "A tools to manage Rasa X deployments",
 	Long:  `rasaxctl helps you to manage Rasa X deployments.`,
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		rasaXCTL = &rasaxctl.RasaXCTL{}
+
+		if err := rasaXCTL.InitClients(); err != nil {
+			return errors.Errorf(errorPrint.Sprintf("%s", err))
+		}
+
+		ns, err := rasaXCTL.GetActiveNamespace()
+		if err != nil {
+			return errors.Errorf(errorPrint.Sprintf("%s", err))
+		}
+		namespace = ns
+
+		return nil
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
