@@ -177,10 +177,15 @@ func (r *RasaXCTL) GetAllHelmValues() error {
 }
 
 func (r *RasaXCTL) GetRasaXURL() (string, error) {
+	if err := r.GetAllHelmValues(); err != nil {
+		return "", err
+	}
+
 	url, err := r.KubernetesClient.GetRasaXURL()
 	if err != nil {
 		return url, err
 	}
+
 	r.Log.V(1).Info("Get Rasa X URL", "url", url)
 	return url, nil
 }

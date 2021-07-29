@@ -68,10 +68,6 @@ func openCmd() *cobra.Command {
 				return nil
 			}
 
-			if err := rasaXCTL.GetAllHelmValues(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
 			url, err := rasaXCTL.GetRasaXURL()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

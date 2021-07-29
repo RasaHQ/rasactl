@@ -16,10 +16,6 @@ func (r *RasaXCTL) Upgrade() error {
 		return err
 	}
 
-	if err := r.GetAllHelmValues(); err != nil {
-		return err
-	}
-
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err

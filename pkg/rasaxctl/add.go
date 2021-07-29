@@ -10,14 +10,6 @@ func (r *RasaXCTL) Add() error {
 		return err
 	}
 
-	if err := r.GetAllHelmValues(); err != nil {
-		return err
-	}
-
-	if err := r.KubernetesClient.SaveSecretWithState(); err != nil {
-		return err
-	}
-
 	r.initRasaXClient()
 	url, err := r.GetRasaXURL()
 	if err != nil {
@@ -29,7 +21,9 @@ func (r *RasaXCTL) Add() error {
 	if err != nil {
 		return err
 	}
-
+	if err := r.KubernetesClient.SaveSecretWithState(); err != nil {
+		return err
+	}
 	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, release); err != nil {
 		return err
 	}

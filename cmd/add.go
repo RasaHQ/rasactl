@@ -55,6 +55,11 @@ func addCmd() *cobra.Command {
 				return nil
 			}
 
+			if rasaXCTL.KubernetesClient.IsNamespaceManageable() {
+				fmt.Println("Already added")
+				return nil
+			}
+
 			if err := rasaXCTL.Add(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}

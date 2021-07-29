@@ -1,6 +1,7 @@
 package rasaxctl
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
@@ -9,6 +10,7 @@ import (
 )
 
 func (r *RasaXCTL) Status() error {
+	var b bytes.Buffer
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()
 	if err != nil {
 		return err
@@ -22,31 +24,37 @@ func (r *RasaXCTL) Status() error {
 	if err != nil {
 		return err
 	}
+	r.HelmClient.Configuration = &types.HelmConfigurationSpec{
+		ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+	}
+	r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
-	fmt.Printf("Name: %s\n", r.Namespace)
-	fmt.Printf("Status: %s\n", statusProject)
-	fmt.Printf("Version: %s\n", stateData[types.StateSecretRasaXVersion])
-	fmt.Printf("Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
+	fmt.Fprintf(&b, "Name: %s\n", r.Namespace)
+	fmt.Fprintf(&b, "Status: %s\n", statusProject)
+	fmt.Fprintf(&b, "Version: %s\n", stateData[types.StateSecretRasaXVersion])
+	fmt.Fprintf(&b, "Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
 
 	projectPath := "not defined"
 	if string(stateData[types.StateSecretProjectPath]) != "" {
 		projectPath = string(stateData[types.StateSecretProjectPath])
 	}
-	fmt.Printf("Project path: %s\n", projectPath)
+	fmt.Fprintf(&b, "Project path: %s\n", projectPath)
+
+	url, err := r.GetRasaXURL()
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(&b, "URL: %s", url)
 
 	if viper.GetBool("details") {
-		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
-			ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
-		}
+
 		release, err := r.HelmClient.GetStatus()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Helm chart: %s-%s\n", release.Chart.Name(), release.Chart.Metadata.Version)
-		fmt.Printf("Helm release: %s\n", release.Name)
-		fmt.Printf("Helm release status: %s\n", release.Info.Status)
-
-		fmt.Println()
+		fmt.Fprintf(&b, "Helm chart: %s-%s\n", release.Chart.Name(), release.Chart.Metadata.Version)
+		fmt.Fprintf(&b, "Helm release: %s\n", release.Name)
+		fmt.Fprintf(&b, "Helm release status: %s\n\n", release.Info.Status)
 
 		pods, err := r.KubernetesClient.GetPods()
 		if err != nil {
@@ -65,15 +73,17 @@ func (r *RasaXCTL) Status() error {
 		}
 
 		if len(pods.Items) != 0 {
-			fmt.Print("Pod details:\n\n")
+			fmt.Fprintf(&b, "Pod details:\n\n")
 		}
+
+		fmt.Println(b.String())
 
 		status.PrintTable(
 			[]string{"Name", "Condition", "Status"},
 			data,
 		)
 	}
-
+	fmt.Println(b.String())
 	fmt.Println()
 
 	return nil

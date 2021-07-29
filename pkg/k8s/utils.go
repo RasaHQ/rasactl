@@ -6,7 +6,6 @@ import (
 	"net"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +22,7 @@ func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
 	}
 
 	ip := net.ParseIP(host)
-	if utils.IsPrivate(ip) || ip.IsLoopback() {
+	if ip.IsLoopback() {
 		backend = types.KubernetesBackendLocal
 	} else {
 		backend = types.KubernetesBackendRemote

@@ -1,6 +1,7 @@
 package helm
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"github.com/spf13/viper"
@@ -33,6 +34,10 @@ func (h *Helm) ReadValuesFile() error {
 func (h *Helm) GetValues() (map[string]interface{}, error) {
 	client := action.NewGetValues(h.ActionConfig)
 	client.AllValues = true
+
+	if h.Configuration == nil {
+		return nil, fmt.Errorf("helm client requires to define a release name: %#v", h)
+	}
 
 	values, err := client.Run(h.Configuration.ReleaseName)
 	if err != nil {

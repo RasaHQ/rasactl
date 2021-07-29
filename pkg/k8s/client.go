@@ -75,7 +75,6 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	url := "UNKNOWN"
 
 	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider.Name != types.CloudProviderUnknown) {
-
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
 			return url, err
