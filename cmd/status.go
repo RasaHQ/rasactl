@@ -26,15 +26,12 @@ func statusCmd() *cobra.Command {
 
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "status PROJECT-NAME",
-		Short: "show status of project",
-		Args:  cobra.MinimumNArgs(1),
+		Use:   "status [DEPLOYMENT NAME]",
+		Short: "show deployment status",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace = args[0]
 
-			rasaXCTL.Namespace = namespace
-			if err := rasaXCTL.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			if namespace == "" {
+				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
 			}
 
 			return nil

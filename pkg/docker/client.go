@@ -275,6 +275,11 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		Tmpfs:       map[string]string{"/run": "", "/tmp": ""},
 	}
 
+	hostConfig.ExtraHosts = []string{
+		"rasa.localhost:host-gateway",
+		"host.docker.internal:host-gateway",
+	}
+
 	hostConfig.Mounts = []mount.Mount{
 		{
 			Source:   "/lib/modules",

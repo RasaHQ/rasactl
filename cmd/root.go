@@ -20,9 +20,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RasaHQ/rasaxctl/pkg/logger"
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/fatih/color"
+	"github.com/go-logr/logr"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -36,7 +39,8 @@ var (
 	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
 	errorPrint        *color.Color                 = color.New(color.FgRed)
 	rasaXCTL          *rasaxctl.RasaXCTL
-	namespace         string = uuid.New().String()
+	log               logr.Logger
+	namespace         string
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -45,22 +49,19 @@ var rootCmd = &cobra.Command{
 	Short: "A tools to manage Rasa X deployments",
 	Long:  `rasaxctl helps you to manage Rasa X deployments.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		rasaXCTL = &rasaxctl.RasaXCTL{
-			Namespace: namespace,
-		}
-
-		if err := rasaXCTL.InitClients(); err != nil {
-			return errors.Errorf(errorPrint.Sprintf("%s", err))
-		}
-
-		ns, err := rasaXCTL.GetActiveNamespace()
-		if err != nil {
-			return errors.Errorf(errorPrint.Sprintf("%s", err))
-		}
-		namespace = ns
 
 		if len(args) != 0 {
 			namespace = args[0]
+		} else if namespace == "" {
+			namespace = uuid.New().String()
+		}
+
+		rasaXCTL = &rasaxctl.RasaXCTL{
+			Log:       log,
+			Namespace: namespace,
+		}
+		if err := rasaXCTL.InitClients(); err != nil {
+			return errors.Errorf(errorPrint.Sprintf("%s", err))
 		}
 		return nil
 	},
@@ -76,7 +77,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initLog)
 
 	home, _ := homedir.Dir()
 
@@ -88,6 +89,11 @@ func init() {
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
+}
+
+func initLog() {
+	log = logger.New()
+	namespace = utils.GetActiveNamespace(log)
 }
 
 // initConfig reads in config file and ENV variables if set.

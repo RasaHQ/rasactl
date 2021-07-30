@@ -1,12 +1,17 @@
 package utils
 
 import (
+	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
+	"strings"
 	"time"
 
+	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -108,4 +113,39 @@ func IsURLAccessible(address string) bool {
 		return false
 	}
 	return true
+}
+
+func readStatusFile(path string, log logr.Logger) (string, error) {
+	file := fmt.Sprintf("%s/.rasaxctl", path)
+
+	log.Info("Reading a status file", "file", file)
+
+	if _, err := os.Stat(file); err != nil {
+		log.Info("Status file doesn't exist", "file", file)
+		return "", nil
+	}
+
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
+
+func GetActiveNamespace(log logr.Logger) string {
+	log.V(1).Info("Getting active namespace")
+	path, err := os.Getwd()
+	if err != nil {
+		log.V(1).Info("Can't get active namespace", "error", err)
+		return ""
+	}
+
+	namespace, err := readStatusFile(path, log)
+	if err != nil {
+		log.V(1).Info("Can't get active namespace", "error", err)
+		return ""
+	}
+
+	return strings.TrimSuffix(namespace, "\n")
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/docker"
 	"github.com/RasaHQ/rasaxctl/pkg/helm"
 	"github.com/RasaHQ/rasaxctl/pkg/k8s"
-	"github.com/RasaHQ/rasaxctl/pkg/logger"
 	"github.com/RasaHQ/rasaxctl/pkg/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
@@ -30,7 +29,6 @@ type RasaXCTL struct {
 }
 
 func (r *RasaXCTL) InitClients() error {
-	r.Log = logger.New()
 	r.Spinner = &status.SpinnerMessage{}
 	r.Spinner.New()
 

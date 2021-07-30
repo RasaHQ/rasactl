@@ -57,7 +57,7 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 			secret.Data[types.StateSecretHelmReleaseStatus] = []byte(t.Info.Status)
 		}
 	}
-	k.Log.Info("Updating secret with the project state", "secret", secret.Name, "namespace", k.Namespace, "data", data)
+	k.Log.Info("Updating secret with the project state", "secret", secret.Name, "namespace", k.Namespace, "data", secret.Data)
 
 	if _, err := k.clientset.CoreV1().Secrets(k.Namespace).Update(context.TODO(), secret, metav1.UpdateOptions{}); err != nil {
 		return err

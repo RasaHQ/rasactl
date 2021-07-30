@@ -35,7 +35,12 @@ func (r *RasaXCTL) List() error {
 			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
 		}
 
-		data = append(data, []string{namespace, status,
+		current := ""
+		if namespace == r.Namespace {
+			current = "*"
+		}
+
+		data = append(data, []string{current, namespace, status,
 			string(stateData[types.StateSecretRasaWorkerVersion]),
 			string(stateData[types.StateSecretEnterprise]),
 			string(stateData[types.StateSecretRasaXVersion]),
@@ -44,7 +49,7 @@ func (r *RasaXCTL) List() error {
 	}
 
 	status.PrintTable(
-		[]string{"Name", "Status", "Rasa worker", "Enterprise", "Version"},
+		[]string{"Current", "Name", "Status", "Rasa worker", "Enterprise", "Version"},
 		data,
 	)
 	return nil

@@ -27,16 +27,13 @@ func openCmd() *cobra.Command {
 
 	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:   "open [PROJECT NAME]",
+		Use:   "open [DEPLOYMENT NAME]",
 		Short: "open Rasa X in a web browser",
-		Args:  cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace = args[0]
-
-			rasaXCTL.Namespace = namespace
-			if err := rasaXCTL.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			if namespace == "" {
+				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
 			}
+
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 

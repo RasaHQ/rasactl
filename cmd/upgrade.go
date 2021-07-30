@@ -26,16 +26,12 @@ func upgradeCmd() *cobra.Command {
 
 	// cmd represents the upgrade command
 	cmd := &cobra.Command{
-		Use:          "upgrade [PROJECT NAME]",
+		Use:          "upgrade [DEPLOYMENT NAME]",
 		Short:        "upgrade/update Rasa X deployment",
-		Args:         cobra.MinimumNArgs(1),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			namespace = args[0]
-
-			rasaXCTL.Namespace = namespace
-			if err := rasaXCTL.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			if namespace == "" {
+				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
 			}
 
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
