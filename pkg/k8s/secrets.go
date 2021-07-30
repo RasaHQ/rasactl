@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,7 +18,7 @@ func (k *Kubernetes) SaveSecretWithState() error {
 		},
 		Type: "rasa.com/rasaxctl.state",
 		Data: map[string][]byte{
-			types.StateSecretProjectPath: []byte(viper.GetString("project-path")),
+			types.StateSecretProjectPath: []byte(k.Flags.ProjectPath),
 		},
 	}
 

@@ -9,10 +9,10 @@ import (
 	"github.com/RasaHQ/rasaxctl/pkg/k8s"
 	"github.com/RasaHQ/rasaxctl/pkg/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/status"
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 )
 
 type RasaXCTL struct {
@@ -26,6 +26,7 @@ type RasaXCTL struct {
 	isRasaXRunning   bool
 	isRasaXDeployed  bool
 	CloudProvider    *cloud.Provider
+	Flags            *types.RasaXCtlFlags
 }
 
 func (r *RasaXCTL) InitClients() error {
@@ -40,6 +41,7 @@ func (r *RasaXCTL) InitClients() error {
 		Namespace:     r.Namespace,
 		Log:           r.Log,
 		CloudProvider: r.CloudProvider,
+		Flags:         r.Flags,
 	}
 	if err := r.KubernetesClient.New(); err != nil {
 		return err
@@ -50,6 +52,7 @@ func (r *RasaXCTL) InitClients() error {
 		Namespace:     r.Namespace,
 		Spinner:       r.Spinner,
 		CloudProvider: r.CloudProvider,
+		Flags:         r.Flags,
 	}
 	if err := r.HelmClient.New(); err != nil {
 		return err
@@ -60,6 +63,7 @@ func (r *RasaXCTL) InitClients() error {
 		Namespace: r.Namespace,
 		Log:       r.Log,
 		Spinner:   r.Spinner,
+		Flags:     r.Flags,
 	}
 	if err := r.DockerClient.New(); err != nil {
 		return err
@@ -91,7 +95,7 @@ func (r *RasaXCTL) CheckDeploymentStatus() (bool, bool, error) {
 }
 
 func (r *RasaXCTL) startOrInstall() error {
-	projectPath := viper.GetString("project-path")
+	projectPath := r.Flags.ProjectPath
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		if projectPath != "" {
@@ -145,7 +149,7 @@ func (r *RasaXCTL) startOrInstall() error {
 		r.Spinner.Message(msg)
 		r.Log.Info(msg)
 
-		if string(state["project-path"]) != "" {
+		if string(state[types.StateSecretProjectPath]) != "" {
 			if r.DockerClient.Kind.ControlPlaneHost != "" {
 				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 				if err := r.DockerClient.StartKindNode(nodeName); err != nil {

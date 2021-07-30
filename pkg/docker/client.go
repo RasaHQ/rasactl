@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
+	rtypes "github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -34,6 +35,7 @@ type Docker struct {
 	ProjectPath  string
 	kubeadmToken string
 	Kind         KindSpec
+	Flags        *rtypes.RasaXCtlFlags
 }
 
 type KindSpec struct {

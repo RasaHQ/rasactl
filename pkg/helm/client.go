@@ -34,6 +34,7 @@ type Helm struct {
 	kubeConfig            string
 	values                map[string]interface{}
 	CloudProvider         *cloud.Provider
+	Flags                 *types.RasaXCtlFlags
 }
 
 func (h *Helm) New() error {

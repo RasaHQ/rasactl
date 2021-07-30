@@ -41,6 +41,7 @@ var (
 	rasaXCTL          *rasaxctl.RasaXCTL
 	log               logr.Logger
 	namespace         string
+	rasaxctlFlags     *types.RasaXCtlFlags = &types.RasaXCtlFlags{}
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -59,6 +60,7 @@ var rootCmd = &cobra.Command{
 		rasaXCTL = &rasaxctl.RasaXCTL{
 			Log:       log,
 			Namespace: namespace,
+			Flags:     rasaxctlFlags,
 		}
 		if err := rasaXCTL.InitClients(); err != nil {
 			return errors.Errorf(errorPrint.Sprintf("%s", err))

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
@@ -12,7 +11,7 @@ import (
 )
 
 func (h *Helm) ReadValuesFile() error {
-	file := viper.GetString("values-file")
+	file := h.Flags.ValuesFile
 
 	if file != "" {
 		h.Log.V(1).Info("Reading the values file", "file", file)

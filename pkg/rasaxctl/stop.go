@@ -1,6 +1,10 @@
 package rasaxctl
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/RasaHQ/rasaxctl/pkg/types"
+)
 
 func (r *RasaXCTL) Stop() error {
 	r.Spinner.Message("Stopping Rasa X")
@@ -13,7 +17,7 @@ func (r *RasaXCTL) Stop() error {
 		return err
 	}
 
-	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state["project-path"]) != "" {
+	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" {
 		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
 			return err

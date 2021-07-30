@@ -2,6 +2,7 @@ package rasaxctl
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
@@ -43,7 +44,7 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
-	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state["project-path"]) != "" || force {
+	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" || force {
 		r.Spinner.Message("Deleting persistent volume")
 		if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
 			return err
@@ -64,6 +65,8 @@ func (r *RasaXCTL) Delete() error {
 		} else if err != nil && force {
 			r.Log.Info("Can't delete a Kubernetes node", "node", nodeName, "error", err)
 		}
+		rasaxctlFile := fmt.Sprintf("%s/.rasaxctl", state[types.StateSecretProjectPath])
+		os.Remove(rasaxctlFile)
 	}
 
 	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {

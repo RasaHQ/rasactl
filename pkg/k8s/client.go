@@ -26,6 +26,7 @@ type Kubernetes struct {
 	Log           logr.Logger
 	BackendType   types.KubernetesBackendType
 	CloudProvider *cloud.Provider
+	Flags         *types.RasaXCtlFlags
 }
 
 type HelmSpec struct {
