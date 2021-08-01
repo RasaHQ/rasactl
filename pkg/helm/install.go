@@ -5,7 +5,6 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
-	"github.com/spf13/viper"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
@@ -50,7 +49,7 @@ func (h *Helm) Install() error {
 
 	h.values = utils.MergeMaps(valuesDisableRasaProduction(), h.values)
 	// Add additional values for local PVC
-	if h.Flags.ProjectPath != "" {
+	if h.Flags.Start.ProjectPath != "" {
 		h.values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.values)
 		h.values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.values)
 		h.Log.V(1).Info("Merging values", "result", h.values)
@@ -73,7 +72,7 @@ func (h *Helm) Install() error {
 	}
 
 	// Set Rasa X password
-	h.values = utils.MergeMaps(valuesSetRasaXPassword(viper.GetString("rasa-x-password")), h.values)
+	h.values = utils.MergeMaps(valuesSetRasaXPassword(h.Flags.Start.RasaXPassword), h.values)
 	h.Log.V(1).Info("Merging values", "result", h.values)
 
 	// install the chart

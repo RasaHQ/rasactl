@@ -5,9 +5,8 @@ import (
 	"strings"
 
 	"github.com/Delta456/box-cli-maker/v2"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	types "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
-	"github.com/spf13/viper"
 )
 
 func GreenBox(tittle string, msg string) {
@@ -40,7 +39,7 @@ func YellowBox(tittle string, msg string) {
 	}
 }
 
-func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
+func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXPassword string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 
 		msg := []string{fmt.Sprintf("URL: %s", url)}
@@ -49,7 +48,7 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string) {
 			msg = append(msg, fmt.Sprintf("Rasa production version: %s", version.Rasa.Production))
 		}
 
-		msg = append(msg, fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s", version.Rasa.Worker, version.RasaX, viper.GetString("rasa-x-password")))
+		msg = append(msg, fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s", version.Rasa.Worker, version.RasaX, rasaXPassword))
 
 		GreenBox(
 			"Rasa X",

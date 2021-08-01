@@ -6,12 +6,11 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
-	"github.com/spf13/viper"
 )
 
 func (r *RasaXCTL) Delete() error {
-	force := viper.GetBool("force")
-	prune := viper.GetBool("prune")
+	force := r.Flags.Delete.Force
+	prune := r.Flags.Delete.Prune
 	r.Spinner.Message("Deleting Rasa X")
 
 	state, err := r.KubernetesClient.ReadSecretWithState()

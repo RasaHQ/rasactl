@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Helm) ReadValuesFile() error {
-	file := h.Flags.ValuesFile
+	file := h.Flags.StartUpgrade.ValuesFile
 
 	if file != "" {
 		h.Log.V(1).Info("Reading the values file", "file", file)

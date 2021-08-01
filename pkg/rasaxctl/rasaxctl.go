@@ -95,7 +95,7 @@ func (r *RasaXCTL) CheckDeploymentStatus() (bool, bool, error) {
 }
 
 func (r *RasaXCTL) startOrInstall() error {
-	projectPath := r.Flags.ProjectPath
+	projectPath := r.Flags.Start.ProjectPath
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		if projectPath != "" {
@@ -239,7 +239,7 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		// Print the status box only if it's a new Rasa X deployment
-		status.PrintRasaXStatus(rasaXVersion, r.RasaXClient.URL)
+		status.PrintRasaXStatus(rasaXVersion, r.RasaXClient.URL, r.Flags.Start.RasaXPassword)
 	}
 	return nil
 }

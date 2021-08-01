@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	rtypes "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -18,7 +19,7 @@ func (k *Kubernetes) SaveSecretWithState() error {
 		},
 		Type: "rasa.com/rasaxctl.state",
 		Data: map[string][]byte{
-			types.StateSecretProjectPath: []byte(k.Flags.ProjectPath),
+			types.StateSecretProjectPath: []byte(k.Flags.Start.ProjectPath),
 		},
 	}
 
@@ -39,7 +40,7 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 	}
 	for _, d := range data {
 		switch t := d.(type) {
-		case *types.VersionEndpointResponse:
+		case *rtypes.VersionEndpointResponse:
 			secret.Data[types.StateSecretRasaXVersion] = []byte(t.RasaX)
 			secret.Data[types.StateSecretRasaWorkerVersion] = []byte(t.Rasa.Worker)
 

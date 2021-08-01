@@ -12,15 +12,13 @@ func addStartUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
 
-	cmd.PersistentFlags().StringVar(&rasaxctlFlags.ValuesFile, "values-file", "", "absolute path to the values file")
+	cmd.PersistentFlags().StringVar(&rasaxctlFlags.StartUpgrade.ValuesFile, "values-file", "", "absolute path to the values file")
 }
 
 func addStartFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().StringVar(&rasaxctlFlags.ProjectPath, "project-path", "", "absolute path to the project directory directory mounted in kind")
-	cmd.PersistentFlags().BoolP("project", "p", false, "use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
-	cmd.PersistentFlags().String("rasa-x-password", "rasaxlocal", "Rasa X password")
-
-	viper.BindPFlag("rasa-x-password", cmd.PersistentFlags().Lookup("rasa-x-password"))
+	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.ProjectPath, "project-path", "", "absolute path to the project directory directory mounted in kind")
+	cmd.PersistentFlags().BoolVarP(&rasaxctlFlags.Start.Project, "project", "p", false, "use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
+	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")
 }
 
 func addUpgradeFlags(cmd *cobra.Command) {
@@ -29,11 +27,8 @@ func addUpgradeFlags(cmd *cobra.Command) {
 }
 
 func addDeleteFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().Bool("force", false, "if true, delete resources and ignore errors")
-	cmd.PersistentFlags().Bool("prune", false, "if true, delete a namespace with a project")
-
-	viper.BindPFlag("force", cmd.PersistentFlags().Lookup("force"))
-	viper.BindPFlag("prune", cmd.PersistentFlags().Lookup("prune"))
+	cmd.PersistentFlags().BoolVar(&rasaxctlFlags.Delete.Force, "force", false, "if true, delete resources and ignore errors")
+	cmd.PersistentFlags().BoolVar(&rasaxctlFlags.Delete.Prune, "prune", false, "if true, delete a namespace with a project")
 }
 
 func addStatusFlags(cmd *cobra.Command) {

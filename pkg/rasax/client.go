@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	types "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
