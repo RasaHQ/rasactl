@@ -47,20 +47,21 @@ func (h *Helm) Install() error {
 		}
 	}
 
-	h.values = utils.MergeMaps(valuesDisableRasaProduction(), h.values)
+	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), h.Values)
+
 	// Add additional values for local PVC
-	if h.Flags.Start.ProjectPath != "" {
-		h.values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.values)
-		h.values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.values)
-		h.Log.V(1).Info("Merging values", "result", h.values)
+	if h.Flags.Start.ProjectPath != "" && h.KubernetesBackendType == types.KubernetesBackendLocal {
+		h.Values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.Values)
+		h.Values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.Values)
+		h.Log.V(1).Info("Merging values", "result", h.Values)
 	}
 
 	// Configure ingress to use local hostname if Kubernetes backend is on a local machine
 	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.rasaxctl.local.io", h.Namespace)
 		ip := "127.0.0.1"
-		h.values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.values)
-		h.Log.V(1).Info("Merging values", "result", h.values)
+		h.Values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.Values)
+		h.Log.V(1).Info("Merging values", "result", h.Values)
 
 		// Add host to /etc/hosts - required sudo
 		if err := utils.AddHostToEtcHosts(host, ip); err != nil {
@@ -68,22 +69,22 @@ func (h *Helm) Install() error {
 		}
 		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
 	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name != types.CloudProviderUnknown {
-		h.values = utils.MergeMaps(valuesNginxNodePort(), h.values)
+		h.Values = utils.MergeMaps(valuesNginxNodePort(), h.Values)
 	}
 
 	// Set Rasa X password
-	h.values = utils.MergeMaps(valuesSetRasaXPassword(h.Flags.Start.RasaXPassword), h.values)
-	h.Log.V(1).Info("Merging values", "result", h.values)
+	h.Values = utils.MergeMaps(valuesSetRasaXPassword(h.Flags.Start.RasaXPassword), h.Values)
+	h.Log.V(1).Info("Merging values", "result", h.Values)
 
 	// install the chart
-	rel, err := client.Run(helmChart, h.values)
+	rel, err := client.Run(helmChart, h.Values)
 	if err != nil {
 		return err
 	}
 
 	msg := fmt.Sprintf("Installation has beed finished, status: %s", rel.Info.Status)
 	h.Log.Info(msg, "releaseName", client.ReleaseName, "namespace", client.Namespace)
-	h.Log.V(1).Info(msg, "values", h.values)
+	h.Log.V(1).Info(msg, "values", h.Values)
 	h.Spinner.Message(msg)
 
 	return nil

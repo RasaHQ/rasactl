@@ -4,6 +4,7 @@ import "github.com/RasaHQ/rasaxctl/pkg/utils"
 
 func (r *RasaXCTL) Start() error {
 
+	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)
 	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {
 		return err
 	}

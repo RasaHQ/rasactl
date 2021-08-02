@@ -33,17 +33,23 @@ func deleteCmd() *cobra.Command {
 		Short: "delete Rasa X deployment",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
+				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
-
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
 			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
 				if os.Getuid() != 0 {
 					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))
 				}
 			}
+
+			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
+				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+			}
+			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
 			return nil
 		},

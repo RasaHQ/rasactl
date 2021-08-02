@@ -1,0 +1,528 @@
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: ingress-ready=true
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        service-node-port-range: 30000-30100
+
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+
+  - containerPort: 30000
+    hostPort: 30000
+    protocol: TCP
+
+
+  - containerPort: 30001
+    hostPort: 30001
+    protocol: TCP
+
+
+  - containerPort: 30002
+    hostPort: 30002
+    protocol: TCP
+
+
+  - containerPort: 30003
+    hostPort: 30003
+    protocol: TCP
+
+
+  - containerPort: 30004
+    hostPort: 30004
+    protocol: TCP
+
+
+  - containerPort: 30005
+    hostPort: 30005
+    protocol: TCP
+
+
+  - containerPort: 30006
+    hostPort: 30006
+    protocol: TCP
+
+
+  - containerPort: 30007
+    hostPort: 30007
+    protocol: TCP
+
+
+  - containerPort: 30008
+    hostPort: 30008
+    protocol: TCP
+
+
+  - containerPort: 30009
+    hostPort: 30009
+    protocol: TCP
+
+
+  - containerPort: 30010
+    hostPort: 30010
+    protocol: TCP
+
+
+  - containerPort: 30011
+    hostPort: 30011
+    protocol: TCP
+
+
+  - containerPort: 30012
+    hostPort: 30012
+    protocol: TCP
+
+
+  - containerPort: 30013
+    hostPort: 30013
+    protocol: TCP
+
+
+  - containerPort: 30014
+    hostPort: 30014
+    protocol: TCP
+
+
+  - containerPort: 30015
+    hostPort: 30015
+    protocol: TCP
+
+
+  - containerPort: 30016
+    hostPort: 30016
+    protocol: TCP
+
+
+  - containerPort: 30017
+    hostPort: 30017
+    protocol: TCP
+
+
+  - containerPort: 30018
+    hostPort: 30018
+    protocol: TCP
+
+
+  - containerPort: 30019
+    hostPort: 30019
+    protocol: TCP
+
+
+  - containerPort: 30020
+    hostPort: 30020
+    protocol: TCP
+
+
+  - containerPort: 30021
+    hostPort: 30021
+    protocol: TCP
+
+
+  - containerPort: 30022
+    hostPort: 30022
+    protocol: TCP
+
+
+  - containerPort: 30023
+    hostPort: 30023
+    protocol: TCP
+
+
+  - containerPort: 30024
+    hostPort: 30024
+    protocol: TCP
+
+
+  - containerPort: 30025
+    hostPort: 30025
+    protocol: TCP
+
+
+  - containerPort: 30026
+    hostPort: 30026
+    protocol: TCP
+
+
+  - containerPort: 30027
+    hostPort: 30027
+    protocol: TCP
+
+
+  - containerPort: 30028
+    hostPort: 30028
+    protocol: TCP
+
+
+  - containerPort: 30029
+    hostPort: 30029
+    protocol: TCP
+
+
+  - containerPort: 30030
+    hostPort: 30030
+    protocol: TCP
+
+
+  - containerPort: 30031
+    hostPort: 30031
+    protocol: TCP
+
+
+  - containerPort: 30032
+    hostPort: 30032
+    protocol: TCP
+
+
+  - containerPort: 30033
+    hostPort: 30033
+    protocol: TCP
+
+
+  - containerPort: 30034
+    hostPort: 30034
+    protocol: TCP
+
+
+  - containerPort: 30035
+    hostPort: 30035
+    protocol: TCP
+
+
+  - containerPort: 30036
+    hostPort: 30036
+    protocol: TCP
+
+
+  - containerPort: 30037
+    hostPort: 30037
+    protocol: TCP
+
+
+  - containerPort: 30038
+    hostPort: 30038
+    protocol: TCP
+
+
+  - containerPort: 30039
+    hostPort: 30039
+    protocol: TCP
+
+
+  - containerPort: 30040
+    hostPort: 30040
+    protocol: TCP
+
+
+  - containerPort: 30041
+    hostPort: 30041
+    protocol: TCP
+
+
+  - containerPort: 30042
+    hostPort: 30042
+    protocol: TCP
+
+
+  - containerPort: 30043
+    hostPort: 30043
+    protocol: TCP
+
+
+  - containerPort: 30044
+    hostPort: 30044
+    protocol: TCP
+
+
+  - containerPort: 30045
+    hostPort: 30045
+    protocol: TCP
+
+
+  - containerPort: 30046
+    hostPort: 30046
+    protocol: TCP
+
+
+  - containerPort: 30047
+    hostPort: 30047
+    protocol: TCP
+
+
+  - containerPort: 30048
+    hostPort: 30048
+    protocol: TCP
+
+
+  - containerPort: 30049
+    hostPort: 30049
+    protocol: TCP
+
+
+  - containerPort: 30050
+    hostPort: 30050
+    protocol: TCP
+
+
+  - containerPort: 30051
+    hostPort: 30051
+    protocol: TCP
+
+
+  - containerPort: 30052
+    hostPort: 30052
+    protocol: TCP
+
+
+  - containerPort: 30053
+    hostPort: 30053
+    protocol: TCP
+
+
+  - containerPort: 30054
+    hostPort: 30054
+    protocol: TCP
+
+
+  - containerPort: 30055
+    hostPort: 30055
+    protocol: TCP
+
+
+  - containerPort: 30056
+    hostPort: 30056
+    protocol: TCP
+
+
+  - containerPort: 30057
+    hostPort: 30057
+    protocol: TCP
+
+
+  - containerPort: 30058
+    hostPort: 30058
+    protocol: TCP
+
+
+  - containerPort: 30059
+    hostPort: 30059
+    protocol: TCP
+
+
+  - containerPort: 30060
+    hostPort: 30060
+    protocol: TCP
+
+
+  - containerPort: 30061
+    hostPort: 30061
+    protocol: TCP
+
+
+  - containerPort: 30062
+    hostPort: 30062
+    protocol: TCP
+
+
+  - containerPort: 30063
+    hostPort: 30063
+    protocol: TCP
+
+
+  - containerPort: 30064
+    hostPort: 30064
+    protocol: TCP
+
+
+  - containerPort: 30065
+    hostPort: 30065
+    protocol: TCP
+
+
+  - containerPort: 30066
+    hostPort: 30066
+    protocol: TCP
+
+
+  - containerPort: 30067
+    hostPort: 30067
+    protocol: TCP
+
+
+  - containerPort: 30068
+    hostPort: 30068
+    protocol: TCP
+
+
+  - containerPort: 30069
+    hostPort: 30069
+    protocol: TCP
+
+
+  - containerPort: 30070
+    hostPort: 30070
+    protocol: TCP
+
+
+  - containerPort: 30071
+    hostPort: 30071
+    protocol: TCP
+
+
+  - containerPort: 30072
+    hostPort: 30072
+    protocol: TCP
+
+
+  - containerPort: 30073
+    hostPort: 30073
+    protocol: TCP
+
+
+  - containerPort: 30074
+    hostPort: 30074
+    protocol: TCP
+
+
+  - containerPort: 30075
+    hostPort: 30075
+    protocol: TCP
+
+
+  - containerPort: 30076
+    hostPort: 30076
+    protocol: TCP
+
+
+  - containerPort: 30077
+    hostPort: 30077
+    protocol: TCP
+
+
+  - containerPort: 30078
+    hostPort: 30078
+    protocol: TCP
+
+
+  - containerPort: 30079
+    hostPort: 30079
+    protocol: TCP
+
+
+  - containerPort: 30080
+    hostPort: 30080
+    protocol: TCP
+
+
+  - containerPort: 30081
+    hostPort: 30081
+    protocol: TCP
+
+
+  - containerPort: 30082
+    hostPort: 30082
+    protocol: TCP
+
+
+  - containerPort: 30083
+    hostPort: 30083
+    protocol: TCP
+
+
+  - containerPort: 30084
+    hostPort: 30084
+    protocol: TCP
+
+
+  - containerPort: 30085
+    hostPort: 30085
+    protocol: TCP
+
+
+  - containerPort: 30086
+    hostPort: 30086
+    protocol: TCP
+
+
+  - containerPort: 30087
+    hostPort: 30087
+    protocol: TCP
+
+
+  - containerPort: 30088
+    hostPort: 30088
+    protocol: TCP
+
+
+  - containerPort: 30089
+    hostPort: 30089
+    protocol: TCP
+
+
+  - containerPort: 30090
+    hostPort: 30090
+    protocol: TCP
+
+
+  - containerPort: 30091
+    hostPort: 30091
+    protocol: TCP
+
+
+  - containerPort: 30092
+    hostPort: 30092
+    protocol: TCP
+
+
+  - containerPort: 30093
+    hostPort: 30093
+    protocol: TCP
+
+
+  - containerPort: 30094
+    hostPort: 30094
+    protocol: TCP
+
+
+  - containerPort: 30095
+    hostPort: 30095
+    protocol: TCP
+
+
+  - containerPort: 30096
+    hostPort: 30096
+    protocol: TCP
+
+
+  - containerPort: 30097
+    hostPort: 30097
+    protocol: TCP
+
+
+  - containerPort: 30098
+    hostPort: 30098
+    protocol: TCP
+
+
+  - containerPort: 30099
+    hostPort: 30099
+    protocol: TCP
+
+
+  - containerPort: 30100
+    hostPort: 30100
+    protocol: TCP
+

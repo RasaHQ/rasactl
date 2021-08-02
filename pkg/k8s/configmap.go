@@ -10,13 +10,26 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (k *Kubernetes) CreateRasaXConfig() error {
+func (k *Kubernetes) UpdateRasaXConfig(token string) error {
+
+	var productionPort int = k.Flags.ConnectRasa.Port
+	var workerPort int = k.Flags.ConnectRasa.Port
+
+	if k.Flags.ConnectRasa.RunSeparateWorker {
+		workerPort = workerPort + 1
+	}
+	urlProduction := fmt.Sprintf("http://rasa.localhost:%d", productionPort)
+	urlWorker := fmt.Sprintf("http://rasa.localhost:%d", workerPort)
 
 	configSpec := types.EnvironmentsConfigurationFile{
 		Rasa: types.RasaSpecEnvironments{
 			Production: types.EnvironmentsConfigurationSpec{
-				Url:   "",
-				Token: "",
+				Url:   urlProduction,
+				Token: token,
+			},
+			Worker: types.EnvironmentsConfigurationSpec{
+				Url:   urlWorker,
+				Token: token,
 			},
 		},
 	}
@@ -38,7 +51,7 @@ func (k *Kubernetes) CreateRasaXConfig() error {
 		},
 	}
 
-	_, err = k.clientset.CoreV1().ConfigMaps(k.Namespace).Create(context.TODO(), config, metav1.CreateOptions{})
+	_, err = k.clientset.CoreV1().ConfigMaps(k.Namespace).Update(context.TODO(), config, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}

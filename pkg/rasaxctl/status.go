@@ -6,7 +6,6 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/status"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/spf13/viper"
 )
 
 func (r *RasaXCTL) Status() error {
@@ -32,7 +31,23 @@ func (r *RasaXCTL) Status() error {
 	fmt.Fprintf(&b, "Name: %s\n", r.Namespace)
 	fmt.Fprintf(&b, "Status: %s\n", statusProject)
 	fmt.Fprintf(&b, "Version: %s\n", stateData[types.StateSecretRasaXVersion])
-	fmt.Fprintf(&b, "Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
+
+	url, err := r.GetRasaXURL()
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(&b, "URL: %s\n", url)
+
+	r.initRasaXClient()
+	r.RasaXClient.URL = url
+
+	versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		fmt.Fprintf(&b, "Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
+	} else {
+		fmt.Fprintf(&b, "Rasa production version: %s\n", versionEndpoint.Rasa.Production)
+		fmt.Fprintf(&b, "Rasa worker version: %s\n", versionEndpoint.Rasa.Worker)
+	}
 
 	projectPath := "not defined"
 	if string(stateData[types.StateSecretProjectPath]) != "" {
@@ -40,13 +55,7 @@ func (r *RasaXCTL) Status() error {
 	}
 	fmt.Fprintf(&b, "Project path: %s\n", projectPath)
 
-	url, err := r.GetRasaXURL()
-	if err != nil {
-		return err
-	}
-	fmt.Fprintf(&b, "URL: %s", url)
-
-	if viper.GetBool("details") {
+	if r.Flags.Status.Details {
 
 		release, err := r.HelmClient.GetStatus()
 		if err != nil {
@@ -73,7 +82,7 @@ func (r *RasaXCTL) Status() error {
 		}
 
 		if len(pods.Items) != 0 {
-			fmt.Fprintf(&b, "Pod details:\n\n")
+			fmt.Fprintf(&b, "Pod details:\n")
 		}
 
 		fmt.Println(b.String())
@@ -82,9 +91,10 @@ func (r *RasaXCTL) Status() error {
 			[]string{"Name", "Condition", "Status"},
 			data,
 		)
+		fmt.Println()
+		return nil
 	}
 	fmt.Println(b.String())
-	fmt.Println()
 
 	return nil
 }

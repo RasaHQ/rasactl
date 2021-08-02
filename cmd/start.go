@@ -44,13 +44,6 @@ func startCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Check if a Rasa X deployment is already installed and running
-
-			if rasaXCTL.KubernetesClient.IsNamespaceManageable() {
-				fmt.Printf("It looks like there is already Rasa X deployment in the %s namespace\n", rasaXCTL.Namespace)
-				return nil
-			}
-
 			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

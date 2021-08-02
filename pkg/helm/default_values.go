@@ -96,3 +96,37 @@ func valuesSetRasaXPassword(password string) map[string]interface{} {
 
 	return values
 }
+
+func ValuesHostNetworkRasaX() map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"hostNetwork": true,
+		},
+	}
+
+	return values
+}
+
+func ValuesRabbitMQNodePort() map[string]interface{} {
+	values := map[string]interface{}{
+		"rabbitmq": map[string]interface{}{
+			"service": map[string]interface{}{
+				"type": "NodePort",
+			},
+		},
+	}
+
+	return values
+}
+
+func ValuesPostgreSQLNodePort() map[string]interface{} {
+	values := map[string]interface{}{
+		"postgresql": map[string]interface{}{
+			"service": map[string]interface{}{
+				"type": "NodePort",
+			},
+		},
+	}
+
+	return values
+}

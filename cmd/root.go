@@ -19,14 +19,15 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/RasaHQ/rasaxctl/pkg/logger"
 	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
-	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
@@ -53,8 +54,10 @@ var rootCmd = &cobra.Command{
 
 		if len(args) != 0 {
 			namespace = args[0]
-		} else if namespace == "" {
-			namespace = uuid.New().String()
+		}
+
+		if namespace == "" && cmd.CalledAs() == "start" {
+			namespace = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
 		}
 
 		rasaXCTL = &rasaxctl.RasaXCTL{

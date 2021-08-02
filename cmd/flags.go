@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func addStartUpgradeFlags(cmd *cobra.Command) {
@@ -32,11 +31,15 @@ func addDeleteFlags(cmd *cobra.Command) {
 }
 
 func addStatusFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().BoolP("details", "d", false, "show detailed information, such as running pods, helm chart status")
-
-	viper.BindPFlag("details", cmd.PersistentFlags().Lookup("details"))
+	cmd.PersistentFlags().BoolVarP(&rasaxctlFlags.Status.Details, "details", "d", false, "show detailed information, such as running pods, helm chart status")
 }
 
 func addAddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
+}
+
+func addConnectRasaFlags(cmd *cobra.Command) {
+	cmd.Flags().IntVarP(&rasaxctlFlags.ConnectRasa.Port, "port", "p", 5005, "port to run the Rasa server at")
+	cmd.Flags().BoolVar(&rasaxctlFlags.ConnectRasa.RunSeparateWorker, "run-saparate-worker", false, "runs a separate Rasa server for the worker environment")
+	cmd.Flags().StringSliceVar(&rasaxctlFlags.ConnectRasa.ExtraArgs, "extra-args", nil, "extra arguments for Rasa server")
 }

@@ -32,7 +32,7 @@ type Helm struct {
 	debugLog              func(format string, v ...interface{})
 	rasaXChartName        string
 	kubeConfig            string
-	values                map[string]interface{}
+	Values                map[string]interface{}
 	CloudProvider         *cloud.Provider
 	Flags                 *types.RasaXCtlFlags
 }

@@ -5,6 +5,8 @@ import (
 	"syscall"
 
 	"github.com/kyokomi/emoji"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 func HandleSignals(sigs chan os.Signal) {
@@ -23,4 +25,15 @@ func runOnClose(signal os.Signal) {
 	default:
 		os.Exit(0)
 	}
+}
+
+func noArgs(cmd *cobra.Command, args []string) error {
+	if len(args) > 0 {
+		return errors.Errorf(
+			"%q accepts no arguments\n\nUsage:  %s",
+			cmd.CommandPath(),
+			cmd.UseLine(),
+		)
+	}
+	return nil
 }

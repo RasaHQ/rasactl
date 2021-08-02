@@ -5,6 +5,7 @@ type RasaXCtlFlags struct {
 	Start        RasaXCtlStartFlags
 	Delete       RasaXCtlDeleteFlags
 	Status       RasaXCtlStatusFlags
+	ConnectRasa  RasaXCtlConnectRasaFlags
 }
 
 type RasaXCtlStartUpgradeFlags struct {
@@ -24,4 +25,10 @@ type RasaXCtlDeleteFlags struct {
 
 type RasaXCtlStatusFlags struct {
 	Details bool
+}
+
+type RasaXCtlConnectRasaFlags struct {
+	RunSeparateWorker bool
+	Port              int
+	ExtraArgs         []string
 }

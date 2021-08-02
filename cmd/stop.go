@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -30,10 +31,16 @@ func stopCmd() *cobra.Command {
 		Short: "stop Rasa X deployment",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
+				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
+				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+			}
+			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
 			return nil
 		},

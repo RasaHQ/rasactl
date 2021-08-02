@@ -17,30 +17,40 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/pkg/browser"
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-func openCmd() *cobra.Command {
+func connectRasaCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "open [DEPLOYMENT NAME]",
-		Short: "open Rasa X in a web browser",
+		Use:   "rasa [DEPLOYMENT NAME]",
+		Short: "run Rasa OSS server and connect it to the Rasa X deployment",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+
 			if namespace == "" {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
 
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
 
+			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
+				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+				ReuseValues: true,
+				Timeout:     time.Minute * 10,
+			}
+
+			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -51,6 +61,10 @@ func openCmd() *cobra.Command {
 				return nil
 			}
 
+			if !rasaXCTL.KubernetesClient.IsNamespaceManageable() {
+				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasaxctl, can't continue :(", rasaXCTL.Namespace))
+			}
+
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {
@@ -58,30 +72,19 @@ func openCmd() *cobra.Command {
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s project is not running.\n", rasaXCTL.Namespace)
+				fmt.Printf("Rasa X for the %s deployment is not running.\n", rasaXCTL.Namespace)
 				return nil
 			}
 
-			url, err := rasaXCTL.GetRasaXURL()
-			if err != nil {
+			if err := rasaXCTL.ConnectRasa(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			if err := browser.OpenURL(url); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("Can't open the URL %s in your web browser: %s", url, err))
-			}
-
-			fmt.Printf("The URL %s has been opened in your web browser\n", url)
-			rasaXCTL.Spinner.Stop()
 			return nil
 		},
 	}
 
+	addConnectRasaFlags(cmd)
+
 	return cmd
-}
-
-func init() {
-
-	openCmd := openCmd()
-	rootCmd.AddCommand(openCmd)
 }

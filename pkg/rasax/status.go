@@ -16,14 +16,12 @@ func (r *RasaX) WaitForDatabaseMigration(ctx context.Context) error {
 			return errors.Errorf("Error while waiting for Rasa X Database migration status, error: %s", ctx.Err())
 		default:
 			healthStatus, err := r.GetHealthEndpoint()
-			if err != nil {
-				return err
-			}
-
-			if healthStatus == nil {
+			if healthStatus == nil || err != nil {
 				msg := "Waiting for the health endpoint to be reachable"
 				r.Log.Info(msg, "health", healthStatus)
 				r.SpinnerMessage.Message(msg)
+				time.Sleep(time.Second * 5)
+				continue
 			}
 
 			datadabaseStatus := healthStatus.DatabaseMigration
@@ -50,15 +48,12 @@ func (r *RasaX) WaitForRasaXWorker(ctx context.Context) error {
 		default:
 
 			healthStatus, err := r.GetHealthEndpoint()
-			if err != nil {
-				return err
-			}
-
-			if healthStatus == nil {
+			if healthStatus == nil || err != nil {
 				msg := "Waiting for the health endpoint to be reachable"
 				r.Log.Info(msg, "health", healthStatus)
 				r.SpinnerMessage.Message(msg)
-				return nil
+				time.Sleep(time.Second * 5)
+				continue
 			}
 
 			workerStatus := healthStatus.Worker

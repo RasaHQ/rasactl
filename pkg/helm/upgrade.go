@@ -51,7 +51,7 @@ func (h *Helm) Upgrade() error {
 	}
 
 	// upgrade the chart
-	rel, err := client.Run(h.Configuration.ReleaseName, helmChart, h.values)
+	rel, err := client.Run(h.Configuration.ReleaseName, helmChart, h.Values)
 	if err != nil {
 		return err
 	}
@@ -60,10 +60,10 @@ func (h *Helm) Upgrade() error {
 	if !h.Configuration.StartProject {
 		msg = fmt.Sprintf("Upgrade has beed finished, status: %s", rel.Info.Status)
 	} else {
-		msg = fmt.Sprintf("Rasa X for the %s project is ready", h.Namespace)
+		msg = fmt.Sprintf("Rasa X for the %s deployment is ready", h.Namespace)
 	}
 	h.Log.Info(msg, "releaseName", rel.Name, "namespace", client.Namespace)
-	h.Log.V(1).Info(msg, "values", h.values)
+	h.Log.V(1).Info(msg, "values", h.Values)
 	h.Spinner.Message(msg)
 
 	return nil

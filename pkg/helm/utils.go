@@ -19,12 +19,12 @@ func (h *Helm) ReadValuesFile() error {
 		if err != nil {
 			return err
 		}
-		err = yaml.Unmarshal([]byte(valuesFile), &h.values)
+		err = yaml.Unmarshal([]byte(valuesFile), &h.Values)
 		if err != nil {
 			return err
 		}
 		h.Log.V(1).Info("Read values from the file",
-			"file", file, "values", h.values,
+			"file", file, "values", h.Values,
 		)
 	}
 	return nil

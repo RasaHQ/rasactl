@@ -190,3 +190,18 @@ func (k *Kubernetes) GetPods() (*v1.PodList, error) {
 	}
 	return pods, nil
 }
+
+func (k *Kubernetes) DeleteRasaXPods() error {
+	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: "app.kubernetes.io/component=rasa-x"})
+	if err != nil {
+		return err
+	}
+
+	for _, pod := range pods.Items {
+		if err := k.clientset.CoreV1().Pods(k.Namespace).Delete(context.TODO(), pod.Name, metav1.DeleteOptions{}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

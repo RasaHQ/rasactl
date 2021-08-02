@@ -14,4 +14,5 @@ type HelmConfigurationSpec struct {
 	ReuseValues  bool
 	StartProject bool
 	Atomic       bool
+	Wait         bool
 }

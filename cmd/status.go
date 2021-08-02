@@ -31,7 +31,7 @@ func statusCmd() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have pass a deployment name"))
+				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
 
 			return nil
