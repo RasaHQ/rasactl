@@ -98,19 +98,27 @@ func (r *RasaXCTL) startOrInstall() error {
 	projectPath := r.Flags.Start.ProjectPath
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
-		if projectPath != "" {
+		if projectPath != "" || r.Flags.Start.Project {
 			if r.DockerClient.Kind.ControlPlaneHost != "" {
-				// check if the project path exists
-
-				if path, err := os.Stat(projectPath); err != nil {
-					if os.IsNotExist(err) {
+				if !r.Flags.Start.Project {
+					// check if the project path exists
+					if path, err := os.Stat(projectPath); err != nil {
+						if os.IsNotExist(err) {
+							return err
+						} else if !path.IsDir() {
+							return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
+						}
 						return err
-					} else if !path.IsDir() {
-						return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
 					}
-					return err
+					r.DockerClient.ProjectPath = projectPath
+				} else {
+					// use a current working directory
+					wd, err := os.Getwd()
+					if err != nil {
+						return err
+					}
+					r.DockerClient.ProjectPath = wd
 				}
-				r.DockerClient.ProjectPath = projectPath
 
 				r.Spinner.Message("Creating and joining a kind node")
 				if err := r.CreateAndJoinKindNode(); err != nil {
@@ -177,6 +185,7 @@ func (r *RasaXCTL) GetAllHelmValues() error {
 		return err
 	}
 	r.KubernetesClient.Helm.Values = allValues
+	r.HelmClient.Values = allValues
 
 	return nil
 }

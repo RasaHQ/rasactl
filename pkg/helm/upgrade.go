@@ -32,6 +32,7 @@ func (h *Helm) Upgrade() error {
 	client.Timeout = h.Configuration.Timeout
 	client.Atomic = h.Configuration.Atomic
 	client.ReuseValues = h.Configuration.ReuseValues
+	client.MaxHistory = 10
 
 	if h.Configuration.StartProject {
 		client.ReuseValues = true

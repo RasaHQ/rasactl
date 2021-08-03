@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
 	rtypes "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
@@ -19,7 +20,8 @@ func (k *Kubernetes) SaveSecretWithState() error {
 		},
 		Type: "rasa.com/rasaxctl.state",
 		Data: map[string][]byte{
-			types.StateSecretProjectPath: []byte(k.Flags.Start.ProjectPath),
+			types.StateSecretProjectPath:     []byte(k.Flags.Start.ProjectPath),
+			types.StateSecretHelmReleaseName: []byte(k.Helm.ReleaseName),
 		},
 	}
 
@@ -81,4 +83,28 @@ func (k *Kubernetes) DeleteSecretWithState() error {
 		return err
 	}
 	return nil
+}
+
+func (k *Kubernetes) GetPostgreSQLCreds() (string, string, error) {
+	secretName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
+	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
+	if err != nil {
+		return "", "", err
+	}
+
+	username := k.Helm.Values["global"].(map[string]interface{})["postgresql"].(map[string]interface{})["postgresqlUsername"].(string)
+
+	return username, string(secret.Data["postgresql-password"]), nil
+}
+
+func (k *Kubernetes) GetRabbitMqCreds() (string, string, error) {
+	secretName := fmt.Sprintf("%s-rabbit", k.Helm.ReleaseName)
+	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
+	if err != nil {
+		return "", "", err
+	}
+
+	username := k.Helm.Values["rabbitmq"].(map[string]interface{})["rabbitmq"].(map[string]interface{})["username"].(string)
+
+	return username, string(secret.Data["rabbitmq-password"]), nil
 }

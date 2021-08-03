@@ -9,12 +9,12 @@ import (
 func addStartUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*10, "time to wait for Rasa X to be ready")
 	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
-	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
 
 	cmd.PersistentFlags().StringVar(&rasaxctlFlags.StartUpgrade.ValuesFile, "values-file", "", "absolute path to the values file")
 }
 
 func addStartFlags(cmd *cobra.Command) {
+	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
 	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.ProjectPath, "project-path", "", "absolute path to the project directory directory mounted in kind")
 	cmd.PersistentFlags().BoolVarP(&rasaxctlFlags.Start.Project, "project", "p", false, "use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
 	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")

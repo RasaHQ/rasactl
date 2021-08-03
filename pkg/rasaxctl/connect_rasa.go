@@ -3,6 +3,7 @@ package rasaxctl
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -11,15 +12,25 @@ import (
 
 	"github.com/RasaHQ/rasaxctl/pkg/helm"
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	rtypes "github.com/RasaHQ/rasaxctl/pkg/types/rasa"
 	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
 )
 
 func (r *RasaXCTL) ConnectRasa() error {
 	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 	rasaToken := uuid.New().String()
 	environmentName := "production-worker"
+
+	stateData, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+	fileCreds := fmt.Sprintf("%s/.credentials.yaml", stateData[types.StateSecretProjectPath])
+	fileEndpoints := fmt.Sprintf("%s/.endpoints.yaml", stateData[types.StateSecretProjectPath])
+
 	mutualArgs := []string{
 		"run",
 		"--verbose",
@@ -28,6 +39,10 @@ func (r *RasaXCTL) ConnectRasa() error {
 		"'*'",
 		"--auth-token",
 		rasaToken,
+		"--credentials",
+		fileCreds,
+		"--endpoints",
+		fileEndpoints,
 	}
 	var productionPort int = r.Flags.ConnectRasa.Port
 	var workerPort int = r.Flags.ConnectRasa.Port
@@ -64,6 +79,14 @@ func (r *RasaXCTL) ConnectRasa() error {
 		return err
 	}
 
+	if err := r.saveRasaCredentialsFile(); err != nil {
+		return err
+	}
+
+	if err := r.saveRasaEndpointsFile(); err != nil {
+		return err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*360)
 	defer cancel()
 	url, err := r.GetRasaXURL()
@@ -78,7 +101,7 @@ func (r *RasaXCTL) ConnectRasa() error {
 
 	msg := "Starting Rasa Server"
 	r.Spinner.Message(msg)
-	r.Log.Info(msg)
+	r.Log.Info(msg, "args", mutualArgs)
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	ready := make(chan bool, 1)
@@ -152,4 +175,110 @@ func (r *RasaXCTL) runRasaServer(environment string, args []string, done chan bo
 	done <- true
 
 	return cmd
+}
+
+func (r *RasaXCTL) saveRasaCredentialsFile() error {
+	stateData, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+	file := fmt.Sprintf("%s/.credentials.yaml", stateData[types.StateSecretProjectPath])
+
+	url, err := r.GetRasaXURL()
+	if err != nil {
+		return err
+	}
+
+	creds := rtypes.CredentialsFile{}
+	creds.Rasa.Url = fmt.Sprintf("%s/api", url)
+
+	r.Log.Info("Saving credentials.yaml configuration file", "file", file)
+
+	data, err := yaml.Marshal(&creds)
+	if err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile(file, data, 0644); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *RasaXCTL) saveRasaEndpointsFile() error {
+	stateData, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+	file := fmt.Sprintf("%s/.endpoints.yaml", stateData[types.StateSecretProjectPath])
+
+	url, err := r.GetRasaXURL()
+	if err != nil {
+		return err
+	}
+
+	token, err := r.GetRasaXToken()
+	if err != nil {
+		return err
+	}
+
+	psqlNodePort, err := r.KubernetesClient.GetPostgreSQLSvcNodePort()
+	if err != nil {
+		return nil
+	}
+
+	rabbitNodePort, err := r.KubernetesClient.GetRabbitMqSvcNodePort()
+	if err != nil {
+		return nil
+	}
+
+	usernamePsql, passwordPsql, err := r.KubernetesClient.GetPostgreSQLCreds()
+	if err != nil {
+		return nil
+	}
+
+	usernameRabbit, passwordRabbit, err := r.KubernetesClient.GetRabbitMqCreds()
+	if err != nil {
+		return nil
+	}
+
+	if err := r.GetAllHelmValues(); err != nil {
+		return err
+	}
+
+	endpoints := rtypes.EndpointsFile{
+		Models: rtypes.EndpointModelSpec{
+			Url:                  fmt.Sprintf("%s/api/projects/default/models/tags/production", url),
+			Token:                token,
+			WaitTimeBetweenPulls: 10,
+		},
+		TrackerStore: rtypes.EndpointTrackerStoreSpec{
+			Type:     "sql",
+			Dialect:  "postgresql",
+			Url:      "127.0.0.1",
+			Port:     psqlNodePort,
+			Username: usernamePsql,
+			Password: passwordPsql,
+			Db:       "tracker",
+			LoginDb:  r.HelmClient.Values["global"].(map[string]interface{})["postgresql"].(map[string]interface{})["postgresqlDatabase"].(string),
+		},
+		EventBroker: rtypes.EndpointEventBrokerSpec{
+			Type:     "pika",
+			Url:      "127.0.0.1",
+			Port:     rabbitNodePort,
+			Username: usernameRabbit,
+			Password: passwordRabbit,
+			Queues:   []string{r.HelmClient.Values["rasa"].(map[string]interface{})["rabbitQueue"].(string)},
+		},
+	}
+
+	r.Log.Info("Saving endpoints.yaml configuration file", "file", file)
+
+	data, err := yaml.Marshal(&endpoints)
+	if err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile(file, data, 0644); err != nil {
+		return err
+	}
+	return nil
 }

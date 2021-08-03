@@ -58,8 +58,8 @@ func (r *RasaXCTL) List() error {
 			data = append(data, []string{current, namespace, status,
 				versionEndpoint.Rasa.Production,
 				versionEndpoint.Rasa.Worker,
-				string(stateData[types.StateSecretEnterprise]),
-				string(stateData[types.StateSecretRasaXVersion]),
+				fmt.Sprintf("%t", versionEndpoint.Enterprise),
+				versionEndpoint.RasaX,
 			},
 			)
 		} else {

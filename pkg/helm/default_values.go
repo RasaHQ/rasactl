@@ -3,8 +3,19 @@ package helm
 func valuesMountHostPath(pvcName string) map[string]interface{} {
 	values := map[string]interface{}{
 		"rasax": map[string]interface{}{
-			"persistence": map[string]interface{}{
-				"existingClaim": pvcName,
+			"extraVolumes": []map[string]interface{}{
+				{
+					"name": "rasa-x-local-path",
+					"persistentVolumeClaim": map[string]interface{}{
+						"claimName": pvcName,
+					},
+				},
+			},
+			"extraVolumeMounts": []map[string]interface{}{
+				{
+					"name":      "rasa-x-local-path",
+					"mountPath": "/project",
+				},
 			},
 		},
 	}

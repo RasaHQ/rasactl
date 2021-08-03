@@ -46,6 +46,7 @@ func deleteCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+			fmt.Println(stateData[types.StateSecretHelmReleaseName])
 			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
 				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
 			}

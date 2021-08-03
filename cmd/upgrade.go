@@ -39,9 +39,8 @@ func upgradeCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
-			}
+			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			rasaXCTL.HelmClient.Configuration.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
 			return nil

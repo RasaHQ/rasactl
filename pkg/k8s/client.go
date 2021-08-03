@@ -205,3 +205,34 @@ func (k *Kubernetes) DeleteRasaXPods() error {
 
 	return nil
 }
+
+func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
+
+	svcName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
+	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
+	if err != nil {
+		return 0, err
+	}
+
+	return svc.Spec.Ports[0].NodePort, nil
+}
+
+func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
+
+	helmValues := k.Helm.Values
+	rabbitPort := helmValues["rabbitmq"].(map[string]interface{})["service"].(map[string]interface{})["port"].(float64)
+
+	svcName := fmt.Sprintf("%s-rabbit", k.Helm.ReleaseName)
+	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
+	if err != nil {
+		return 0, err
+	}
+
+	for _, port := range svc.Spec.Ports {
+		if port.Port == int32(rabbitPort) {
+			return port.NodePort, nil
+		}
+	}
+
+	return 0, nil
+}

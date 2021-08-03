@@ -30,7 +30,6 @@ func (r *RasaXCTL) Status() error {
 
 	fmt.Fprintf(&b, "Name: %s\n", r.Namespace)
 	fmt.Fprintf(&b, "Status: %s\n", statusProject)
-	fmt.Fprintf(&b, "Version: %s\n", stateData[types.StateSecretRasaXVersion])
 
 	url, err := r.GetRasaXURL()
 	if err != nil {
@@ -43,8 +42,12 @@ func (r *RasaXCTL) Status() error {
 
 	versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {
+		fmt.Fprintf(&b, "Version: %s\n", stateData[types.StateSecretRasaXVersion])
+		fmt.Fprintf(&b, "Enterprise: %s\n", stateData[types.StateSecretEnterprise])
 		fmt.Fprintf(&b, "Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
 	} else {
+		fmt.Fprintf(&b, "Version: %s\n", versionEndpoint.RasaX)
+		fmt.Fprintf(&b, "Enterprise: %t\n", versionEndpoint.Enterprise)
 		fmt.Fprintf(&b, "Rasa production version: %s\n", versionEndpoint.Rasa.Production)
 		fmt.Fprintf(&b, "Rasa worker version: %s\n", versionEndpoint.Rasa.Worker)
 	}
