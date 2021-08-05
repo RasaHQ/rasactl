@@ -6,6 +6,7 @@ type RasaXCtlFlags struct {
 	Delete       RasaXCtlDeleteFlags
 	Status       RasaXCtlStatusFlags
 	ConnectRasa  RasaXCtlConnectRasaFlags
+	Global       RasaXCtlGlobalFlags
 }
 
 type RasaXCtlStartUpgradeFlags struct {
@@ -31,4 +32,9 @@ type RasaXCtlConnectRasaFlags struct {
 	RunSeparateWorker bool
 	Port              int
 	ExtraArgs         []string
+}
+
+type RasaXCtlGlobalFlags struct {
+	Debug   bool
+	Verbose bool
 }

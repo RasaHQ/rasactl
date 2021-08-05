@@ -1,23 +1,23 @@
 package logger
 
 import (
+	"github.com/RasaHQ/rasaxctl/pkg/types"
 	"github.com/go-logr/logr"
-	"github.com/spf13/viper"
 	"go.uber.org/zap/zapcore"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-func New() logr.Logger {
+func New(flags *types.RasaXCtlFlags) logr.Logger {
 	opts := zap.Options{
 		Development: true,
 		Level:       zapcore.PanicLevel,
 	}
 
-	if viper.GetBool("debug") {
+	if flags.Global.Debug {
 		opts.Level = zapcore.DebugLevel
 	}
 
-	if viper.GetBool("verbose") {
+	if flags.Global.Verbose {
 		opts.Level = zapcore.InfoLevel
 	}
 

@@ -22,6 +22,17 @@ func (r *RasaXCTL) List() error {
 
 	for _, namespace := range namespaces {
 		r.KubernetesClient.Namespace = namespace
+
+		stateData, err := r.KubernetesClient.ReadSecretWithState()
+		if err != nil {
+			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
+		}
+		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
+			ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+		}
+		r.HelmClient.Namespace = namespace
+		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+
 		isRunning, err := r.KubernetesClient.IsRasaXRunning()
 		if err != nil {
 			return err
@@ -31,20 +42,11 @@ func (r *RasaXCTL) List() error {
 			status = "Running"
 		}
 
-		stateData, err := r.KubernetesClient.ReadSecretWithState()
-		if err != nil {
-			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
-		}
-
 		current := ""
 		if namespace == r.Namespace {
 			current = "*"
 		}
 
-		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
-			ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
-		}
-		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 		url, err := r.GetRasaXURL()
 		if err != nil {
 			return err

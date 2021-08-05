@@ -18,7 +18,8 @@ func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
 
 	host, _, err := net.SplitHostPort(k.clientset.RESTClient().Get().URL().Host)
 	if err != nil {
-		return "", err
+		host = k.clientset.RESTClient().Get().URL().Host
+		k.Log.Info("Can't parse Kubernetes server host", "error", err)
 	}
 
 	ip := net.ParseIP(host)

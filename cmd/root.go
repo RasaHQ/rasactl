@@ -88,17 +88,15 @@ func init() {
 	home, _ := homedir.Dir()
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rasaxctl.yaml)")
-	rootCmd.PersistentFlags().Bool("verbose", false, "enable verbose output")
-	rootCmd.PersistentFlags().Bool("debug", false, "enable debug output")
+	rootCmd.PersistentFlags().BoolVar(&rasaxctlFlags.Global.Verbose, "verbose", false, "enable verbose output")
+	rootCmd.PersistentFlags().BoolVar(&rasaxctlFlags.Global.Debug, "debug", false, "enable debug output")
 	rootCmd.PersistentFlags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
 
-	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
 }
 
 func initLog() {
-	log = logger.New()
+	log = logger.New(rasaxctlFlags)
 	namespace = utils.GetActiveNamespace(log)
 }
 

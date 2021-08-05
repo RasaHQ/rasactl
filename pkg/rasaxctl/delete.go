@@ -31,6 +31,7 @@ func (r *RasaXCTL) Delete() error {
 	} else if err != nil && force {
 		r.Log.Info("Can't read state secret", "error", err)
 	}
+	rasaxctlFile := fmt.Sprintf("%s/.rasaxctl", state[types.StateSecretProjectPath])
 
 	if !prune {
 		if err := r.HelmClient.Uninstall(); err != nil && !force {
@@ -76,8 +77,6 @@ func (r *RasaXCTL) Delete() error {
 		} else if err != nil && force {
 			r.Log.Info("Can't delete a Kubernetes node", "node", nodeName, "error", err)
 		}
-		rasaxctlFile := fmt.Sprintf("%s/.rasaxctl", state[types.StateSecretProjectPath])
-		os.Remove(rasaxctlFile)
 	}
 
 	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
@@ -99,6 +98,7 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
+	os.Remove(rasaxctlFile)
 	r.Spinner.Message("Done!")
 	r.Spinner.Stop()
 	return nil
