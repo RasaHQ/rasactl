@@ -10,7 +10,6 @@ func (r *RasaXCTL) Add() error {
 		return err
 	}
 
-	r.initRasaXClient()
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err

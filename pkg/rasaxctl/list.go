@@ -9,7 +9,7 @@ import (
 
 func (r *RasaXCTL) List() error {
 	data := [][]string{}
-	header := []string{"Current", "Name", "Status", "Enterprise", "Version"}
+	header := []string{"Current", "Name", "Status", "Rasa production", "Rasa worker", "Enterprise", "Version"}
 	namespaces, err := r.KubernetesClient.GetNamespaces()
 	if err != nil {
 		return err
@@ -54,16 +54,22 @@ func (r *RasaXCTL) List() error {
 
 		versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
 		if err == nil {
-			header = []string{"Current", "Name", "Status", "Rasa production", "Rasa worker", "Enterprise", "Version"}
+			enterprise := "inactive"
+			if versionEndpoint.Enterprise {
+				enterprise = "active"
+			}
+
 			data = append(data, []string{current, namespace, status,
 				versionEndpoint.Rasa.Production,
 				versionEndpoint.Rasa.Worker,
-				fmt.Sprintf("%t", versionEndpoint.Enterprise),
+				enterprise,
 				versionEndpoint.RasaX,
 			},
 			)
 		} else {
 			data = append(data, []string{current, namespace, status,
+				"0.0.0",
+				string(stateData[types.StateSecretRasaWorkerVersion]),
 				string(stateData[types.StateSecretEnterprise]),
 				string(stateData[types.StateSecretRasaXVersion]),
 			},

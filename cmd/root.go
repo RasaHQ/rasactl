@@ -39,6 +39,7 @@ var (
 	cfgFile           string
 	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
 	errorPrint        *color.Color                 = color.New(color.FgRed)
+	warnPrint         *color.Color                 = color.New(color.FgYellow)
 	rasaXCTL          *rasaxctl.RasaXCTL
 	log               logr.Logger
 	namespace         string

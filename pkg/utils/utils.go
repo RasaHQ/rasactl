@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -148,4 +150,33 @@ func GetActiveNamespace(log logr.Logger) string {
 	}
 
 	return strings.TrimSuffix(namespace, "\n")
+}
+
+func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
+	r := bufio.NewReader(in)
+
+	for ; retry > 0; retry-- {
+		fmt.Printf("%s [yes/no]: ", s)
+
+		res, err := r.ReadString('\n')
+		if err != nil {
+			return false, nil
+		}
+
+		if len(res) < 2 {
+			continue
+		}
+
+		response := strings.ToLower(strings.TrimSpace(res))
+
+		if response == "yes" || response == "no" {
+			return strings.ToLower(strings.TrimSpace(res)) == "yes", nil
+		} else {
+			fmt.Println("You have to put 'yes' or 'no'")
+			continue
+		}
+	}
+
+	return false, nil
+
 }

@@ -38,7 +38,12 @@ func deleteCmd() *cobra.Command {
 
 			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
 				if os.Getuid() != 0 {
-					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))
+					return errors.Errorf(
+						warnPrint.Sprintf(
+							"Administrator permissions required, please run the command with sudo.\n%s needs administrator permissions to remove a hostname from /etc/hosts which was created during the creation of the deployment.",
+							cmd.CommandPath(),
+						),
+					)
 				}
 			}
 
@@ -46,7 +51,6 @@ func deleteCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			fmt.Println(stateData[types.StateSecretHelmReleaseName])
 			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
 				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
 			}
@@ -55,7 +59,6 @@ func deleteCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

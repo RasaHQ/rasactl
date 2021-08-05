@@ -11,6 +11,18 @@ import (
 func (r *RasaXCTL) Delete() error {
 	force := r.Flags.Delete.Force
 	prune := r.Flags.Delete.Prune
+
+	if prune {
+		aYes, err := utils.AskForConfirmation("You're about to delete the namespace with all resources in it, are you sure?", 5, os.Stdin)
+		if err != nil {
+			return err
+		}
+
+		if !aYes {
+			return nil
+		}
+	}
+
 	r.Spinner.Message("Deleting Rasa X")
 
 	state, err := r.KubernetesClient.ReadSecretWithState()

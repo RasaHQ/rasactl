@@ -34,7 +34,12 @@ func startCmd() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
 				if os.Getuid() != 0 {
-					return errors.Errorf(errorPrint.Sprint("Administrator permissions required, please run the command with sudo"))
+					return errors.Errorf(
+						warnPrint.Sprintf(
+							"Administrator permissions required, please run the command with sudo.\n%s needs administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
+							cmd.CommandPath(),
+						),
+					)
 				}
 			}
 

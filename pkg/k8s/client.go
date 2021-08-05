@@ -102,6 +102,10 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 		}
 		host := ingress.Spec.Rules[0].Host
 
+		if len(ingress.Spec.TLS) != 0 {
+			rasaXScheme = "https://"
+		}
+
 		url = fmt.Sprintf("%s://%s", rasaXScheme, host)
 	}
 
