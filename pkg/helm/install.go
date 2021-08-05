@@ -69,6 +69,7 @@ func (h *Helm) Install() error {
 		}
 		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
 	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name != types.CloudProviderUnknown {
+		h.Values = utils.MergeMaps(valuesEnableRasaProduction(), h.Values)
 		h.Values = utils.MergeMaps(valuesNginxNodePort(), h.Values)
 	}
 
