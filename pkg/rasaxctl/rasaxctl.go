@@ -118,6 +118,7 @@ func (r *RasaXCTL) startOrInstall() error {
 						return err
 					}
 					r.DockerClient.ProjectPath = wd
+					projectPath = wd
 				}
 
 				r.Spinner.Message("Creating and joining a kind node")
