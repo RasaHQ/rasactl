@@ -32,26 +32,28 @@ func startCmd() *cobra.Command {
 		Short:        "start Rasa X deployment",
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal {
-				if os.Getuid() != 0 {
-					return errors.Errorf(
-						warnPrint.Sprintf(
-							"Administrator permissions required, please run the command with sudo.\n%s needs administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
-							cmd.CommandPath(),
-						),
-					)
-				}
-			}
-
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+			isDeployed, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isDeployed {
+				if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal && rasaXCTL.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
+					if os.Getuid() != 0 {
+						return errors.Errorf(
+							warnPrint.Sprintf(
+								"Administrator permissions required, please run the command with sudo.\n%s needs administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
+								cmd.CommandPath(),
+							),
+						)
+					}
+				}
 			}
 
 			if isRunning {

@@ -23,7 +23,7 @@ func (r *RasaXCTL) Stop() error {
 			return err
 		}
 	}
-	r.Spinner.Message(fmt.Sprintf("Rasa X for the %s project has been stopped", r.Namespace))
+	r.Spinner.Message(fmt.Sprintf("Rasa X for the %s deployment has been stopped", r.Namespace))
 	r.Spinner.Stop()
 	return nil
 }
