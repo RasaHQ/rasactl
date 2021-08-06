@@ -82,7 +82,7 @@ func (r *RasaXCTL) Delete() error {
 	}
 
 	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
-		host := fmt.Sprintf("%s.rasaxctl.localhost", r.Namespace)
+		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaXCtlLocalDomain)
 		err := utils.DeleteHostToEtcHosts(host)
 		if err != nil && !force {
 			return err

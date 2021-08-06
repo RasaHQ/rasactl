@@ -1,5 +1,7 @@
 package types
 
+const RasaXCtlLocalDomain string = "rasaxctl.localhost"
+
 type RasaXCtlFlags struct {
 	StartUpgrade RasaXCtlStartUpgradeFlags
 	Start        RasaXCtlStartFlags
