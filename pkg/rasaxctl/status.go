@@ -93,6 +93,8 @@ func (r *RasaXCTL) Status() error {
 				[]string{"Name", "Condition", "Status"},
 				data,
 			)
+		} else {
+			fmt.Println(b.String())
 		}
 		fmt.Println()
 		return nil
