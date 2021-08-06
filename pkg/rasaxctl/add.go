@@ -14,6 +14,7 @@ func (r *RasaXCTL) Add() error {
 	if err != nil {
 		return err
 	}
+	r.initRasaXClient()
 	r.RasaXClient.URL = url
 
 	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
