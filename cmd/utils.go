@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"strings"
 	"syscall"
 
 	"github.com/kyokomi/emoji"
@@ -36,4 +37,21 @@ func noArgs(cmd *cobra.Command, args []string) error {
 		)
 	}
 	return nil
+}
+
+func examples(s string) string {
+	trimmedText := strings.TrimSpace(s)
+	if trimmedText == "" {
+		return ""
+	}
+
+	const indent = `  `
+	inLines := strings.Split(trimmedText, "\n")
+	outLines := make([]string, 0, len(inLines))
+
+	for _, line := range inLines {
+		outLines = append(outLines, indent+strings.TrimSpace(line))
+	}
+
+	return strings.Join(outLines, "\n")
 }

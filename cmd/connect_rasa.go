@@ -24,12 +24,37 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	connectRasaDesc = `
+Connect Rasa OSS (Open Source Server) to Rasa X deployment.
+
+The command prepares a configuration that's required to connect Rasa X deployment and run a local Rasa server.
+
+It's required to have the 'rasa' command accessible by rasaxctl.
+
+The command works only if Rasa X deployment uses a local rasa project.
+`
+
+	connectRasaExample = `
+	# Connect Rasa Server to Rasa X deployment.
+	$ rasaxctl connect rasa
+
+	# Run a saparate rasa server for the Rasa X worker environment.
+	$ rasaxctl connect rasa --run-saparate-worker
+
+	# Pass extra arguments to rasa server.
+	$ rasaxctl connect rasa --extra-args="--debug"
+`
+)
+
 func connectRasaCmd() *cobra.Command {
 
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "rasa [DEPLOYMENT NAME]",
-		Short: "run Rasa OSS server and connect it to the Rasa X deployment",
+		Use:     "rasa [DEPLOYMENT NAME]",
+		Short:   "run Rasa OSS server and connect it to the Rasa X deployment",
+		Long:    connectRasaDesc,
+		Example: examples(connectRasaExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if namespace == "" {

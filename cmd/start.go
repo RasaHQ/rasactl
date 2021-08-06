@@ -24,12 +24,44 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	startDesc = `
+This command creates a Rasa X deployment or starts stopped deployment if a given deployment already exists.
+
+If the --project or --project-path is used, a Rasa X deployment will be using a local directory with Rasa project.
+
+If a deployment name is not defined, a random name is generated and used as a deployment name.
+`
+
+	startExample = `
+	# Create a Rasa X deployment.
+	$ rasaxctl start
+
+	# Create a Rasa X deployment with custom configuration, e.g the following configuration changes a Rasa X version.
+	# All available values: https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml
+	$ rasaxctl start --values-file custom-configuration.yaml
+
+	# Create a Rasa X deployment with a defined password.
+	$ rasaxctl start --rasa-x-password mypassword
+
+	# Create a Rasa X deployment that uses a local Rasa project.
+	# The command is executed in a Rasa project directory.
+	$ rasaxctl start --project
+
+	# Create a Rasa X deployment with a defined name.
+	$ rasaxctl start my-deployment
+
+`
+)
+
 func startCmd() *cobra.Command {
 
 	// cmd represents the start command
 	cmd := &cobra.Command{
 		Use:          "start [DEPLOYMENT NAME]",
-		Short:        "start Rasa X deployment",
+		Short:        "start a Rasa X deployment",
+		Long:         startDesc,
+		Example:      examples(startExample),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
