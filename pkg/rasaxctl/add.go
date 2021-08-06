@@ -32,7 +32,7 @@ func (r *RasaXCTL) Add() error {
 		return err
 	}
 
-	fmt.Printf("The %s namespace has been added as a project\n", r.Namespace)
+	fmt.Printf("The %s has been added as a deployment.\n", r.Namespace)
 
 	return nil
 }
