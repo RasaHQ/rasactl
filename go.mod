@@ -21,6 +21,7 @@ require (
 	github.com/txn2/txeh v1.3.0
 	go.uber.org/zap v1.17.0
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	helm.sh/helm/v3 v3.6.3
 	k8s.io/api v0.21.3

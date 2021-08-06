@@ -18,6 +18,7 @@ func addStartFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.ProjectPath, "project-path", "", "absolute path to the project directory directory mounted in kind")
 	cmd.PersistentFlags().BoolVarP(&rasaxctlFlags.Start.Project, "project", "p", false, "use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
 	cmd.PersistentFlags().StringVar(&rasaxctlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")
+	cmd.PersistentFlags().BoolVar(&rasaxctlFlags.Start.RasaXPasswordStdin, "rasa-x-password-stdin", false, "read the Rasa X password from stdin")
 }
 
 func addUpgradeFlags(cmd *cobra.Command) {

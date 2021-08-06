@@ -67,9 +67,18 @@ func startCmd() *cobra.Command {
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration
 
+			if rasaxctlFlags.Start.RasaXPasswordStdin {
+				password, err := getRasaXPasswordStdin()
+				if err != nil {
+					return err
+				}
+				rasaxctlFlags.Start.RasaXPassword = password
+			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			isDeployed, isRunning, err := rasaXCTL.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

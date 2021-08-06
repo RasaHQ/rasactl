@@ -24,9 +24,10 @@ func listCmd() *cobra.Command {
 
 	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:   "list",
-		Short: "list deployments",
-		Args:  noArgs,
+		Use:     "list",
+		Short:   "list deployments",
+		Aliases: []string{"ls"},
+		Args:    noArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := rasaXCTL.List(); err != nil {

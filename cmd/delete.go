@@ -29,8 +29,9 @@ func deleteCmd() *cobra.Command {
 
 	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:   "delete [DEPLOYMENT NAME]",
-		Short: "delete Rasa X deployment",
+		Use:     "delete [DEPLOYMENT NAME]",
+		Short:   "delete Rasa X deployment",
+		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))

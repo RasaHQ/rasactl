@@ -229,7 +229,7 @@ func (r *RasaXCTL) checkDeploymentStatus() error {
 		return err
 	}
 
-	r.Log.Info("Rasa X is ready", "url", r.RasaXClient.URL)
+	r.Log.Info("Rasa X is ready", "url", r.RasaXClient.URL, "password", r.Flags.Start.RasaXPassword)
 	r.Spinner.Message("Ready!")
 	r.Spinner.Stop()
 

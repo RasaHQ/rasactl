@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"os"
 	"strings"
 	"syscall"
@@ -54,4 +55,13 @@ func examples(s string) string {
 	}
 
 	return strings.Join(outLines, "\n")
+}
+
+func getRasaXPasswordStdin() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return line, err
+	}
+	return strings.TrimSuffix(line, "\n"), nil
 }

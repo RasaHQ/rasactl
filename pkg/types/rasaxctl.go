@@ -16,9 +16,10 @@ type RasaXCtlStartUpgradeFlags struct {
 }
 
 type RasaXCtlStartFlags struct {
-	ProjectPath   string
-	Project       bool
-	RasaXPassword string
+	ProjectPath        string
+	Project            bool
+	RasaXPassword      string
+	RasaXPasswordStdin bool
 }
 
 type RasaXCtlDeleteFlags struct {
