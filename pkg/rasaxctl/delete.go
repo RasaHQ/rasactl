@@ -23,7 +23,9 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
-	r.Spinner.Message("Deleting Rasa X")
+	msg := "Deleting Rasa X"
+	r.Spinner.Message(msg)
+	r.Log.Info(msg, "namespace", r.Namespace)
 
 	state, err := r.KubernetesClient.ReadSecretWithState()
 	if err != nil && !force {
@@ -56,7 +58,7 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
-	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" || force {
+	if (r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "") || force {
 		r.Spinner.Message("Deleting persistent volume")
 		if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
 			return err
@@ -98,7 +100,12 @@ func (r *RasaXCTL) Delete() error {
 		}
 	}
 
-	os.Remove(rasaxctlFile)
+	if string(state[types.StateSecretProjectPath]) != "" {
+		if err := os.Remove(rasaxctlFile); err != nil && !force {
+			return err
+		}
+	}
+
 	r.Spinner.Message("Done!")
 	r.Spinner.Stop()
 	return nil

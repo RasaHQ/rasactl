@@ -50,7 +50,7 @@ func (h *Helm) Install() error {
 	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), h.Values)
 
 	// Add additional values for local PVC
-	if h.Flags.Start.ProjectPath != "" && h.KubernetesBackendType == types.KubernetesBackendLocal {
+	if (h.Flags.Start.ProjectPath != "" || h.Flags.Start.Project) && h.KubernetesBackendType == types.KubernetesBackendLocal {
 		h.Values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.Values)
 		h.Values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.Values)
 		h.Log.V(1).Info("Merging values", "result", h.Values)

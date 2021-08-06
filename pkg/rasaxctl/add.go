@@ -20,7 +20,7 @@ func (r *RasaXCTL) Add() error {
 	if err != nil {
 		return err
 	}
-	if err := r.KubernetesClient.SaveSecretWithState(); err != nil {
+	if err := r.KubernetesClient.SaveSecretWithState(""); err != nil {
 		return err
 	}
 	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, release); err != nil {

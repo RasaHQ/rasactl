@@ -13,14 +13,14 @@ import (
 
 const secretName string = "rasaxctl"
 
-func (k *Kubernetes) SaveSecretWithState() error {
+func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 	secret := &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: secretName,
 		},
 		Type: "rasa.com/rasaxctl.state",
 		Data: map[string][]byte{
-			types.StateSecretProjectPath:     []byte(k.Flags.Start.ProjectPath),
+			types.StateSecretProjectPath:     []byte(projectPath),
 			types.StateSecretHelmReleaseName: []byte(k.Helm.ReleaseName),
 		},
 	}

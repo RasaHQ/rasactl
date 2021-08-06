@@ -140,7 +140,7 @@ func (r *RasaXCTL) startOrInstall() error {
 			}
 		}
 
-		if err := r.KubernetesClient.SaveSecretWithState(); err != nil {
+		if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
 			return err
 		}
 
