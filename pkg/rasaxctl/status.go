@@ -86,14 +86,14 @@ func (r *RasaXCTL) Status() error {
 
 		if len(pods.Items) != 0 {
 			fmt.Fprintf(&b, "Pod details:\n")
+
+			fmt.Println(b.String())
+
+			status.PrintTable(
+				[]string{"Name", "Condition", "Status"},
+				data,
+			)
 		}
-
-		fmt.Println(b.String())
-
-		status.PrintTable(
-			[]string{"Name", "Condition", "Status"},
-			data,
-		)
 		fmt.Println()
 		return nil
 	}
