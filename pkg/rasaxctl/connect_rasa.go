@@ -28,8 +28,23 @@ func (r *RasaXCTL) ConnectRasa() error {
 	if err != nil {
 		return err
 	}
-	fileCreds := fmt.Sprintf("%s/.credentials.yaml", stateData[types.StateSecretProjectPath])
-	fileEndpoints := fmt.Sprintf("%s/.endpoints.yaml", stateData[types.StateSecretProjectPath])
+
+	configDir := string(stateData[types.StateSecretProjectPath])
+	if configDir == "" {
+		configDir = fmt.Sprintf("/tmp/rasaxctl-%s", r.Namespace)
+
+		r.Log.V(1).Info("Creating directory", "dir", configDir)
+
+		if _, err := os.Stat(configDir); os.IsNotExist(err) {
+			err := os.Mkdir(configDir, 0755)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	fileCreds := fmt.Sprintf("%s/.credentials.yaml", configDir)
+	fileEndpoints := fmt.Sprintf("%s/.endpoints.yaml", configDir)
 
 	mutualArgs := []string{
 		"run",
@@ -79,11 +94,11 @@ func (r *RasaXCTL) ConnectRasa() error {
 		return err
 	}
 
-	if err := r.saveRasaCredentialsFile(); err != nil {
+	if err := r.saveRasaCredentialsFile(fileCreds); err != nil {
 		return err
 	}
 
-	if err := r.saveRasaEndpointsFile(); err != nil {
+	if err := r.saveRasaEndpointsFile(fileEndpoints); err != nil {
 		return err
 	}
 
@@ -177,13 +192,7 @@ func (r *RasaXCTL) runRasaServer(environment string, args []string, done chan bo
 	return cmd
 }
 
-func (r *RasaXCTL) saveRasaCredentialsFile() error {
-	stateData, err := r.KubernetesClient.ReadSecretWithState()
-	if err != nil {
-		return err
-	}
-	file := fmt.Sprintf("%s/.credentials.yaml", stateData[types.StateSecretProjectPath])
-
+func (r *RasaXCTL) saveRasaCredentialsFile(file string) error {
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err
@@ -204,13 +213,7 @@ func (r *RasaXCTL) saveRasaCredentialsFile() error {
 	return nil
 }
 
-func (r *RasaXCTL) saveRasaEndpointsFile() error {
-	stateData, err := r.KubernetesClient.ReadSecretWithState()
-	if err != nil {
-		return err
-	}
-	file := fmt.Sprintf("%s/.endpoints.yaml", stateData[types.StateSecretProjectPath])
-
+func (r *RasaXCTL) saveRasaEndpointsFile(file string) error {
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err

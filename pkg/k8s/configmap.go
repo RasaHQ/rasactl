@@ -18,8 +18,8 @@ func (k *Kubernetes) UpdateRasaXConfig(token string) error {
 	if k.Flags.ConnectRasa.RunSeparateWorker {
 		workerPort = workerPort + 1
 	}
-	urlProduction := fmt.Sprintf("http://rasa.localhost:%d", productionPort)
-	urlWorker := fmt.Sprintf("http://rasa.localhost:%d", workerPort)
+	urlProduction := fmt.Sprintf("http://gateway.docker.internal:%d", productionPort)
+	urlWorker := fmt.Sprintf("http://gateway.docker.internal:%d", workerPort)
 
 	configSpec := types.EnvironmentsConfigurationFile{
 		Rasa: types.RasaSpecEnvironments{
