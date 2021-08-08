@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasaxctl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -59,6 +60,10 @@ func connectRasaCmd() *cobra.Command {
 
 			if namespace == "" {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+			}
+
+			if !utils.CommandExists("rasa") {
+				return errors.Errorf(errorPrint.Sprint("The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/"))
 			}
 
 			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()

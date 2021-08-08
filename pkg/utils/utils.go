@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -179,4 +180,9 @@ func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 
 	return false, nil
 
+}
+
+func CommandExists(cmd string) bool {
+	_, err := exec.LookPath(cmd)
+	return err == nil
 }
