@@ -16,7 +16,6 @@ limitations under the License.
 package rasactl
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/RasaHQ/rasactl/pkg/status"
@@ -24,7 +23,7 @@ import (
 )
 
 func (r *RasaCtl) Status() error {
-	var b bytes.Buffer
+	var d = [][]string{}
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()
 	if err != nil {
 		return err
@@ -43,35 +42,39 @@ func (r *RasaCtl) Status() error {
 	}
 	r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
-	fmt.Fprintf(&b, "Name: %s\n", r.Namespace)
-	fmt.Fprintf(&b, "Status: %s\n", statusProject)
+	d = append(d, []string{"Name:", r.Namespace})
+	d = append(d, []string{"Status:", statusProject})
 
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(&b, "URL: %s\n", url)
+	d = append(d, []string{"URL:", url})
 
 	r.initRasaXClient()
 	r.RasaXClient.URL = url
 
 	versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {
-		fmt.Fprintf(&b, "Version: %s\n", stateData[types.StateSecretRasaXVersion])
-		fmt.Fprintf(&b, "Enterprise: %s\n", stateData[types.StateSecretEnterprise])
-		fmt.Fprintf(&b, "Rasa worker version: %s\n", stateData[types.StateSecretRasaWorkerVersion])
+		d = append(d, []string{"Version:", string(stateData[types.StateSecretRasaXVersion])})
+		d = append(d, []string{"Enterprise:", string(stateData[types.StateSecretEnterprise])})
+		d = append(d, []string{"Rasa worker version:", string(stateData[types.StateSecretRasaWorkerVersion])})
 	} else {
-		fmt.Fprintf(&b, "Version: %s\n", versionEndpoint.RasaX)
-		fmt.Fprintf(&b, "Enterprise: %t\n", versionEndpoint.Enterprise)
-		fmt.Fprintf(&b, "Rasa production version: %s\n", versionEndpoint.Rasa.Production)
-		fmt.Fprintf(&b, "Rasa worker version: %s\n", versionEndpoint.Rasa.Worker)
+		enterprise := "inactive"
+		if versionEndpoint.Enterprise {
+			enterprise = "active"
+		}
+		d = append(d, []string{"Version:", versionEndpoint.RasaX})
+		d = append(d, []string{"Enterprise:", enterprise})
+		d = append(d, []string{"Rasa production version:", versionEndpoint.Rasa.Production})
+		d = append(d, []string{"Rasa worker version:", versionEndpoint.Rasa.Worker})
 	}
 
 	projectPath := "not defined"
 	if string(stateData[types.StateSecretProjectPath]) != "" {
 		projectPath = string(stateData[types.StateSecretProjectPath])
 	}
-	fmt.Fprintf(&b, "Project path: %s\n", projectPath)
+	d = append(d, []string{"Project path:", projectPath})
 
 	if r.Flags.Status.Details {
 
@@ -79,9 +82,9 @@ func (r *RasaCtl) Status() error {
 		if err != nil {
 			return err
 		}
-		fmt.Fprintf(&b, "Helm chart: %s-%s\n", release.Chart.Name(), release.Chart.Metadata.Version)
-		fmt.Fprintf(&b, "Helm release: %s\n", release.Name)
-		fmt.Fprintf(&b, "Helm release status: %s\n\n", release.Info.Status)
+		d = append(d, []string{"Helm chart:", fmt.Sprintf("%s-%s", release.Chart.Name(), release.Chart.Metadata.Version)})
+		d = append(d, []string{"Helm release:", release.Name})
+		d = append(d, []string{"Helm release status", release.Info.Status.String()})
 
 		pods, err := r.KubernetesClient.GetPods()
 		if err != nil {
@@ -100,9 +103,9 @@ func (r *RasaCtl) Status() error {
 		}
 
 		if len(pods.Items) != 0 {
-			fmt.Fprintf(&b, "Pod details:\n")
+			status.PrintTableNoHeader(d)
 
-			fmt.Println(b.String())
+			fmt.Println()
 
 			status.PrintTable(
 				[]string{"Name", "Condition", "Status"},
@@ -110,11 +113,11 @@ func (r *RasaCtl) Status() error {
 			)
 			fmt.Println()
 		} else {
-			fmt.Println(b.String())
+			status.PrintTableNoHeader(d)
 		}
 		return nil
 	}
-	fmt.Println(b.String())
+	status.PrintTableNoHeader(d)
 
 	return nil
 }

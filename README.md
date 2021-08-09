@@ -175,14 +175,14 @@ $ rasactl connect rasa funny-hopper
 
 ```bash
 $ rasactl status funny-hopper
-Name: funny-hopper
-Status: Running
-URL: http://funny-hopper.rasactl.localhost
-Version: 0.42.0
-Enterprise: inactive
-Rasa production version: 2.7.0
-Rasa worker version: 2.7.0
-Project path: not defined
+Name:                   	funny-hopper
+Status:                 	Running
+URL:                    	http://funny-hopper.rasactl.localhost
+Version:                	0.42.0
+Enterprise:             	inactive
+Rasa production version:	2.7.0
+Rasa worker version:    	2.7.0
+Project path:           	not defined
 ```
 
 ### Run Rasa X / Enterprise with mounted a local Rasa project
