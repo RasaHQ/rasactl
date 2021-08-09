@@ -6,6 +6,7 @@ require (
 	github.com/Delta456/box-cli-maker/v2 v2.2.1
 	github.com/briandowns/spinner v1.16.0
 	github.com/docker/docker v17.12.0-ce-rc1.0.20200618181300-9dc6525e6118+incompatible
+	github.com/docker/docker-credential-helpers v0.6.3 // indirect
 	github.com/fatih/color v1.12.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
