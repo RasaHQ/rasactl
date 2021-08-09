@@ -1,5 +1,7 @@
 package helm
 
+import "github.com/google/uuid"
+
 func valuesMountHostPath(pvcName string) map[string]interface{} {
 	values := map[string]interface{}{
 		"rasax": map[string]interface{}{
@@ -149,6 +151,18 @@ func ValuesPostgreSQLNodePort() map[string]interface{} {
 		"postgresql": map[string]interface{}{
 			"service": map[string]interface{}{
 				"type": "NodePort",
+			},
+		},
+	}
+
+	return values
+}
+
+func valuesRabbitMQErlangCookie() map[string]interface{} {
+	values := map[string]interface{}{
+		"rabbitmq": map[string]interface{}{
+			"rabbitmq": map[string]interface{}{
+				"erlangCookie": uuid.New().String(),
 			},
 		},
 	}
