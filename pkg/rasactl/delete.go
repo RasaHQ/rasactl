@@ -1,14 +1,29 @@
-package rasaxctl
+/*
+Copyright © 2021 Rasa Technologies GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+package rasactl
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
-func (r *RasaXCTL) Delete() error {
+func (r *RasaCtl) Delete() error {
 	force := r.Flags.Delete.Force
 	prune := r.Flags.Delete.Prune
 
@@ -33,7 +48,7 @@ func (r *RasaXCTL) Delete() error {
 	} else if err != nil && force {
 		r.Log.Info("Can't read state secret", "error", err)
 	}
-	rasaxctlFile := fmt.Sprintf("%s/.rasaxctl", state[types.StateSecretProjectPath])
+	rasactlFile := fmt.Sprintf("%s/.rasactl", state[types.StateSecretProjectPath])
 
 	if !prune {
 		if err := r.HelmClient.Uninstall(); err != nil && !force {
@@ -42,7 +57,7 @@ func (r *RasaXCTL) Delete() error {
 			r.Log.Info("Can't uninstall helm chart", "error", err)
 		}
 
-		msgDelSec := "Deleting secret with rasaxctl state"
+		msgDelSec := "Deleting secret with rasactl state"
 		r.Spinner.Message(msgDelSec)
 		r.Log.Info(msgDelSec)
 		if err := r.KubernetesClient.DeleteSecretWithState(); err != nil && !force {
@@ -82,7 +97,7 @@ func (r *RasaXCTL) Delete() error {
 	}
 
 	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
-		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaXCtlLocalDomain)
+		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaCtlLocalDomain)
 		err := utils.DeleteHostToEtcHosts(host)
 		if err != nil && !force {
 			return err
@@ -101,7 +116,7 @@ func (r *RasaXCTL) Delete() error {
 	}
 
 	if string(state[types.StateSecretProjectPath]) != "" {
-		if err := os.Remove(rasaxctlFile); err != nil && !force {
+		if err := os.Remove(rasactlFile); err != nil && !force {
 			return err
 		}
 	}

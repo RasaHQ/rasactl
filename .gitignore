@@ -4,10 +4,10 @@
 *.dll
 *.so
 *.dylib
-rasaxctl
-rasaxctl_*
-!pkg/rasaxctl
-.rasaxctl
+rasactl
+rasactl_*
+!pkg/rasactl
+.rasactl
 models/
 # Test binary, built with `go test -c`
 *.test

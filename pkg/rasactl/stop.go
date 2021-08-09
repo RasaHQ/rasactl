@@ -13,31 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package logger
+package rasactl
 
 import (
+	"fmt"
+
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/go-logr/logr"
-	"go.uber.org/zap/zapcore"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-func New(flags *types.RasaCtlFlags) logr.Logger {
-	opts := zap.Options{
-		Development: true,
-		Level:       zapcore.PanicLevel,
+func (r *RasaCtl) Stop() error {
+	r.Spinner.Message("Stopping Rasa X")
+	if err := r.KubernetesClient.ScaleDown(); err != nil {
+		return err
 	}
 
-	if flags.Global.Debug {
-		opts.Level = zapcore.DebugLevel
+	state, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
 	}
 
-	if flags.Global.Verbose {
-		opts.Level = zapcore.InfoLevel
+	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" {
+		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
+			return err
+		}
 	}
-
-	logger := zap.New(zap.UseFlagOptions(&opts))
-	logger.WithName("rasactl")
-
-	return logger
+	r.Spinner.Message(fmt.Sprintf("Rasa X for the %s deployment has been stopped", r.Namespace))
+	r.Spinner.Stop()
+	return nil
 }

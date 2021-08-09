@@ -1,3 +1,18 @@
+/*
+Copyright © 2021 Rasa Technologies GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package k8s
 
 import (
@@ -5,7 +20,7 @@ import (
 	"encoding/json"
 	"net"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/types"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,7 +83,7 @@ func (k *Kubernetes) IsNamespaceManageable() bool {
 	if err != nil {
 		return false
 	}
-	if namespace.Labels["rasaxctl"] == "true" {
+	if namespace.Labels["rasactl"] == "true" {
 		return true
 	}
 	return false
@@ -83,7 +98,7 @@ func (k *Kubernetes) AddNamespaceLabel() error {
 
 	payload := []patch{{
 		Op:    "add",
-		Path:  "/metadata/labels/rasaxctl",
+		Path:  "/metadata/labels/rasactl",
 		Value: "true",
 	}}
 
@@ -103,7 +118,7 @@ func (k *Kubernetes) DeleteNamespaceLabel() error {
 
 	payload := []patch{{
 		Op:   "remove",
-		Path: "/metadata/labels/rasaxctl",
+		Path: "/metadata/labels/rasactl",
 	}}
 
 	payloadBytes, _ := json.Marshal(payload)
@@ -130,7 +145,7 @@ func (k *Kubernetes) DeleteNamespace() error {
 
 func (k *Kubernetes) GetNamespaces() ([]string, error) {
 	result := []string{}
-	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{LabelSelector: "rasaxctl=true"})
+	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{LabelSelector: "rasactl=true"})
 	if err != nil {
 		return nil, err
 	}

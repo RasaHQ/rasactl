@@ -1,4 +1,4 @@
-module github.com/RasaHQ/rasaxctl
+module github.com/RasaHQ/rasactl
 
 go 1.16
 

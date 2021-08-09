@@ -13,30 +13,32 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package helm
+package rasactl
 
 import (
-	"helm.sh/helm/v3/pkg/action"
+	"fmt"
 )
 
-func (h *Helm) Uninstall() error {
+func (r *RasaCtl) CreateAndJoinKindNode() error {
+	nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+	if _, err := r.DockerClient.CreateKindNode(nodeName); err != nil {
+		return err
+	}
+	return nil
+}
 
-	client := action.NewUninstall(h.ActionConfig)
-	client.Description = "rasactl"
-	client.KeepHistory = false
-	client.Timeout = h.Configuration.Timeout
-
-	h.Log.V(1).Info("Helm client settings", "settings", client)
-
-	// uninstall the chart
-	rel, err := client.Run(h.Configuration.ReleaseName)
+func (r *RasaCtl) GetKindControlPlaneNodeInfo() error {
+	node, err := r.KubernetesClient.GetKindControlPlaneNode()
 	if err != nil {
 		return err
 	}
 
-	msg := "Uninstalling Rasa X"
-	h.Log.Info(msg, "releaseName", rel.Release.Name, "namespace", h.Namespace)
-	h.Spinner.Message(msg)
+	if node.Name == "" {
+		r.Log.Info("Can't find kind control plane. Are you sure that the current Kubernetes context is kind?")
+	}
+
+	r.DockerClient.Kind.ControlPlaneHost = node.Name
+	r.DockerClient.Kind.Version = node.Status.NodeInfo.KubeletVersion
 
 	return nil
 }

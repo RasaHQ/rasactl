@@ -30,7 +30,7 @@ func listCmd() *cobra.Command {
 		Args:    noArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			if err := rasaXCTL.List(); err != nil {
+			if err := rasaCtl.List(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

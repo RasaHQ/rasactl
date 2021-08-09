@@ -1,10 +1,25 @@
+/*
+Copyright © 2021 Rasa Technologies GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package helm
 
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
@@ -29,7 +44,7 @@ func (h *Helm) Install() error {
 	client := action.NewInstall(h.ActionConfig)
 	client.Namespace = h.Namespace
 	client.ReleaseName = h.Configuration.ReleaseName
-	client.Description = "rasaxctl"
+	client.Description = "rasactl"
 	client.Wait = true
 	client.DryRun = false
 	client.Timeout = h.Configuration.Timeout
@@ -47,7 +62,7 @@ func (h *Helm) Install() error {
 		}
 	}
 
-	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), h.Values)
+	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), valuesRabbitMQErlangCookie(), h.Values)
 
 	// Add additional values for local PVC
 	if (h.Flags.Start.ProjectPath != "" || h.Flags.Start.Project) && h.KubernetesBackendType == types.KubernetesBackendLocal {
@@ -58,7 +73,7 @@ func (h *Helm) Install() error {
 
 	// Configure ingress to use local hostname if Kubernetes backend is on a local machine
 	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name == types.CloudProviderUnknown {
-		host := fmt.Sprintf("%s.%s", h.Namespace, types.RasaXCtlLocalDomain)
+		host := fmt.Sprintf("%s.%s", h.Namespace, types.RasaCtlLocalDomain)
 		ip := "127.0.0.1"
 		h.Values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.Values)
 		h.Log.V(1).Info("Merging values", "result", h.Values)

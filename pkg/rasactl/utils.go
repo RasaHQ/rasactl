@@ -13,31 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package logger
+package rasactl
 
 import (
-	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/go-logr/logr"
-	"go.uber.org/zap/zapcore"
-	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"fmt"
+	"io/ioutil"
 )
 
-func New(flags *types.RasaCtlFlags) logr.Logger {
-	opts := zap.Options{
-		Development: true,
-		Level:       zapcore.PanicLevel,
+func (r *RasaCtl) writeStatusFile(path string) error {
+	d := []byte(r.Namespace)
+	file := fmt.Sprintf("%s/.rasactl", path)
+
+	r.Log.Info("Writing a status file", "file", file)
+
+	if err := ioutil.WriteFile(file, d, 0644); err != nil {
+		return err
 	}
 
-	if flags.Global.Debug {
-		opts.Level = zapcore.DebugLevel
-	}
-
-	if flags.Global.Verbose {
-		opts.Level = zapcore.InfoLevel
-	}
-
-	logger := zap.New(zap.UseFlagOptions(&opts))
-	logger.WithName("rasactl")
-
-	return logger
+	return nil
 }

@@ -21,10 +21,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/RasaHQ/rasaxctl/pkg/logger"
-	"github.com/RasaHQ/rasaxctl/pkg/rasaxctl"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/logger"
+	"github.com/RasaHQ/rasactl/pkg/rasactl"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
@@ -40,17 +40,17 @@ var (
 	helmConfiguration *types.HelmConfigurationSpec = &types.HelmConfigurationSpec{}
 	errorPrint        *color.Color                 = color.New(color.FgRed)
 	warnPrint         *color.Color                 = color.New(color.FgYellow)
-	rasaXCTL          *rasaxctl.RasaXCTL
+	rasaCtl           *rasactl.RasaCtl
 	log               logr.Logger
 	namespace         string
-	rasaxctlFlags     *types.RasaXCtlFlags = &types.RasaXCtlFlags{}
+	rasactlFlags      *types.RasaCtlFlags = &types.RasaCtlFlags{}
 )
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "rasaxctl",
-	Short: "A tools to manage Rasa X deployments",
-	Long:  `rasaxctl helps you to manage Rasa X deployments.`,
+	Use:   "rasactl",
+	Short: "rasactl provisions and manages Rasa X deployments.",
+	Long:  `rasactl provisions and manages Rasa X deployments.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
 		if len(args) != 0 {
@@ -61,12 +61,12 @@ var rootCmd = &cobra.Command{
 			namespace = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
 		}
 
-		rasaXCTL = &rasaxctl.RasaXCTL{
+		rasaCtl = &rasactl.RasaCtl{
 			Log:       log,
 			Namespace: namespace,
-			Flags:     rasaxctlFlags,
+			Flags:     rasactlFlags,
 		}
-		if err := rasaXCTL.InitClients(); err != nil {
+		if err := rasaCtl.InitClients(); err != nil {
 			return errors.Errorf(errorPrint.Sprintf("%s", err))
 		}
 		return nil
@@ -87,9 +87,9 @@ func init() {
 
 	home, _ := homedir.Dir()
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rasaxctl.yaml)")
-	rootCmd.PersistentFlags().BoolVar(&rasaxctlFlags.Global.Verbose, "verbose", false, "enable verbose output")
-	rootCmd.PersistentFlags().BoolVar(&rasaxctlFlags.Global.Debug, "debug", false, "enable debug output")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.rasactl.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&rasactlFlags.Global.Verbose, "verbose", false, "enable verbose output")
+	rootCmd.PersistentFlags().BoolVar(&rasactlFlags.Global.Debug, "debug", false, "enable debug output")
 	rootCmd.PersistentFlags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
 
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
@@ -98,7 +98,7 @@ func init() {
 }
 
 func initLog() {
-	log = logger.New(rasaxctlFlags)
+	log = logger.New(rasactlFlags)
 	namespace = utils.GetActiveNamespace(log)
 }
 
@@ -115,9 +115,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".rasaxctl" (without extension).
+		// Search config in home directory with name ".rasactl" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".rasaxctl")
+		viper.SetConfigName(".rasactl")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

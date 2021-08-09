@@ -34,35 +34,35 @@ func openCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
 
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
 				return nil
 			}
 
 			// Check if a Rasa X deployment is already installed and running
-			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s project is not running.\n", rasaXCTL.Namespace)
+				fmt.Printf("Rasa X for the %s project is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			url, err := rasaXCTL.GetRasaXURL()
+			url, err := rasaCtl.GetRasaXURL()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
@@ -72,7 +72,7 @@ func openCmd() *cobra.Command {
 			}
 
 			fmt.Printf("The URL %s has been opened in your web browser\n", url)
-			rasaXCTL.Spinner.Stop()
+			rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

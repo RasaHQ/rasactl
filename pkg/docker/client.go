@@ -1,3 +1,18 @@
+/*
+Copyright © 2021 Rasa Technologies GmbH
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package docker
 
 import (
@@ -10,8 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/status"
-	rtypes "github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/status"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -35,7 +50,7 @@ type Docker struct {
 	ProjectPath  string
 	kubeadmToken string
 	Kind         KindSpec
-	Flags        *rtypes.RasaXCtlFlags
+	Flags        *rtypes.RasaCtlFlags
 }
 
 type KindSpec struct {
@@ -68,7 +83,7 @@ func (d *Docker) prepareKindJoinConfiguration() (string, error) {
 	}
 	d.kubeadmToken = token
 
-	file := fmt.Sprintf("/tmp/rasaxctl-kind-joinconfig-%s.yaml", d.Namespace)
+	file := fmt.Sprintf("/tmp/rasactl-kind-joinconfig-%s.yaml", d.Namespace)
 
 	joinConfiguration := bootstrapv1.JoinConfiguration{
 		TypeMeta: metav1.TypeMeta{
@@ -88,11 +103,11 @@ func (d *Docker) prepareKindJoinConfiguration() (string, error) {
 			CRISocket: "unix:///run/containerd/containerd.sock",
 			KubeletExtraArgs: map[string]string{
 				"fail-swap-on": "false",
-				"node-labels":  fmt.Sprintf("rasaxctl-project=%s", d.Namespace),
+				"node-labels":  fmt.Sprintf("rasactl-project=%s", d.Namespace),
 			},
 			Name: fmt.Sprintf("kind-%s", d.Namespace),
 			Taints: []v1.Taint{{
-				Key:    "rasaxctl",
+				Key:    "rasactl",
 				Value:  "true",
 				Effect: v1.TaintEffectNoSchedule,
 			}},
