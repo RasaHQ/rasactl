@@ -22,13 +22,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func addCmd() *cobra.Command {
+const (
+	addDesc = `
+This command adds existing Rasa X deployment to rasaxctl.
 
-	// cmd represents the status command
+If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it via rasaxctl.
+`
+
+	addExample = `
+	# Add a Rasa X deployment that is deployed in the 'my-test' namespace.
+	$ rasaxctl add my-test
+
+	# Add a Rasa X deployment that is deployed in the 'my-test' namespace and
+	# a helm release name for the deployment is 'rasa-x-example'.
+	$ rasaxctl add my-test --rasa-x-release-name rasa-x-example
+`
+)
+
+func addCmd() *cobra.Command {
+	// cmd represents the add command
 	cmd := &cobra.Command{
-		Use:   "add NAMESPACE",
-		Short: "add existing Rasa X deployment",
-		Args:  cobra.MinimumNArgs(1),
+		Use:     "add NAMESPACE",
+		Short:   "add existing Rasa X deployment",
+		Long:    addDesc,
+		Example: examples(addExample),
+		Args:    cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaXCTL.HelmClient.Configuration = helmConfiguration

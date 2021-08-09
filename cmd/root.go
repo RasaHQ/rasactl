@@ -49,8 +49,8 @@ var (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "rasaxctl",
-	Short: "A tools to manage Rasa X deployments",
-	Long:  `rasaxctl helps you to manage Rasa X deployments.`,
+	Short: "rasaxctl provisions and manages Rasa X deployments.",
+	Long:  `rasaxctl provisions and manages Rasa X deployments.`,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
 		if len(args) != 0 {

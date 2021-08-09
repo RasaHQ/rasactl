@@ -25,12 +25,32 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	deleteDesc = `
+This command deletes a Rasa X deployment.
+
+In a case where a Rasa X deployment is using kind and is deployed locally, you have to run the command with administrator permissions (sudo).
+It's required because the command removes a hostname from /etc/hosts which was added during deployment creation.
+
+`
+
+	deleteExample = `
+	# Delete the 'my-example' deployment.
+	$ sudo rasaxctl delete my-example
+
+	# Prune the 'my-example' deployment, execute the command with the --prune flag deletes the whole namespace.
+	$ sudo rasaxctl delete my-example --prune
+`
+)
+
 func deleteCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the delete command
 	cmd := &cobra.Command{
 		Use:     "delete [DEPLOYMENT NAME]",
 		Short:   "delete Rasa X deployment",
+		Long:    deleteDesc,
+		Example: examples(deleteExample),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
