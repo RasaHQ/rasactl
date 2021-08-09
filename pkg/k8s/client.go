@@ -19,8 +19,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
 	v1 "k8s.io/api/core/v1"
@@ -41,7 +41,7 @@ type Kubernetes struct {
 	Log           logr.Logger
 	BackendType   types.KubernetesBackendType
 	CloudProvider *cloud.Provider
-	Flags         *types.RasaXCtlFlags
+	Flags         *types.RasaCtlFlags
 }
 
 type HelmSpec struct {
@@ -184,7 +184,7 @@ func (k *Kubernetes) CreateNamespace() error {
 		ObjectMeta: metav1.ObjectMeta{
 			Name: k.Namespace,
 			Labels: map[string]string{
-				"rasaxctl": "true",
+				"rasactl": "true",
 			},
 		},
 	}

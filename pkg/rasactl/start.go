@@ -13,11 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
-import "github.com/RasaHQ/rasaxctl/pkg/utils"
+import "github.com/RasaHQ/rasactl/pkg/utils"
 
-func (r *RasaXCTL) Start() error {
+func (r *RasaCtl) Start() error {
 
 	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)
 	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {

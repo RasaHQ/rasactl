@@ -16,13 +16,13 @@ limitations under the License.
 package logger
 
 import (
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/go-logr/logr"
 	"go.uber.org/zap/zapcore"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
-func New(flags *types.RasaXCtlFlags) logr.Logger {
+func New(flags *types.RasaCtlFlags) logr.Logger {
 	opts := zap.Options{
 		Development: true,
 		Level:       zapcore.PanicLevel,
@@ -37,7 +37,7 @@ func New(flags *types.RasaXCtlFlags) logr.Logger {
 	}
 
 	logger := zap.New(zap.UseFlagOptions(&opts))
-	logger.WithName("rasaxctl")
+	logger.WithName("rasactl")
 
 	return logger
 }

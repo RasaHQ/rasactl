@@ -13,24 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/RasaHQ/rasaxctl/pkg/docker"
-	"github.com/RasaHQ/rasaxctl/pkg/helm"
-	"github.com/RasaHQ/rasaxctl/pkg/k8s"
-	"github.com/RasaHQ/rasaxctl/pkg/rasax"
-	"github.com/RasaHQ/rasaxctl/pkg/status"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
+	"github.com/RasaHQ/rasactl/pkg/docker"
+	"github.com/RasaHQ/rasactl/pkg/helm"
+	"github.com/RasaHQ/rasactl/pkg/k8s"
+	"github.com/RasaHQ/rasactl/pkg/rasax"
+	"github.com/RasaHQ/rasactl/pkg/status"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 )
 
-type RasaXCTL struct {
+type RasaCtl struct {
 	KubernetesClient *k8s.Kubernetes
 	HelmClient       *helm.Helm
 	RasaXClient      *rasax.RasaX
@@ -41,10 +41,10 @@ type RasaXCTL struct {
 	isRasaXRunning   bool
 	isRasaXDeployed  bool
 	CloudProvider    *cloud.Provider
-	Flags            *types.RasaXCtlFlags
+	Flags            *types.RasaCtlFlags
 }
 
-func (r *RasaXCTL) InitClients() error {
+func (r *RasaCtl) InitClients() error {
 	r.Spinner = &status.SpinnerMessage{}
 	r.Spinner.New()
 
@@ -91,7 +91,7 @@ func (r *RasaXCTL) InitClients() error {
 	return nil
 }
 
-func (r *RasaXCTL) CheckDeploymentStatus() (bool, bool, error) {
+func (r *RasaCtl) CheckDeploymentStatus() (bool, bool, error) {
 	// Check if a Rasa X deployment is already installed and running
 	isRasaXDeployed, err := r.HelmClient.IsDeployed()
 	if err != nil {
@@ -109,7 +109,7 @@ func (r *RasaXCTL) CheckDeploymentStatus() (bool, bool, error) {
 	return isRasaXDeployed, isRasaXRunning, nil
 }
 
-func (r *RasaXCTL) startOrInstall() error {
+func (r *RasaCtl) startOrInstall() error {
 	projectPath := r.Flags.Start.ProjectPath
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
@@ -195,7 +195,7 @@ func (r *RasaXCTL) startOrInstall() error {
 	return nil
 }
 
-func (r *RasaXCTL) GetAllHelmValues() error {
+func (r *RasaCtl) GetAllHelmValues() error {
 	allValues, err := r.HelmClient.GetValues()
 	if err != nil {
 		return err
@@ -206,7 +206,7 @@ func (r *RasaXCTL) GetAllHelmValues() error {
 	return nil
 }
 
-func (r *RasaXCTL) GetRasaXURL() (string, error) {
+func (r *RasaCtl) GetRasaXURL() (string, error) {
 	if err := r.GetAllHelmValues(); err != nil {
 		return "", err
 	}
@@ -220,7 +220,7 @@ func (r *RasaXCTL) GetRasaXURL() (string, error) {
 	return url, nil
 }
 
-func (r *RasaXCTL) GetRasaXToken() (string, error) {
+func (r *RasaCtl) GetRasaXToken() (string, error) {
 	token, err := r.KubernetesClient.GetRasaXToken()
 	if err != nil {
 		return token, err
@@ -229,7 +229,7 @@ func (r *RasaXCTL) GetRasaXToken() (string, error) {
 	return token, nil
 }
 
-func (r *RasaXCTL) initRasaXClient() {
+func (r *RasaCtl) initRasaXClient() {
 	r.RasaXClient = &rasax.RasaX{
 		Log:            r.Log,
 		SpinnerMessage: r.Spinner,
@@ -238,7 +238,7 @@ func (r *RasaXCTL) initRasaXClient() {
 	r.RasaXClient.New()
 }
 
-func (r *RasaXCTL) checkDeploymentStatus() error {
+func (r *RasaCtl) checkDeploymentStatus() error {
 	err := r.RasaXClient.WaitForRasaX()
 	if err != nil {
 		return err

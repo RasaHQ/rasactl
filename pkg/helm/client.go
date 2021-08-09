@@ -20,9 +20,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/RasaHQ/rasaxctl/pkg/status"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud"
+	"github.com/RasaHQ/rasactl/pkg/status"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -49,7 +49,7 @@ type Helm struct {
 	kubeConfig            string
 	Values                map[string]interface{}
 	CloudProvider         *cloud.Provider
-	Flags                 *types.RasaXCtlFlags
+	Flags                 *types.RasaCtlFlags
 }
 
 func (h *Helm) New() error {

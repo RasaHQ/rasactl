@@ -19,21 +19,21 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	rtypes "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const secretName string = "rasaxctl"
+const secretName string = "rasactl"
 
 func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 	secret := &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: secretName,
 		},
-		Type: "rasa.com/rasaxctl.state",
+		Type: "rasa.com/rasactl.state",
 		Data: map[string][]byte{
 			types.StateSecretProjectPath:     []byte(projectPath),
 			types.StateSecretHelmReleaseName: []byte(k.Helm.ReleaseName),

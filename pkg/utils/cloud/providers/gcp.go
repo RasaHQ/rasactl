@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 func Google() types.CloudProvider {

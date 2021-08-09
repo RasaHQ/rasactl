@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -31,20 +31,20 @@ Connect Rasa OSS (Open Source Server) to Rasa X deployment.
 
 The command prepares a configuration that's required to connect Rasa X deployment and run a local Rasa server.
 
-It's required to have the 'rasa' command accessible by rasaxctl.
+It's required to have the 'rasa' command accessible by rasactl.
 
 The command works only if Rasa X deployment uses a local rasa project.
 `
 
 	connectRasaExample = `
 	# Connect Rasa Server to Rasa X deployment.
-	$ rasaxctl connect rasa
+	$ rasactl connect rasa
 
 	# Run a saparate rasa server for the Rasa X worker environment.
-	$ rasaxctl connect rasa --run-saparate-worker
+	$ rasactl connect rasa --run-saparate-worker
 
 	# Pass extra arguments to rasa server.
-	$ rasaxctl connect rasa --extra-args="--debug"
+	$ rasactl connect rasa --extra-args="--debug"
 `
 )
 
@@ -66,47 +66,47 @@ func connectRasaCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprint("The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/"))
 			}
 
-			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()
+			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			rasaXCTL.HelmClient.Configuration = &types.HelmConfigurationSpec{
+			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
 				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
 				ReuseValues: true,
 				Timeout:     time.Minute * 10,
 			}
 
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			if !rasaXCTL.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasaxctl, can't continue :(", rasaXCTL.Namespace))
+			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
+				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
 			// Check if a Rasa X deployment is already installed and running
-			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s deployment is not running.\n", rasaXCTL.Namespace)
+				fmt.Printf("Rasa X for the %s deployment is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			if err := rasaXCTL.ConnectRasa(); err != nil {
+			if err := rasaCtl.ConnectRasa(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

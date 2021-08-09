@@ -13,21 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
-import "github.com/RasaHQ/rasaxctl/pkg/utils"
+import "fmt"
 
-func (r *RasaXCTL) Upgrade() error {
+func (r *RasaCtl) Add() error {
+	r.Log.Info("Adding existing project", "namespace", r.Namespace, "releaseName", r.HelmClient.Configuration.ReleaseName)
 
-	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {
-		return err
-	}
-
-	// Init Rasa X client
-	r.initRasaXClient()
-
-	r.Spinner.Message("Upgrading Rasa X")
-	if err := r.HelmClient.Upgrade(); err != nil {
+	release, err := r.HelmClient.GetStatus()
+	if err != nil {
 		return err
 	}
 
@@ -35,25 +29,25 @@ func (r *RasaXCTL) Upgrade() error {
 	if err != nil {
 		return err
 	}
+	r.initRasaXClient()
 	r.RasaXClient.URL = url
-
-	if err := r.RasaXClient.WaitForRasaX(); err != nil {
-		return err
-	}
 
 	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {
 		return err
 	}
-
-	helmRelease, err := r.HelmClient.GetStatus()
-	if err != nil {
+	if err := r.KubernetesClient.SaveSecretWithState(""); err != nil {
+		return err
+	}
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, release); err != nil {
 		return err
 	}
 
-	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion, helmRelease); err != nil {
+	if err := r.KubernetesClient.AddNamespaceLabel(); err != nil {
 		return err
 	}
+
+	fmt.Printf("The %s has been added as a deployment.\n", r.Namespace)
 
 	return nil
 }

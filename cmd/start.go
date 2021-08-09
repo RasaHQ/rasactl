@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -35,21 +35,21 @@ If a deployment name is not defined, a random name is generated and used as a de
 
 	startExample = `
 	# Create a Rasa X deployment.
-	$ rasaxctl start
+	$ rasactl start
 
 	# Create a Rasa X deployment with custom configuration, e.g the following configuration changes a Rasa X version.
 	# All available values: https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml
-	$ rasaxctl start --values-file custom-configuration.yaml
+	$ rasactl start --values-file custom-configuration.yaml
 
 	# Create a Rasa X deployment with a defined password.
-	$ rasaxctl start --rasa-x-password mypassword
+	$ rasactl start --rasa-x-password mypassword
 
 	# Create a Rasa X deployment that uses a local Rasa project.
 	# The command is executed in a Rasa project directory.
-	$ rasaxctl start --project
+	$ rasactl start --project
 
 	# Create a Rasa X deployment with a defined name.
-	$ rasaxctl start my-deployment
+	$ rasactl start my-deployment
 
 `
 )
@@ -64,28 +64,28 @@ func startCmd() *cobra.Command {
 		Example:      examples(startExample),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.HelmClient.Configuration = helmConfiguration
 
-			if rasaxctlFlags.Start.RasaXPasswordStdin {
+			if rasactlFlags.Start.RasaXPasswordStdin {
 				password, err := getRasaXPasswordStdin()
 				if err != nil {
 					return err
 				}
-				rasaxctlFlags.Start.RasaXPassword = password
+				rasactlFlags.Start.RasaXPassword = password
 			}
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			isDeployed, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+			isDeployed, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isDeployed {
-				if rasaXCTL.KubernetesClient.BackendType == types.KubernetesBackendLocal && rasaXCTL.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
+				if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal && rasaCtl.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
 					if os.Getuid() != 0 {
 						return errors.Errorf(
 							warnPrint.Sprintf(
@@ -98,14 +98,14 @@ func startCmd() *cobra.Command {
 			}
 
 			if isRunning {
-				fmt.Printf("Rasa X for the %s namespace is running.\n", rasaXCTL.HelmClient.Namespace)
+				fmt.Printf("Rasa X for the %s namespace is running.\n", rasaCtl.HelmClient.Namespace)
 				return nil
 			}
 
-			if err := rasaXCTL.Start(); err != nil {
+			if err := rasaCtl.Start(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			defer rasaXCTL.Spinner.Stop()
+			defer rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

@@ -18,8 +18,8 @@ package helm
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
@@ -44,7 +44,7 @@ func (h *Helm) Install() error {
 	client := action.NewInstall(h.ActionConfig)
 	client.Namespace = h.Namespace
 	client.ReleaseName = h.Configuration.ReleaseName
-	client.Description = "rasaxctl"
+	client.Description = "rasactl"
 	client.Wait = true
 	client.DryRun = false
 	client.Timeout = h.Configuration.Timeout
@@ -73,7 +73,7 @@ func (h *Helm) Install() error {
 
 	// Configure ingress to use local hostname if Kubernetes backend is on a local machine
 	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name == types.CloudProviderUnknown {
-		host := fmt.Sprintf("%s.%s", h.Namespace, types.RasaXCtlLocalDomain)
+		host := fmt.Sprintf("%s.%s", h.Namespace, types.RasaCtlLocalDomain)
 		ip := "127.0.0.1"
 		h.Values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.Values)
 		h.Log.V(1).Info("Merging values", "result", h.Values)

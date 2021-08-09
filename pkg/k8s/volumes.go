@@ -40,12 +40,12 @@ func (k *Kubernetes) CreateVolume(hostPath string) (string, error) {
 }
 
 func (k *Kubernetes) DeleteVolume() error {
-	pvc := fmt.Sprintf("rasaxctl-pvc-%s", k.Namespace)
+	pvc := fmt.Sprintf("rasactl-pvc-%s", k.Namespace)
 	if err := k.deletePVC(pvc); err != nil {
 		return err
 	}
 
-	pv := fmt.Sprintf("rasaxctl-pv-%s", k.Namespace)
+	pv := fmt.Sprintf("rasactl-pv-%s", k.Namespace)
 	if err := k.deletePV(pv); err != nil {
 		return err
 	}
@@ -57,10 +57,10 @@ func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) 
 
 	pvSpec := &apiv1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("rasaxctl-pv-%s", k.Namespace),
+			Name:      fmt.Sprintf("rasactl-pv-%s", k.Namespace),
 			Namespace: k.Namespace,
 			Labels: map[string]string{
-				"rasaxctl": "true",
+				"rasactl": "true",
 			},
 		},
 		Spec: apiv1.PersistentVolumeSpec{
@@ -92,10 +92,10 @@ func (k *Kubernetes) createPVC(pv *apiv1.PersistentVolume) (*apiv1.PersistentVol
 
 	pvcSpec := &apiv1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("rasaxctl-pvc-%s", k.Namespace),
+			Name:      fmt.Sprintf("rasactl-pvc-%s", k.Namespace),
 			Namespace: k.Namespace,
 			Labels: map[string]string{
-				"rasaxctl": "true",
+				"rasactl": "true",
 			},
 		},
 		Spec: apiv1.PersistentVolumeClaimSpec{

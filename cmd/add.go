@@ -24,18 +24,18 @@ import (
 
 const (
 	addDesc = `
-This command adds existing Rasa X deployment to rasaxctl.
+This command adds existing Rasa X deployment to rasactl.
 
-If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it via rasaxctl.
+If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it via rasactl.
 `
 
 	addExample = `
 	# Add a Rasa X deployment that is deployed in the 'my-test' namespace.
-	$ rasaxctl add my-test
+	$ rasactl add my-test
 
 	# Add a Rasa X deployment that is deployed in the 'my-test' namespace and
 	# a helm release name for the deployment is 'rasa-x-example'.
-	$ rasaxctl add my-test --rasa-x-release-name rasa-x-example
+	$ rasactl add my-test --rasa-x-release-name rasa-x-example
 `
 )
 
@@ -48,28 +48,28 @@ func addCmd() *cobra.Command {
 		Example: examples(addExample),
 		Args:    cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
+			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s namespace doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s namespace doesn't exist.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			if rasaXCTL.KubernetesClient.IsNamespaceManageable() {
+			if rasaCtl.KubernetesClient.IsNamespaceManageable() {
 				fmt.Println("Already added")
 				return nil
 			}
 
-			if err := rasaXCTL.Add(); err != nil {
+			if err := rasaCtl.Add(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

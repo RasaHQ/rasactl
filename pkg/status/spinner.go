@@ -20,7 +20,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/briandowns/spinner"
 )
 

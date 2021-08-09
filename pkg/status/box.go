@@ -20,8 +20,8 @@ import (
 	"strings"
 
 	"github.com/Delta456/box-cli-maker/v2"
-	types "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 func GreenBox(tittle string, msg string) {

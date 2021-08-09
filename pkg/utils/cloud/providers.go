@@ -16,8 +16,8 @@ limitations under the License.
 package cloud
 
 import (
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	"github.com/RasaHQ/rasaxctl/pkg/utils/cloud/providers"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud/providers"
 	"github.com/go-logr/logr"
 )
 

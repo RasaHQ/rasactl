@@ -20,7 +20,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/RasaHQ/rasaxctl/cmd"
+	"github.com/RasaHQ/rasactl/cmd"
 )
 
 func main() {

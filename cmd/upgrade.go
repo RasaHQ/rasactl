@@ -18,7 +18,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -35,43 +35,43 @@ func upgradeCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
 
-			stateData, err := rasaXCTL.KubernetesClient.ReadSecretWithState()
+			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaXCTL.HelmClient.Configuration = helmConfiguration
-			rasaXCTL.HelmClient.Configuration.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
-			rasaXCTL.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+			rasaCtl.HelmClient.Configuration = helmConfiguration
+			rasaCtl.HelmClient.Configuration.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
 				return nil
 			}
 
 			// Check if a Rasa X deployment is already installed and running
-			_, isRunning, err := rasaXCTL.CheckDeploymentStatus()
+			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s project is not running.\n", rasaXCTL.Namespace)
+				fmt.Printf("Rasa X for the %s project is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			if err := rasaXCTL.Upgrade(); err != nil {
+			if err := rasaCtl.Upgrade(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaXCTL.Spinner.Message("Ready!")
-			defer rasaXCTL.Spinner.Stop()
+			rasaCtl.Spinner.Message("Ready!")
+			defer rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

@@ -73,14 +73,14 @@ func valuesUseDedicatedKindNode(namespace string) map[string]interface{} {
 		"rasax": map[string]interface{}{
 			"tolerations": []map[string]interface{}{
 				{
-					"key":      "rasaxctl",
+					"key":      "rasactl",
 					"operator": "Equal",
 					"value":    "true",
 					"effect":   "NoSchedule",
 				},
 			},
 			"nodeSelector": map[string]interface{}{
-				"rasaxctl-project": namespace,
+				"rasactl-project": namespace,
 			},
 		},
 	}

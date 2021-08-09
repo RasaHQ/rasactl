@@ -42,7 +42,7 @@ func (h *Helm) Upgrade() error {
 
 	client := action.NewUpgrade(h.ActionConfig)
 	client.Namespace = h.Namespace
-	client.Description = "rasaxctl"
+	client.Description = "rasactl"
 	client.Wait = true
 	client.Timeout = h.Configuration.Timeout
 	client.Atomic = h.Configuration.Atomic

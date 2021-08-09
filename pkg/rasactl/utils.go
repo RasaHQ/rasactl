@@ -13,32 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
 import (
 	"fmt"
-
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"io/ioutil"
 )
 
-func (r *RasaXCTL) Stop() error {
-	r.Spinner.Message("Stopping Rasa X")
-	if err := r.KubernetesClient.ScaleDown(); err != nil {
+func (r *RasaCtl) writeStatusFile(path string) error {
+	d := []byte(r.Namespace)
+	file := fmt.Sprintf("%s/.rasactl", path)
+
+	r.Log.Info("Writing a status file", "file", file)
+
+	if err := ioutil.WriteFile(file, d, 0644); err != nil {
 		return err
 	}
 
-	state, err := r.KubernetesClient.ReadSecretWithState()
-	if err != nil {
-		return err
-	}
-
-	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" {
-		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
-		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
-			return err
-		}
-	}
-	r.Spinner.Message(fmt.Sprintf("Rasa X for the %s deployment has been stopped", r.Namespace))
-	r.Spinner.Stop()
 	return nil
 }

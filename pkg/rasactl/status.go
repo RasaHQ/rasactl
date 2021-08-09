@@ -13,17 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
 import (
 	"bytes"
 	"fmt"
 
-	"github.com/RasaHQ/rasaxctl/pkg/status"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/status"
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
-func (r *RasaXCTL) Status() error {
+func (r *RasaCtl) Status() error {
 	var b bytes.Buffer
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()
 	if err != nil {

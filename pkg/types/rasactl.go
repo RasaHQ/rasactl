@@ -15,44 +15,44 @@ limitations under the License.
 */
 package types
 
-const RasaXCtlLocalDomain string = "rasaxctl.localhost"
+const RasaCtlLocalDomain string = "rasactl.localhost"
 
-type RasaXCtlFlags struct {
-	StartUpgrade RasaXCtlStartUpgradeFlags
-	Start        RasaXCtlStartFlags
-	Delete       RasaXCtlDeleteFlags
-	Status       RasaXCtlStatusFlags
-	ConnectRasa  RasaXCtlConnectRasaFlags
-	Global       RasaXCtlGlobalFlags
+type RasaCtlFlags struct {
+	StartUpgrade RasaCtlStartUpgradeFlags
+	Start        RasaCtlStartFlags
+	Delete       RasaCtlDeleteFlags
+	Status       RasaCtlStatusFlags
+	ConnectRasa  RasaCtlConnectRasaFlags
+	Global       RasaCtlGlobalFlags
 }
 
-type RasaXCtlStartUpgradeFlags struct {
+type RasaCtlStartUpgradeFlags struct {
 	ValuesFile string
 }
 
-type RasaXCtlStartFlags struct {
+type RasaCtlStartFlags struct {
 	ProjectPath        string
 	Project            bool
 	RasaXPassword      string
 	RasaXPasswordStdin bool
 }
 
-type RasaXCtlDeleteFlags struct {
+type RasaCtlDeleteFlags struct {
 	Force bool
 	Prune bool
 }
 
-type RasaXCtlStatusFlags struct {
+type RasaCtlStatusFlags struct {
 	Details bool
 }
 
-type RasaXCtlConnectRasaFlags struct {
+type RasaCtlConnectRasaFlags struct {
 	RunSeparateWorker bool
 	Port              int
 	ExtraArgs         []string
 }
 
-type RasaXCtlGlobalFlags struct {
+type RasaCtlGlobalFlags struct {
 	Debug   bool
 	Verbose bool
 }

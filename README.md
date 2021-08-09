@@ -1,4 +1,8 @@
-# rasaxctl
+# rasactl
+
+
+
+
 
 ## How to run it?
 
@@ -17,13 +21,13 @@ $ go build
 3. Run it
 
 ```
-$ ./rasaxctl
+$ ./rasactl
 ```
 
-4. (optional) Make rasaxctl global
+4. (optional) Make rasactl global
 
 ```
-$ sudo cp rasaxctl /usr/local/bin/
+$ sudo cp rasactl /usr/local/bin/
 ```
 
 ## Kind cluster for developing purposes
@@ -59,13 +63,13 @@ $ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 
 2. Deploy Rasa X
 ```
-$ sudo ./rasaxctl start -p
+$ sudo ./rasactl start -p
 ```
 
 ## Open Rasa X in a web browser
 
 ```
-$ ./rasaxctl open
+$ ./rasactl open
 ```
 
 ## Deploy Rasa X with mounted a local path and a custom Docker image
@@ -98,9 +102,9 @@ $ kubectl -n my-test patch serviceaccount default -p '{"imagePullSecrets": [{"na
 4. Create a deployment with a custom Docker image
 
 ```
-$ ./rasaxctl start my-test -p --values-file testdata/test-image.yaml
+$ ./rasactl start my-test -p --values-file testdata/test-image.yaml
 ```
 
-## Running rasaxctl
+## Running rasactl
 
-You can use the `help` command to display description and examples for a specific command, e.g. `rasaxctl help start`.
+You can use the `help` command to display description and examples for a specific command, e.g. `rasactl help start`.

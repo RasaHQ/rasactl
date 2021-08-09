@@ -23,9 +23,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/status"
-	types "github.com/RasaHQ/rasaxctl/pkg/types/rasax"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/status"
+	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 )

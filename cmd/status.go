@@ -37,21 +37,21 @@ func statusCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaXCTL.KubernetesClient.IsNamespaceExist(rasaXCTL.Namespace)
+			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaXCTL.Namespace)
+				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
 				return nil
 			}
 
-			if !rasaXCTL.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasaxctl, can't continue :(", rasaXCTL.Namespace))
+			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
+				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
-			if err := rasaXCTL.Status(); err != nil {
+			if err := rasaCtl.Status(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

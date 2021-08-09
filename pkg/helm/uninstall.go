@@ -22,7 +22,7 @@ import (
 func (h *Helm) Uninstall() error {
 
 	client := action.NewUninstall(h.ActionConfig)
-	client.Description = "rasaxctl"
+	client.Description = "rasactl"
 	client.KeepHistory = false
 	client.Timeout = h.Configuration.Timeout
 

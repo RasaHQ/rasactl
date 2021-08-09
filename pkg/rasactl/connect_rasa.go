@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
 import (
 	"context"
@@ -25,16 +25,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/RasaHQ/rasaxctl/pkg/helm"
-	"github.com/RasaHQ/rasaxctl/pkg/types"
-	rtypes "github.com/RasaHQ/rasaxctl/pkg/types/rasa"
-	"github.com/RasaHQ/rasaxctl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/helm"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasa"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
-func (r *RasaXCTL) ConnectRasa() error {
+func (r *RasaCtl) ConnectRasa() error {
 	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 	rasaToken := uuid.New().String()
 	environmentName := "production-worker"
@@ -46,7 +46,7 @@ func (r *RasaXCTL) ConnectRasa() error {
 
 	configDir := string(stateData[types.StateSecretProjectPath])
 	if configDir == "" {
-		configDir = fmt.Sprintf("/tmp/rasaxctl-%s", r.Namespace)
+		configDir = fmt.Sprintf("/tmp/rasactl-%s", r.Namespace)
 
 		r.Log.V(1).Info("Creating directory", "dir", configDir)
 
@@ -173,7 +173,7 @@ func (r *RasaXCTL) ConnectRasa() error {
 	return nil
 }
 
-func (r *RasaXCTL) runRasaServer(environment string, args []string, done chan bool, ready chan bool) *exec.Cmd {
+func (r *RasaCtl) runRasaServer(environment string, args []string, done chan bool, ready chan bool) *exec.Cmd {
 
 	cmd := exec.Command("rasa", args...)
 	stdout, err := cmd.StderrPipe()
@@ -207,7 +207,7 @@ func (r *RasaXCTL) runRasaServer(environment string, args []string, done chan bo
 	return cmd
 }
 
-func (r *RasaXCTL) saveRasaCredentialsFile(file string) error {
+func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err
@@ -228,7 +228,7 @@ func (r *RasaXCTL) saveRasaCredentialsFile(file string) error {
 	return nil
 }
 
-func (r *RasaXCTL) saveRasaEndpointsFile(file string) error {
+func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 	url, err := r.GetRasaXURL()
 	if err != nil {
 		return err

@@ -13,13 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package rasaxctl
+package rasactl
 
 import (
 	"fmt"
 )
 
-func (r *RasaXCTL) CreateAndJoinKindNode() error {
+func (r *RasaCtl) CreateAndJoinKindNode() error {
 	nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 	if _, err := r.DockerClient.CreateKindNode(nodeName); err != nil {
 		return err
@@ -27,7 +27,7 @@ func (r *RasaXCTL) CreateAndJoinKindNode() error {
 	return nil
 }
 
-func (r *RasaXCTL) GetKindControlPlaneNodeInfo() error {
+func (r *RasaCtl) GetKindControlPlaneNodeInfo() error {
 	node, err := r.KubernetesClient.GetKindControlPlaneNode()
 	if err != nil {
 		return err

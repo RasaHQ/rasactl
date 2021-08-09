@@ -134,7 +134,7 @@ func IsURLAccessible(address string) bool {
 }
 
 func readStatusFile(path string, log logr.Logger) (string, error) {
-	file := fmt.Sprintf("%s/.rasaxctl", path)
+	file := fmt.Sprintf("%s/.rasactl", path)
 
 	log.Info("Reading a status file", "file", file)
 
