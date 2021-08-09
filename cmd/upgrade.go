@@ -23,12 +23,30 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	upgradeDesc = `
+This command upgrades a Rasa X / Enterprise deployment.
+
+The upgrade command upgrades or change configuration for Rasa X / Enterprise deployment.
+
+You can specify a values file with you custom configuration. The values file has the same form as a values file for helm chart.
+Here you can find all available values that can be configured: https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml
+`
+
+	upgradeExample = `
+	# Change configuration for Rasa X / Enterprise deployment by passing a custom configuration.
+	$ rasactl upgrade my-deployment --values-file my-custom-values.yaml
+`
+)
+
 func upgradeCmd() *cobra.Command {
 
 	// cmd represents the upgrade command
 	cmd := &cobra.Command{
 		Use:          "upgrade [DEPLOYMENT NAME]",
-		Short:        "upgrade/update Rasa X deployment",
+		Short:        "upgrade Rasa X deployment",
+		Long:         upgradeDesc,
+		Example:      examples(upgradeExample),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
