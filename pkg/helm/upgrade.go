@@ -22,6 +22,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
+// Upgrade prepares and executes the upgrade.
 func (h *Helm) Upgrade() error {
 
 	err := h.updateRepository()
@@ -40,6 +41,7 @@ func (h *Helm) Upgrade() error {
 		return err
 	}
 
+	// Creates a new upgrade object with a given configuration.
 	client := action.NewUpgrade(h.ActionConfig)
 	client.Namespace = h.Namespace
 	client.Description = "rasactl"
@@ -49,6 +51,8 @@ func (h *Helm) Upgrade() error {
 	client.ReuseValues = h.Configuration.ReuseValues
 	client.MaxHistory = 10
 
+	// In a case where deployment was stopped, and it's started again,
+	// the upgrade action is run with the current values defined for a helm release.
 	if h.Configuration.StartProject {
 		client.ReuseValues = true
 	}
@@ -66,7 +70,7 @@ func (h *Helm) Upgrade() error {
 		}
 	}
 
-	// upgrade the chart
+	// Upgrade the chart
 	rel, err := client.Run(h.Configuration.ReleaseName, helmChart, h.Values)
 	if err != nil {
 		return err

@@ -24,6 +24,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 )
 
+// Install prepares and executes the installation.
 func (h *Helm) Install() error {
 
 	err := h.updateRepository()
@@ -41,6 +42,8 @@ func (h *Helm) Install() error {
 	if err != nil {
 		return err
 	}
+
+	// Creates a new install object with a given configuration.
 	client := action.NewInstall(h.ActionConfig)
 	client.Namespace = h.Namespace
 	client.ReleaseName = h.Configuration.ReleaseName
@@ -62,6 +65,7 @@ func (h *Helm) Install() error {
 		}
 	}
 
+	// Merge helm values - disable Rasa production deployment, set erlang cookie for rabbitmq.
 	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), valuesRabbitMQErlangCookie(), h.Values)
 
 	// Add additional values for local PVC
@@ -92,7 +96,7 @@ func (h *Helm) Install() error {
 	h.Values = utils.MergeMaps(valuesSetRasaXPassword(h.Flags.Start.RasaXPassword), h.Values)
 	h.Log.V(1).Info("Merging values", "result", h.Values)
 
-	// install the chart
+	// Install the chart
 	rel, err := client.Run(helmChart, h.Values)
 	if err != nil {
 		return err

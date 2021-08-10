@@ -33,25 +33,50 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
+// Helm represents a helm client.
 type Helm struct {
-	settings              *cli.EnvSettings
-	ActionConfig          *action.Configuration
-	Namespace             string
-	PVCName               string
+	settings *cli.EnvSettings
+
+	// ActionConfig injects the dependencies that all actions share.
+	ActionConfig *action.Configuration
+
+	// Namespace is a namespace name that is used for the current client.
+	Namespace string
+
+	// PVCName defines a persistent volume claim name that is used to create a PVC.
+	PVCName string
+
+	// KubernetesBackendType defines a Kubernetes cluster type.
 	KubernetesBackendType types.KubernetesBackendType
-	Repositories          []types.RepositorySpec
-	Configuration         *types.HelmConfigurationSpec
-	Spinner               *status.SpinnerMessage
-	Log                   logr.Logger
-	driver                string
-	debugLog              func(format string, v ...interface{})
-	rasaXChartName        string
-	kubeConfig            string
-	Values                map[string]interface{}
-	CloudProvider         *cloud.Provider
-	Flags                 *types.RasaCtlFlags
+
+	// Repositories store slices of helm repository that used used by the client.
+	Repositories []types.RepositorySpec
+
+	// Configuration defines configuration for the client.
+	Configuration *types.HelmConfigurationSpec
+
+	// Spinner stores a spinner client.
+	Spinner *status.SpinnerMessage
+
+	// Log defines logger.
+	Log logr.Logger
+
+	driver         string
+	debugLog       func(format string, v ...interface{})
+	rasaXChartName string
+	kubeConfig     string
+
+	// Values store helm values that are used by the client.
+	Values map[string]interface{}
+
+	// CloudProvider stores information about a cloud provider.
+	CloudProvider *cloud.Provider
+
+	// Flags stores command flags and their values.
+	Flags *types.RasaCtlFlags
 }
 
+// New initializes a new helm client.
 func (h *Helm) New() error {
 	var driverIsSet bool
 
@@ -59,6 +84,7 @@ func (h *Helm) New() error {
 	h.rasaXChartName = "rasa-x"
 	h.kubeConfig = viper.GetString("kubeconfig")
 
+	h.Log.Info("Initializing Helm client")
 	if err := h.ReadValuesFile(); err != nil {
 		return err
 	}
@@ -87,8 +113,6 @@ func (h *Helm) New() error {
 	if err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog); err != nil {
 		return err
 	}
-
-	h.Log.Info("Initializing Helm client")
 
 	return nil
 }
