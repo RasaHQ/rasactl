@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -68,6 +67,15 @@ func deleteCmd() *cobra.Command {
 				}
 			}
 
+			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isNamespaceExist {
+				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			}
+
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -80,16 +88,6 @@ func deleteCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
-
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() && !viper.GetBool("force") {
 				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
