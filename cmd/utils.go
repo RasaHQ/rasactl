@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// HandleSignals receives a signal from the channel and runs an action depends on the type of the signal.
 func HandleSignals(sigs chan os.Signal) {
 	signal := <-sigs
 	runOnClose(signal)

@@ -49,6 +49,7 @@ func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
 	return backend, nil
 }
 
+// IsNamespaceExist checks if a namespace exists.
 func (k *Kubernetes) IsNamespaceExist(namespace string) (bool, error) {
 
 	_, err := k.clientset.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
@@ -64,6 +65,7 @@ func (k *Kubernetes) IsNamespaceExist(namespace string) (bool, error) {
 	return true, nil
 }
 
+// GetKindControlPlaneNode returns v1.Node object that defines a kind control plane node.
 func (k *Kubernetes) GetKindControlPlaneNode() (v1.Node, error) {
 
 	nodes, err := k.clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{LabelSelector: "node-role.kubernetes.io/control-plane="})
@@ -78,6 +80,7 @@ func (k *Kubernetes) GetKindControlPlaneNode() (v1.Node, error) {
 	return v1.Node{}, nil
 }
 
+// IsNamespaceManageable checks if a given namespace is managed by rasactl and returns `true` if it is.
 func (k *Kubernetes) IsNamespaceManageable() bool {
 	namespace, err := k.clientset.CoreV1().Namespaces().Get(context.TODO(), k.Namespace, metav1.GetOptions{})
 	if err != nil {
@@ -89,6 +92,8 @@ func (k *Kubernetes) IsNamespaceManageable() bool {
 	return false
 }
 
+// AddNamespaceLabels adds an extra label to a given namespace that indicates that the namespace
+// is managed by rasactl.
 func (k *Kubernetes) AddNamespaceLabel() error {
 	type patch struct {
 		Op    string `json:"op"`
@@ -110,6 +115,7 @@ func (k *Kubernetes) AddNamespaceLabel() error {
 	return nil
 }
 
+// DeleteNamespaceLabel deletes a label that indicates if a given namespaces is managed by rasactl.
 func (k *Kubernetes) DeleteNamespaceLabel() error {
 	type patch struct {
 		Op   string `json:"op"`
@@ -129,6 +135,7 @@ func (k *Kubernetes) DeleteNamespaceLabel() error {
 	return nil
 }
 
+// DeleteNode deletes a given Kubernetes node.
 func (k *Kubernetes) DeleteNode(node string) error {
 	if err := k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{}); err != nil {
 		return err
@@ -136,6 +143,7 @@ func (k *Kubernetes) DeleteNode(node string) error {
 	return nil
 }
 
+// DeleteNamespace deletes the active namespace.
 func (k *Kubernetes) DeleteNamespace() error {
 	if err := k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{}); err != nil {
 		return err
@@ -143,6 +151,7 @@ func (k *Kubernetes) DeleteNamespace() error {
 	return nil
 }
 
+// GetNamespaces returns namespaces that are managed by rasactl.
 func (k *Kubernetes) GetNamespaces() ([]string, error) {
 	result := []string{}
 	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{LabelSelector: "rasactl=true"})
@@ -157,6 +166,7 @@ func (k *Kubernetes) GetNamespaces() ([]string, error) {
 	return result, nil
 }
 
+// PodStatus returns a pod condition.
 func (k *Kubernetes) PodStatus(conditions []v1.PodCondition) string {
 	for _, c := range conditions {
 		if c.Status != v1.ConditionTrue {

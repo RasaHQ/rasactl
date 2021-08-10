@@ -22,6 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 )
 
+// New initializes and return a new logger object.
 func New(flags *types.RasaCtlFlags) logr.Logger {
 	opts := zap.Options{
 		Development: true,

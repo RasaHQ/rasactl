@@ -22,6 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// ScaleDown scales down all deployments and statefulsets for a given deployment.
 func (k *Kubernetes) ScaleDown() error {
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -68,6 +69,7 @@ func (k *Kubernetes) ScaleDown() error {
 	return nil
 }
 
+// ScaleDown scales up all deployments and statefulsets for a given deployment.
 func (k *Kubernetes) ScaleUp() error {
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {

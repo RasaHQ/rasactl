@@ -33,30 +33,50 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+// Kubernetes represents Kubernetes client.
 type Kubernetes struct {
-	kubeconfig    string
-	clientset     *kubernetes.Clientset
-	Namespace     string
-	Helm          HelmSpec
-	Log           logr.Logger
-	BackendType   types.KubernetesBackendType
+	kubeconfig string
+
+	clientset *kubernetes.Clientset
+
+	// Namespace is a namepace name used by the client.
+	Namespace string
+
+	// Helm defines helm release configuration.
+	Helm HelmSpec
+
+	// Log defines logger.
+	Log logr.Logger
+
+	// BackendType stores a Kubernetes cluster type.
+	BackendType types.KubernetesBackendType
+
+	// CloudProvider defines a detected cloud provider.
 	CloudProvider *cloud.Provider
-	Flags         *types.RasaCtlFlags
+
+	// Flags stores command flags used during the command execution.
+	Flags *types.RasaCtlFlags
 }
 
+// HelmSpec stores data related to helm release.
 type HelmSpec struct {
-	Values      map[string]interface{}
+	// Values stores helm values for a given helm release.
+	Values map[string]interface{}
+
+	// ReleaseName is a helm release name used by the client.
 	ReleaseName string
 }
 
+// New initializes a new Kubernetes client.
 func (k *Kubernetes) New() error {
+	k.Log.Info("Initializing Kubernetes client")
 	k.kubeconfig = viper.GetString("kubeconfig")
 	config, err := clientcmd.BuildConfigFromFlags("", k.kubeconfig)
 	if err != nil {
 		return err
 	}
 
-	// create the clientset
+	// Create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return err
@@ -69,11 +89,10 @@ func (k *Kubernetes) New() error {
 	}
 	k.BackendType = backendType
 
-	k.Log.Info("Initializing Kubernetes client")
-
 	return nil
 }
 
+// GetRasaXURL returns URL for a given deployment.
 func (k *Kubernetes) GetRasaXURL() (string, error) {
 
 	if k.Helm.Values == nil {
@@ -127,6 +146,7 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	return url, nil
 }
 
+// GetRasaXToken returns a Rasa X token that is stored in a Kubernetes secret.
 func (k *Kubernetes) GetRasaXToken() (string, error) {
 	var token string
 
@@ -141,6 +161,7 @@ func (k *Kubernetes) GetRasaXToken() (string, error) {
 	return string(secret.Data[keyName]), nil
 }
 
+// IsRasaXRunning checks if Rasa X deployment is running.
 func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -179,6 +200,7 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 	return true, nil
 }
 
+// CreateNamespace creates a namespace.
 func (k *Kubernetes) CreateNamespace() error {
 	namespace := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
@@ -202,6 +224,7 @@ func (k *Kubernetes) CreateNamespace() error {
 	return nil
 }
 
+// GetPods returns a list of pods for the active namespace.
 func (k *Kubernetes) GetPods() (*v1.PodList, error) {
 	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
@@ -225,6 +248,7 @@ func (k *Kubernetes) DeleteRasaXPods() error {
 	return nil
 }
 
+// GetPostgreSQLSvcPort returns a node port for the postgresql service.
 func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
 
 	svcName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
@@ -236,6 +260,7 @@ func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
 	return svc.Spec.Ports[0].NodePort, nil
 }
 
+// GetRabbitMqNodePort returns a node port for the rabbitmq service.
 func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
 
 	helmValues := k.Helm.Values

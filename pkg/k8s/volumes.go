@@ -24,6 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// CreateVolume creates a volume that uses a local host path.
 func (k *Kubernetes) CreateVolume(hostPath string) (string, error) {
 
 	pv, err := k.createPV(hostPath)
@@ -39,6 +40,7 @@ func (k *Kubernetes) CreateVolume(hostPath string) (string, error) {
 	return pvc.Name, nil
 }
 
+// DeleteVolumes deletes a volume that uses a local host path.
 func (k *Kubernetes) DeleteVolume() error {
 	pvc := fmt.Sprintf("rasactl-pvc-%s", k.Namespace)
 	if err := k.deletePVC(pvc); err != nil {

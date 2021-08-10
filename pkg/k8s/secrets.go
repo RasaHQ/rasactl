@@ -28,6 +28,7 @@ import (
 
 const secretName string = "rasactl"
 
+// SaveSecretWithState saves the rasactl secrets with a deployment state.
 func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 	secret := &v1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
@@ -50,6 +51,7 @@ func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 	return nil
 }
 
+// UpdateSecretWithState updates the rasactl secret.
 func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
@@ -83,6 +85,7 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 	return nil
 }
 
+// ReadSecretWithState returns data from the rasactl secret.
 func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
@@ -93,6 +96,7 @@ func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 	return secret.Data, nil
 }
 
+// DeleteSecretWithState deletes the rasactl secret.
 func (k *Kubernetes) DeleteSecretWithState() error {
 	if err := k.clientset.CoreV1().Secrets(k.Namespace).Delete(context.TODO(), secretName, metav1.DeleteOptions{}); err != nil {
 		return err
@@ -100,6 +104,7 @@ func (k *Kubernetes) DeleteSecretWithState() error {
 	return nil
 }
 
+// GetPostgreSQLCreds returns credentials for the postgresql deployment.
 func (k *Kubernetes) GetPostgreSQLCreds() (string, string, error) {
 	secretName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
@@ -112,6 +117,7 @@ func (k *Kubernetes) GetPostgreSQLCreds() (string, string, error) {
 	return username, string(secret.Data["postgresql-password"]), nil
 }
 
+// GetRabbitMqCreds returns credentials for the rabbitmq deployment.
 func (k *Kubernetes) GetRabbitMqCreds() (string, string, error) {
 	secretName := fmt.Sprintf("%s-rabbit", k.Helm.ReleaseName)
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
