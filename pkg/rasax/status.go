@@ -24,6 +24,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// WaitForDatabaseMigration waits until Rasa X database migration is completed.
 func (r *RasaX) WaitForDatabaseMigration(ctx context.Context) error {
 	for {
 		select {
@@ -55,6 +56,7 @@ func (r *RasaX) WaitForDatabaseMigration(ctx context.Context) error {
 	}
 }
 
+// WaitForRasaXWorker waits for Rasa worker until it returns the 200 code.
 func (r *RasaX) WaitForRasaXWorker(ctx context.Context) error {
 	for {
 		select {
@@ -88,6 +90,8 @@ func (r *RasaX) WaitForRasaXWorker(ctx context.Context) error {
 	}
 }
 
+// WaitForRasaX waits for Rasa X to be fully operational,
+// it includes the WaitForDatabaseMigration and the WaitForRasaXWorker methods.
 func (r *RasaX) WaitForRasaX() error {
 	c, cancel := context.WithTimeout(context.Background(), time.Second*360)
 	defer cancel()

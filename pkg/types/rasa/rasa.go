@@ -15,6 +15,7 @@ limitations under the License.
 */
 package rasa
 
+// CredentialsFile defines the credential.yaml file used by Rasa OSS.
 type CredentialsFile struct {
 	Rasa struct {
 		Url string `yaml:"url"`
@@ -22,18 +23,21 @@ type CredentialsFile struct {
 	Rest string `yaml:"rest"`
 }
 
+// EndpointsFile defines the endpoints.yaml file used by Rasa OSS.
 type EndpointsFile struct {
 	Models       EndpointModelSpec        `yaml:"models"`
 	TrackerStore EndpointTrackerStoreSpec `yaml:"tracker_store"`
 	EventBroker  EndpointEventBrokerSpec  `yaml:"event_broker"`
 }
 
+// EndpointModelSpec specifies a configuration for a model server.
 type EndpointModelSpec struct {
 	Url                  string `yaml:"url"`
 	Token                string `yaml:"token"`
 	WaitTimeBetweenPulls int    `yaml:"wait_time_between_pulls"`
 }
 
+// EndpointTrackerStoreSpec specifies a configuration for Tacker Store.
 type EndpointTrackerStoreSpec struct {
 	Type     string `yaml:"type"`
 	Dialect  string `yaml:"dialect"`
@@ -45,6 +49,7 @@ type EndpointTrackerStoreSpec struct {
 	LoginDb  string `yaml:"login_db"`
 }
 
+// EndpointEventBrokerSpec stores specification for Event Broker configuration.
 type EndpointEventBrokerSpec struct {
 	Type     string   `yaml:"type"`
 	Url      string   `yaml:"url"`

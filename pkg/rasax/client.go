@@ -50,7 +50,7 @@ type RasaX struct {
 	client *http.Client
 }
 
-// New initrializes a new Rasa X client.
+// New initializes a new Rasa X client.
 func (r *RasaX) New() {
 	r.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -60,6 +60,7 @@ func (r *RasaX) New() {
 	}
 }
 
+// GetHealthEndpoint returns a response from the /api/health endpoint.
 func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 	urlAddress := r.URL
 

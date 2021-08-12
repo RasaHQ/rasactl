@@ -24,10 +24,12 @@ import (
 	"github.com/briandowns/spinner"
 )
 
+// SpinnerMessage defines a spinner object.
 type SpinnerMessage struct {
 	spinner *spinner.Spinner
 }
 
+// New create a new spinner object.
 func (s *SpinnerMessage) New() {
 	s.spinner = spinner.New(spinner.CharSets[69], 200*time.Millisecond, spinner.WithWriter(os.Stderr))
 }

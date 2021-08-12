@@ -24,6 +24,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
+// GreenBox prints a green color box in the terminal.
 func GreenBox(tittle string, msg string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 		b := box.New(box.Config{Py: 1, Px: 4, Type: "Round", TitlePos: "Top"})
@@ -34,6 +35,7 @@ func GreenBox(tittle string, msg string) {
 	}
 }
 
+// RedBox prints a red color box in the terminal.
 func RedBox(tittle string, msg string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 		b := box.New(box.Config{Py: 1, Px: 4, Type: "Round", TitlePos: "Top"})
@@ -44,6 +46,7 @@ func RedBox(tittle string, msg string) {
 	}
 }
 
+// YellowBox prints a yellow box in the terminal.
 func YellowBox(tittle string, msg string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 		b := box.New(box.Config{Py: 1, Px: 4, Type: "Round", TitlePos: "Top"})
@@ -54,6 +57,7 @@ func YellowBox(tittle string, msg string) {
 	}
 }
 
+// PrintRasaXStatus prints a box with details for Rasa X deployment.
 func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXPassword string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 

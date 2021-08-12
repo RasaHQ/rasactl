@@ -168,6 +168,8 @@ func GetActiveNamespace(log logr.Logger) string {
 	return strings.TrimSuffix(namespace, "\n")
 }
 
+// AskForConfirmation waits for a input to confirm an operation and returns `true`
+// if the input == 'yes'.
 func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 	r := bufio.NewReader(in)
 
@@ -197,6 +199,7 @@ func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 
 }
 
+// Check if a given command exists.
 func CommandExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil
