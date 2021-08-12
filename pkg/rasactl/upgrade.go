@@ -17,6 +17,7 @@ package rasactl
 
 import "github.com/RasaHQ/rasactl/pkg/utils"
 
+// Upgrade upgrades a deployment.
 func (r *RasaCtl) Upgrade() error {
 
 	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {

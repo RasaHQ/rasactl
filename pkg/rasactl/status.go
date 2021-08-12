@@ -22,6 +22,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
+// Status prints status for a given deployment.
 func (r *RasaCtl) Status() error {
 	var d = [][]string{}
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()

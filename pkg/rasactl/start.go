@@ -17,6 +17,7 @@ package rasactl
 
 import "github.com/RasaHQ/rasactl/pkg/utils"
 
+// Start starts a Rasa X / Enterprise deployment.
 func (r *RasaCtl) Start() error {
 
 	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)

@@ -30,20 +30,40 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RasaCtl defines the rasactl client.
 type RasaCtl struct {
+	// KubernetesClient defines the Kubernetes client.
 	KubernetesClient *k8s.Kubernetes
-	HelmClient       *helm.Helm
-	RasaXClient      *rasax.RasaX
-	DockerClient     *docker.Docker
-	Log              logr.Logger
-	Spinner          *status.SpinnerMessage
-	Namespace        string
-	isRasaXRunning   bool
-	isRasaXDeployed  bool
-	CloudProvider    *cloud.Provider
-	Flags            *types.RasaCtlFlags
+
+	// HelmClient defines the helm client.
+	HelmClient *helm.Helm
+
+	// RasaXClient defines the Rasa X client.
+	RasaXClient *rasax.RasaX
+
+	// DockerClient defines the Docker client.
+	DockerClient *docker.Docker
+
+	// Log defines logger.
+	Log logr.Logger
+
+	// Spinner stores a spinner object.
+	Spinner *status.SpinnerMessage
+
+	// Namespace is a namespace name.
+	Namespace string
+
+	isRasaXRunning  bool
+	isRasaXDeployed bool
+
+	// CloudProvider stores a type of a detected cloud provider.
+	CloudProvider *cloud.Provider
+
+	// Flags stores the command flags.
+	Flags *types.RasaCtlFlags
 }
 
+// InitClients initializes clients.
 func (r *RasaCtl) InitClients() error {
 	r.Spinner = &status.SpinnerMessage{}
 	r.Spinner.New()
@@ -91,6 +111,10 @@ func (r *RasaCtl) InitClients() error {
 	return nil
 }
 
+// CheckDeploymentStatus checks if a given deployment is deployed and running.
+//
+// It returns 'true' as the first value if the deployment is deployed, and 'true'
+// as the second value if the deployment is running.
 func (r *RasaCtl) CheckDeploymentStatus() (bool, bool, error) {
 	// Check if a Rasa X deployment is already installed and running
 	isRasaXDeployed, err := r.HelmClient.IsDeployed()
@@ -195,6 +219,8 @@ func (r *RasaCtl) startOrInstall() error {
 	return nil
 }
 
+// GetAllHelmValues gets all evaluated values for a given helm release,
+// and stores it in KubernetesClient.Helm.Values, HelmClient.Values.
 func (r *RasaCtl) GetAllHelmValues() error {
 	allValues, err := r.HelmClient.GetValues()
 	if err != nil {
@@ -206,6 +232,7 @@ func (r *RasaCtl) GetAllHelmValues() error {
 	return nil
 }
 
+// GetRasaXURL returns a Rasa X URL.
 func (r *RasaCtl) GetRasaXURL() (string, error) {
 	if err := r.GetAllHelmValues(); err != nil {
 		return "", err

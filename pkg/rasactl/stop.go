@@ -21,6 +21,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
+// Stop stops a deployment.
 func (r *RasaCtl) Stop() error {
 	r.Spinner.Message("Stopping Rasa X")
 	if err := r.KubernetesClient.ScaleDown(); err != nil {

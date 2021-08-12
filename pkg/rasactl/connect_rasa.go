@@ -34,6 +34,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ConnectRasa connects a local rasa server to a given deployment.
 func (r *RasaCtl) ConnectRasa() error {
 	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 	rasaToken := uuid.New().String()

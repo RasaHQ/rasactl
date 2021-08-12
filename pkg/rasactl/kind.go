@@ -19,6 +19,7 @@ import (
 	"fmt"
 )
 
+// CreateAndJoinKindNode creates and joins a kind node.
 func (r *RasaCtl) CreateAndJoinKindNode() error {
 	nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 	if _, err := r.DockerClient.CreateKindNode(nodeName); err != nil {
@@ -27,6 +28,8 @@ func (r *RasaCtl) CreateAndJoinKindNode() error {
 	return nil
 }
 
+// GetKindControlPlaneNodeInfo gets information about a kind control plane node
+// and stores data in the DockerClient.Kind object.
 func (r *RasaCtl) GetKindControlPlaneNodeInfo() error {
 	node, err := r.KubernetesClient.GetKindControlPlaneNode()
 	if err != nil {

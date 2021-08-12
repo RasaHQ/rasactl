@@ -23,6 +23,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
+// Delete deletes a given deployment.
 func (r *RasaCtl) Delete() error {
 	force := r.Flags.Delete.Force
 	prune := r.Flags.Delete.Prune
