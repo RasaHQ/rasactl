@@ -30,15 +30,27 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RasaX defines Rasa X client.
 type RasaX struct {
-	URL            string
-	Token          string
-	Log            logr.Logger
+	// URL is a Rasa X URL
+	URL string
+
+	// Token stores a Rasa X admin token.
+	Token string
+
+	// Log defines logger.
+	Log logr.Logger
+
+	// Log defines the spinner object.
 	SpinnerMessage *status.SpinnerMessage
-	WaitTimeout    time.Duration
-	client         *http.Client
+
+	// WaitTimeout defines timeout for the client.
+	WaitTimeout time.Duration
+
+	client *http.Client
 }
 
+// New initrializes a new Rasa X client.
 func (r *RasaX) New() {
 	r.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {

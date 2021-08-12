@@ -17,3 +17,7 @@ changelog:
       - '^docs:'
       - typo
       - (?i)foo
+
+builds:
+  - ldflags:
+    - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
