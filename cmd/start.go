@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
@@ -68,7 +69,7 @@ func startCmd() *cobra.Command {
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			if rasactlFlags.Start.RasaXPasswordStdin {
-				password, err := getRasaXPasswordStdin()
+				password, err := utils.GetPasswordStdin()
 				if err != nil {
 					return err
 				}

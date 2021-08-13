@@ -27,13 +27,16 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"syscall"
 	"time"
 
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/txn2/txeh"
+	"golang.org/x/term"
 )
 
 type NetworkError string
@@ -200,4 +203,50 @@ func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 func CommandExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil
+}
+
+func ReadCredentials(flags *types.RasaCtlFlags) (string, string, error) {
+	var username, password string
+
+	if flags.Auth.Login.Username != "" {
+		username = flags.Auth.Login.Username
+	} else {
+		reader := bufio.NewReader(os.Stdin)
+
+		fmt.Print("Username: ")
+		user, err := reader.ReadString('\n')
+		if err != nil {
+			return "", "", err
+		}
+		username = user
+	}
+
+	if flags.Auth.Login.Password != "" {
+		fmt.Println("WARNING! Using the --password flag is insecure. Use the --password-stdin flag.")
+		password = flags.Auth.Login.Password
+	} else if flags.Auth.Login.PasswordStdin {
+		pass, err := GetPasswordStdin()
+		if err != nil {
+			return "", "", err
+		}
+		password = pass
+	} else {
+		fmt.Print("Password: ")
+		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			return "", "", err
+		}
+		password = string(bytePassword)
+	}
+
+	return strings.TrimSpace(username), strings.TrimSpace(password), nil
+}
+
+func GetPasswordStdin() (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	line, err := reader.ReadString('\n')
+	if err != nil {
+		return line, err
+	}
+	return strings.TrimSuffix(line, "\n"), nil
 }

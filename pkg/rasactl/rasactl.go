@@ -230,12 +230,15 @@ func (r *RasaCtl) GetRasaXToken() (string, error) {
 }
 
 func (r *RasaCtl) initRasaXClient() {
+	url, _ := r.GetRasaXURL()
 	r.RasaXClient = &rasax.RasaX{
 		Log:            r.Log,
 		SpinnerMessage: r.Spinner,
 		WaitTimeout:    r.HelmClient.Configuration.Timeout,
+		Flags:          r.Flags,
 	}
 	r.RasaXClient.New()
+	r.RasaXClient.URL = url
 }
 
 func (r *RasaCtl) checkDeploymentStatus() error {

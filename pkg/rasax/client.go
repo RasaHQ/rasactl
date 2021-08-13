@@ -24,7 +24,8 @@ import (
 	"time"
 
 	"github.com/RasaHQ/rasactl/pkg/status"
-	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -33,10 +34,12 @@ import (
 type RasaX struct {
 	URL            string
 	Token          string
+	BearerToken    string
 	Log            logr.Logger
 	SpinnerMessage *status.SpinnerMessage
 	WaitTimeout    time.Duration
 	client         *http.Client
+	Flags          *types.RasaCtlFlags
 }
 
 func (r *RasaX) New() {
@@ -48,7 +51,7 @@ func (r *RasaX) New() {
 	}
 }
 
-func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
+func (r *RasaX) getURL() string {
 	urlAddress := r.URL
 
 	if !utils.IsURLAccessible(urlAddress) {
@@ -61,6 +64,12 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 		r.Log.V(1).Info("The URL is not accessible for the health endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
 	}
 
+	return urlAddress
+}
+
+func (r *RasaX) GetHealthEndpoint() (*rtypes.HealthEndpointsResponse, error) {
+	urlAddress := r.getURL()
+
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/health", urlAddress), nil)
 	if err != nil {
 		return nil, err
@@ -72,7 +81,7 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 || resp.StatusCode == 304 || resp.StatusCode == 502 {
-		bodyData := &types.HealthEndpointsResponse{}
+		bodyData := &rtypes.HealthEndpointsResponse{}
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
@@ -85,22 +94,9 @@ func (r *RasaX) GetHealthEndpoint() (*types.HealthEndpointsResponse, error) {
 	}
 }
 
-func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
-	urlAddress := r.URL
+func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
+	urlAddress := r.getURL()
 
-	if !utils.IsURLAccessible(urlAddress) {
-		parsedURL, _ := url.Parse(urlAddress)
-		scheme := "http"
-		if parsedURL.Scheme != "" {
-			scheme = parsedURL.Scheme
-		}
-
-		urlAddress = fmt.Sprintf("%s://%s", scheme, "127.0.0.1")
-		if parsedURL.Port() != "" {
-			urlAddress = fmt.Sprintf("%s:%s", urlAddress, parsedURL.Port())
-		}
-		r.Log.V(1).Info("The URL is not accessible fot the version endpoint, using internal address", "url", r.URL, "internalURL", urlAddress)
-	}
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/version", urlAddress), nil)
 	if err != nil {
 		return nil, err
@@ -112,7 +108,7 @@ func (r *RasaX) GetVersionEndpoint() (*types.VersionEndpointResponse, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		bodyData := &types.VersionEndpointResponse{}
+		bodyData := &rtypes.VersionEndpointResponse{}
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err

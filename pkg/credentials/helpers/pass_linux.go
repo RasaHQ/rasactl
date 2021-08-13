@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"github.com/docker/docker-credential-helpers/pass"
+	"github.com/docker/docker-credential-helpers/secretservice"
 )
 
-var Helper = pass.Pass{}
+var Helper = secretservice.Secretservice{}

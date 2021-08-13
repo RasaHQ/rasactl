@@ -60,3 +60,20 @@ type EnvironmentsConfigurationSpec struct {
 	Url   string `yaml:"url"`
 	Token string `yaml:"token"`
 }
+
+type AuthEndpointResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+type ModelsListEndpointResponse struct {
+	Models []ModelSpec
+}
+
+type ModelSpec struct {
+	Model        string   `json:"model"`
+	Hash         string   `json:"hash"`
+	TrainedAt    float64  `json:"trained_at"`
+	Version      string   `json:"version"`
+	Tags         []string `json:"tags"`
+	IsCompatible bool     `json:"is_compatible"`
+}

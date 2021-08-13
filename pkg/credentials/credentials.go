@@ -1,36 +1,42 @@
 package credentials
 
 import (
+	"fmt"
+
 	"github.com/docker/docker-credential-helpers/credentials"
 )
 
 type Helper interface {
 	Add(creds *credentials.Credentials) error
-	Get(serverURL string) (string, string, error)
-	Delete(serverURL string) error
+	Get(name string) (string, string, error)
+	Delete(name string) error
 }
 
 type Credentials struct {
-	Helper Helper
+	Helper    Helper
+	Namespace string
 }
 
-func (c *Credentials) Set(label, url, user, secret string) error {
+func (c *Credentials) Set(name, user, secret string) error {
+	cName := fmt.Sprintf("%s-%s", name, c.Namespace)
 	cr := &credentials.Credentials{
-		ServerURL: url,
+		ServerURL: fmt.Sprintf("https://%s", cName),
 		Username:  user,
 		Secret:    secret,
 	}
 
-	credentials.SetCredsLabel(label)
+	credentials.SetCredsLabel(cName)
 	return c.Helper.Add(cr)
 }
 
-func (c *Credentials) Get(label, url string) (string, string, error) {
-	credentials.SetCredsLabel(label)
-	return c.Helper.Get(url)
+func (c *Credentials) Get(name string) (string, string, error) {
+	cName := fmt.Sprintf("%s-%s", name, c.Namespace)
+	credentials.SetCredsLabel(cName)
+	return c.Helper.Get(fmt.Sprintf("https://%s", cName))
 }
 
-func (c *Credentials) Delete(label, url string) error {
-	credentials.SetCredsLabel(label)
-	return c.Helper.Delete(url)
+func (c *Credentials) Delete(name string) error {
+	cName := fmt.Sprintf("%s-%s", name, c.Namespace)
+	credentials.SetCredsLabel(cName)
+	return c.Helper.Delete(fmt.Sprintf("https://%s", cName))
 }

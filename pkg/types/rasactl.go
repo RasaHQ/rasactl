@@ -24,6 +24,8 @@ type RasaCtlFlags struct {
 	Status       RasaCtlStatusFlags
 	ConnectRasa  RasaCtlConnectRasaFlags
 	Global       RasaCtlGlobalFlags
+	Auth         RasaCtlAuthFlags
+	Model        RasaCtlModelFlags
 }
 
 type RasaCtlStartUpgradeFlags struct {
@@ -55,4 +57,29 @@ type RasaCtlConnectRasaFlags struct {
 type RasaCtlGlobalFlags struct {
 	Debug   bool
 	Verbose bool
+}
+
+type RasaCtlAuthFlags struct {
+	Login struct {
+		Username      string
+		Password      string
+		PasswordStdin bool
+	}
+}
+
+type RasaCtlModelFlags struct {
+	Upload struct {
+		File string
+	}
+	Download struct {
+		Name     string
+		FilePath string
+	}
+	Tag struct {
+		Name  string
+		Model string
+	}
+	Delete struct {
+		Name string
+	}
 }

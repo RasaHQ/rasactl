@@ -44,3 +44,9 @@ func addConnectRasaFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&rasactlFlags.ConnectRasa.RunSeparateWorker, "run-saparate-worker", false, "runs a separate Rasa server for the worker environment")
 	cmd.Flags().StringSliceVar(&rasactlFlags.ConnectRasa.ExtraArgs, "extra-args", nil, "extra arguments for Rasa server")
 }
+
+func addAuthLoginFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVar(&rasactlFlags.Auth.Login.PasswordStdin, "password-stdin", false, "read the password from stdin")
+	cmd.PersistentFlags().StringVarP(&rasactlFlags.Auth.Login.Username, "username", "u", "", "username")
+	cmd.PersistentFlags().StringVarP(&rasactlFlags.Auth.Login.Password, "password", "p", "", "password")
+}

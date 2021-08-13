@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"os"
 	"strings"
 	"syscall"
@@ -40,6 +39,21 @@ func noArgs(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func maximumNArgs(n int) cobra.PositionalArgs {
+	return func(cmd *cobra.Command, args []string) error {
+		if len(args) > n {
+			return errors.Errorf(
+				"%q accepts at most %d %s\n\nUsage:  %s",
+				cmd.CommandPath(),
+				n,
+				"arguments",
+				cmd.UseLine(),
+			)
+		}
+		return nil
+	}
+}
+
 func examples(s string) string {
 	trimmedText := strings.TrimSpace(s)
 	if trimmedText == "" {
@@ -57,11 +71,59 @@ func examples(s string) string {
 	return strings.Join(outLines, "\n")
 }
 
-func getRasaXPasswordStdin() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	line, err := reader.ReadString('\n')
-	if err != nil {
-		return line, err
+func parseModelDownloadArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
+	var modelName, modelPath string
+	if namespace == "" {
+		return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+	} else if len(args) == 1 {
+		if args[0] == detectedNamespace {
+			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
+		} else if detectedNamespace != "" {
+			modelName = args[0]
+			return modelName, modelPath, detectedNamespace, nil
+		} else if detectedNamespace == "" {
+			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
+		}
+	} else if len(args) == 2 && detectedNamespace != "" {
+		modelName = args[0]
+		modelPath = args[1]
+		return modelName, modelPath, detectedNamespace, nil
+	} else if len(args) == 2 && detectedNamespace == "" {
+		modelName = args[1]
+		return modelName, modelPath, namespace, nil
+	} else if len(args) == 3 {
+		modelName = args[1]
+		modelPath = args[2]
+		return modelName, modelPath, namespace, nil
 	}
-	return strings.TrimSuffix(line, "\n"), nil
+
+	return "", "", "", nil
+}
+
+func parseModelTagArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
+	var modelName, modelTag string
+	if namespace == "" {
+		return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+	} else if len(args) == 2 {
+		if args[0] == detectedNamespace {
+			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
+		} else if detectedNamespace != "" {
+			modelName = args[0]
+			return modelName, modelTag, detectedNamespace, nil
+		} else if detectedNamespace == "" {
+			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a tag name"))
+		}
+	} else if len(args) == 2 && detectedNamespace != "" {
+		modelName = args[0]
+		modelTag = args[1]
+		return modelName, modelTag, detectedNamespace, nil
+	} else if len(args) == 2 && detectedNamespace == "" {
+		return "", "", "", errors.Errorf(errorPrint.Sprint("Not enough arguments"))
+	} else if len(args) == 3 {
+		modelName = args[1]
+		modelTag = args[2]
+		return modelName, modelTag, namespace, nil
+	}
+
+	return "", "", "", nil
 }
