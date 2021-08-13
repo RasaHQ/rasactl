@@ -64,8 +64,8 @@ func CheckNetworkError(err error) (NetworkError, error) {
 	return "", err
 }
 
+// MergeMaps merges maps into one.
 func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
-
 	result := make(map[string]interface{})
 	for _, m := range maps {
 		mergo.Map(&result, m, mergo.WithOverride)
@@ -73,6 +73,8 @@ func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	return result
 }
 
+// AddHostToEtcHosts adds a host with a given IP address to /etc/hosts,
+// for Windows it is C:\Windows\System32\Drivers\etc\hosts.
 func AddHostToEtcHosts(host, ip string) error {
 	hosts, err := txeh.NewHostsDefault()
 	if err != nil {
@@ -88,6 +90,8 @@ func AddHostToEtcHosts(host, ip string) error {
 	return nil
 }
 
+// DeleteHostToEtcHosts removes a host from /etc/hosts (linux, darwin), or
+// C:\Windows\System32\Drivers\etc\hosts (Windows).
 func DeleteHostToEtcHosts(host string) error {
 	hosts, err := txeh.NewHostsDefault()
 	if err != nil {
@@ -113,6 +117,7 @@ func ValidateName(name string) error {
 	return nil
 }
 
+// IsURLAccessible returns `true` if a client can connect to a given URL.
 func IsURLAccessible(address string) bool {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -151,6 +156,8 @@ func readStatusFile(path string, log logr.Logger) (string, error) {
 	return string(data), nil
 }
 
+// GetActiveNamespace returns a active namespace, it checks the .rasactl file if exists
+// and read a namespace from the file.
 func GetActiveNamespace(log logr.Logger) string {
 	log.V(1).Info("Getting active namespace")
 	path, err := os.Getwd()

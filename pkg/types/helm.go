@@ -17,11 +17,13 @@ package types
 
 import "time"
 
+// RepositorySpec stores data related to a helm repository.
 type RepositorySpec struct {
 	Name string
 	URL  string
 }
 
+// HelmConfigurationSpec stores a configuration for the helm client.
 type HelmConfigurationSpec struct {
 	Timeout      time.Duration
 	ReleaseName  string

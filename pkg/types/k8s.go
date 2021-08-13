@@ -18,6 +18,11 @@ package types
 type KubernetesBackendType string
 
 const (
-	KubernetesBackendLocal  KubernetesBackendType = "local"
+	// KubernetesBackendLocal indicates if a Kubernetes cluster used as a backend is running
+	// locally. The local type means that 127.0.0.1 address is used to connect to the Kubernetes API.
+	KubernetesBackendLocal KubernetesBackendType = "local"
+
+	// KubernetesBackendRemote indicates if a Kubernetes cluster used as a backend is running
+	// remotely. The remote type means that external IP address is used to connect to the Kubernetes API.
 	KubernetesBackendRemote KubernetesBackendType = "remote"
 )
