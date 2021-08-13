@@ -25,6 +25,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
+	"github.com/RasaHQ/rasactl/pkg/version"
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
@@ -48,9 +49,10 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "rasactl",
-	Short: "rasactl provisions and manages Rasa X deployments.",
-	Long:  `rasactl provisions and manages Rasa X deployments.`,
+	Use:     "rasactl",
+	Short:   "rasactl provisions and manages Rasa X deployments.",
+	Long:    `rasactl provisions and manages Rasa X deployments.`,
+	Version: version.VERSION,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
 		if len(args) != 0 {

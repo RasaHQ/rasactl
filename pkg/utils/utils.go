@@ -67,8 +67,8 @@ func CheckNetworkError(err error) (NetworkError, error) {
 	return "", err
 }
 
+// MergeMaps merges maps into one.
 func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
-
 	result := make(map[string]interface{})
 	for _, m := range maps {
 		mergo.Map(&result, m, mergo.WithOverride)
@@ -76,6 +76,8 @@ func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	return result
 }
 
+// AddHostToEtcHosts adds a host with a given IP address to /etc/hosts,
+// for Windows it is C:\Windows\System32\Drivers\etc\hosts.
 func AddHostToEtcHosts(host, ip string) error {
 	hosts, err := txeh.NewHostsDefault()
 	if err != nil {
@@ -91,6 +93,8 @@ func AddHostToEtcHosts(host, ip string) error {
 	return nil
 }
 
+// DeleteHostToEtcHosts removes a host from /etc/hosts (linux, darwin), or
+// C:\Windows\System32\Drivers\etc\hosts (Windows).
 func DeleteHostToEtcHosts(host string) error {
 	hosts, err := txeh.NewHostsDefault()
 	if err != nil {
@@ -116,6 +120,7 @@ func ValidateName(name string) error {
 	return nil
 }
 
+// IsURLAccessible returns `true` if a client can connect to a given URL.
 func IsURLAccessible(address string) bool {
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -154,6 +159,8 @@ func readStatusFile(path string, log logr.Logger) (string, error) {
 	return string(data), nil
 }
 
+// GetActiveNamespace returns a active namespace, it checks the .rasactl file if exists
+// and read a namespace from the file.
 func GetActiveNamespace(log logr.Logger) string {
 	log.V(1).Info("Getting active namespace")
 	path, err := os.Getwd()
@@ -171,6 +178,8 @@ func GetActiveNamespace(log logr.Logger) string {
 	return strings.TrimSuffix(namespace, "\n")
 }
 
+// AskForConfirmation waits for a input to confirm an operation and returns `true`
+// if the input == 'yes'.
 func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 	r := bufio.NewReader(in)
 
@@ -200,6 +209,7 @@ func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 
 }
 
+// Check if a given command exists.
 func CommandExists(cmd string) bool {
 	_, err := exec.LookPath(cmd)
 	return err == nil

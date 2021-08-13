@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// ReadValuesFiles reads the value file and store values in the Helm.Values object.
 func (h *Helm) ReadValuesFile() error {
 	file := h.Flags.StartUpgrade.ValuesFile
 
@@ -45,6 +46,7 @@ func (h *Helm) ReadValuesFile() error {
 	return nil
 }
 
+// GetValues returns values for the active helm release.
 func (h *Helm) GetValues() (map[string]interface{}, error) {
 	client := action.NewGetValues(h.ActionConfig)
 	client.AllValues = true
@@ -69,6 +71,8 @@ func (h *Helm) GetValues() (map[string]interface{}, error) {
 	return values, err
 }
 
+// IsDeployed checks if a given helm release is deployed.
+// Return 'true' if release is found.
 func (h *Helm) IsDeployed() (bool, error) {
 	client := action.NewHistory(h.ActionConfig)
 	client.Max = 1
@@ -83,6 +87,7 @@ func (h *Helm) IsDeployed() (bool, error) {
 	return true, nil
 }
 
+// GetStatus returns a helm relese status.
 func (h *Helm) GetStatus() (*release.Release, error) {
 	client := action.NewStatus(h.ActionConfig)
 	release, err := client.Run(h.Configuration.ReleaseName)

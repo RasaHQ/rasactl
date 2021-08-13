@@ -22,6 +22,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
+// List lists all deployments.
 func (r *RasaCtl) List() error {
 	data := [][]string{}
 	header := []string{"Current", "Name", "Status", "Rasa production", "Rasa worker", "Enterprise", "Version"}

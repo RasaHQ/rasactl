@@ -21,6 +21,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
+// PrintTable prints a table in the terminal.
 func PrintTable(header []string, data [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(header)
@@ -39,6 +40,7 @@ func PrintTable(header []string, data [][]string) {
 	table.Render()
 }
 
+// PrintTableNoHeader prints a table without headers in the terminal.
 func PrintTableNoHeader(data [][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoWrapText(false)

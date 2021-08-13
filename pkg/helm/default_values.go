@@ -139,6 +139,8 @@ func valuesSetRasaXPassword(password string) map[string]interface{} {
 	return values
 }
 
+// ValuesHostNetworkRasaX returns helm values that set hostNetwork to 'true'
+// for Rasa X deployment.
 func ValuesHostNetworkRasaX() map[string]interface{} {
 	values := map[string]interface{}{
 		"rasax": map[string]interface{}{
@@ -149,6 +151,7 @@ func ValuesHostNetworkRasaX() map[string]interface{} {
 	return values
 }
 
+// ValuesRabbitMQNodePort returns helm values which set the rabbitmq service type to NodePort.
 func ValuesRabbitMQNodePort() map[string]interface{} {
 	values := map[string]interface{}{
 		"rabbitmq": map[string]interface{}{
@@ -161,6 +164,7 @@ func ValuesRabbitMQNodePort() map[string]interface{} {
 	return values
 }
 
+// ValuesPostgreSQLNodePort return helm vales which set the postgresql service type to NodePort.
 func ValuesPostgreSQLNodePort() map[string]interface{} {
 	values := map[string]interface{}{
 		"postgresql": map[string]interface{}{

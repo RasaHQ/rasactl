@@ -66,6 +66,15 @@ func connectRasaCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprint("The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/"))
 			}
 
+			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isNamespaceExist {
+				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			}
+
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -81,15 +90,6 @@ func connectRasaCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
 
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
 				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))

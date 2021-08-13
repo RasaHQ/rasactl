@@ -210,8 +210,32 @@ $ sudo rasactl start --project
 $ rasactl open
 ```
 
+### Upgrade Rasa X / Enterprise version
+
+The following example shows how to upgrade Rasa X / Enterprise version for a deployment that already exists.
+
+1. Create the `values.yaml` file with a specific version.
+
+```yaml
+# values.yaml
+rasax:
+  tag: "0.42.0"
+eventService:
+  tag: "0.42.0"
+dbMigrationService:
+  tag: "0.42.0"
+```
+
+2. Run upgrade.
+
+```bash
+$ rasactl upgrade deployment-name --values-file values.yaml
+```
+
 ## Development
-ToDO: rewrite this section
+
+Below you can find a setup required for developing `rasactl` locally.
+
 ### How to run it?
 
 1. Install go
@@ -270,6 +294,7 @@ $ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 1. Go to a rasa project directory
 
 2. Deploy Rasa X
+
 ```
 $ sudo ./rasactl start -p
 ```
@@ -312,7 +337,3 @@ $ kubectl -n my-test patch serviceaccount default -p '{"imagePullSecrets": [{"na
 ```
 $ ./rasactl start my-test -p --values-file testdata/test-image.yaml
 ```
-
-### Running rasactl
-
-You can use the `help` command to display description and examples for a specific command, e.g. `rasactl help start`.

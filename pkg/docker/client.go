@@ -41,6 +41,7 @@ import (
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha4"
 )
 
+// Docker represents a Docker client.
 type Docker struct {
 	Client       *client.Client
 	ctx          context.Context
@@ -53,24 +54,27 @@ type Docker struct {
 	Flags        *rtypes.RasaCtlFlags
 }
 
+// KindSpec represents the kind specification that stores
+// information relented to kind.
 type KindSpec struct {
 	ControlPlaneHost string
 	Version          string
 }
 
 const (
+	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
 )
 
+// New initializes Docker client.
 func (d *Docker) New() error {
+	d.Log.Info("Initializing Docker client")
 	d.ctx = context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
 	d.Client = cli
-
-	d.Log.Info("Initializing Docker client")
 
 	return nil
 }
@@ -263,6 +267,7 @@ func (d *Docker) getKindNetwork() (string, error) {
 	return inspect.HostConfig.NetworkMode.NetworkName(), nil
 }
 
+// CreateKindNode creates a new container that is used as a kind node.
 func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreatedBody, error) {
 	kindImage := fmt.Sprintf("%s%s", kindImagePrefix, d.Kind.Version)
 
@@ -306,6 +311,7 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		},
 	}
 
+	// Mount a local directory if a project path is defined.
 	if d.ProjectPath != "" {
 		hostConfig.Mounts = append(hostConfig.Mounts, mount.Mount{
 			Source: d.ProjectPath,
@@ -353,6 +359,9 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 	return resp, nil
 }
 
+// StopKindNode stops a container that is used as a kind node.
+// In case the container fails to stop gracefully within a minute,
+// it is forcefully terminated (killed).
 func (d *Docker) StopKindNode(hostname string) error {
 	timeout := time.Minute * 1
 	if err := d.Client.ContainerStop(d.ctx, hostname, &timeout); err != nil {
@@ -361,6 +370,7 @@ func (d *Docker) StopKindNode(hostname string) error {
 	return nil
 }
 
+// StartKindNode starts a kind node that was previously stopped.
 func (d *Docker) StartKindNode(hostname string) error {
 	if err := d.Client.ContainerStart(d.ctx, hostname, types.ContainerStartOptions{}); err != nil {
 		return err
@@ -368,6 +378,7 @@ func (d *Docker) StartKindNode(hostname string) error {
 	return nil
 }
 
+// DeleteKindNode deletes a kind node.
 func (d *Docker) DeleteKindNode(hostname string) error {
 	if err := d.Client.ContainerRemove(d.ctx, hostname, types.ContainerRemoveOptions{
 		RemoveVolumes: true,

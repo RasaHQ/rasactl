@@ -31,17 +31,29 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RasaX defines Rasa X client.
 type RasaX struct {
-	URL            string
-	Token          string
-	BearerToken    string
-	Log            logr.Logger
+	BearerToken string
+	Flags       *types.RasaCtlFlags
+	// URL is a Rasa X URL
+	URL string
+
+	// Token stores a Rasa X admin token.
+	Token string
+
+	// Log defines logger.
+	Log logr.Logger
+
+	// Log defines the spinner object.
 	SpinnerMessage *status.SpinnerMessage
-	WaitTimeout    time.Duration
-	client         *http.Client
-	Flags          *types.RasaCtlFlags
+
+	// WaitTimeout defines timeout for the client.
+	WaitTimeout time.Duration
+
+	client *http.Client
 }
 
+// New initializes a new Rasa X client.
 func (r *RasaX) New() {
 	r.client = &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -67,6 +79,7 @@ func (r *RasaX) getURL() string {
 	return urlAddress
 }
 
+// GetHealthEndpoint returns a response from the /api/health endpoint.
 func (r *RasaX) GetHealthEndpoint() (*rtypes.HealthEndpointsResponse, error) {
 	urlAddress := r.getURL()
 

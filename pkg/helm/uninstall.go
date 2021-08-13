@@ -19,6 +19,7 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 )
 
+// Uninstall prepares and executes the uninstall.
 func (h *Helm) Uninstall() error {
 
 	client := action.NewUninstall(h.ActionConfig)
@@ -28,15 +29,16 @@ func (h *Helm) Uninstall() error {
 
 	h.Log.V(1).Info("Helm client settings", "settings", client)
 
-	// uninstall the chart
+	msg := "Uninstalling Rasa X"
+	h.Spinner.Message(msg)
+
+	// Uninstall the chart
 	rel, err := client.Run(h.Configuration.ReleaseName)
 	if err != nil {
 		return err
 	}
 
-	msg := "Uninstalling Rasa X"
 	h.Log.Info(msg, "releaseName", rel.Release.Name, "namespace", h.Namespace)
-	h.Spinner.Message(msg)
 
 	return nil
 }

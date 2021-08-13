@@ -33,6 +33,16 @@ func stopCmd() *cobra.Command {
 			if namespace == "" {
 				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 			}
+
+			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isNamespaceExist {
+				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			}
+
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -45,17 +55,6 @@ func stopCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
-
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {

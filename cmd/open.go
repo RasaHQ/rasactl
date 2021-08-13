@@ -41,14 +41,13 @@ func openCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
+			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
+			if !isNamespaceExist {
+				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
 			}
 
 			// Check if a Rasa X deployment is already installed and running

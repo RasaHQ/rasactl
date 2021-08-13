@@ -13,16 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package types
+package version
 
-type KubernetesBackendType string
-
-const (
-	// KubernetesBackendLocal indicates if a Kubernetes cluster used as a backend is running
-	// locally. The local type means that 127.0.0.1 address is used to connect to the Kubernetes API.
-	KubernetesBackendLocal KubernetesBackendType = "local"
-
-	// KubernetesBackendRemote indicates if a Kubernetes cluster used as a backend is running
-	// remotely. The remote type means that external IP address is used to connect to the Kubernetes API.
-	KubernetesBackendRemote KubernetesBackendType = "remote"
-)
+// VERSION is filled out during the build process (using git describe output)
+var VERSION string

@@ -25,6 +25,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// UpdateRasaXConfig generates configuration for Rasa X environments and update a Kubernetes secret which stores the configuration.
 func (k *Kubernetes) UpdateRasaXConfig(token string) error {
 
 	var productionPort int = k.Flags.ConnectRasa.Port
