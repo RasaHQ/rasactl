@@ -16,12 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -35,11 +34,11 @@ const (
 func modelDownloadCmd() *cobra.Command {
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:     "download [DEPLOYMENT NAME] MODEL-NAME [STORE-PATH]",
+		Use:     "download [DEPLOYMENT NAME] MODEL-NAME [DESTINATION]",
 		Short:   "download a model from Rasa X / Enterprise",
 		Long:    modelDownloadDesc,
-		Example: examples(modelDownloadExample),
-		Args:    maximumNArgs(3),
+		Example: templates.Examples(modelDownloadExample),
+		Args:    cobra.MaximumNArgs(3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelName, modelPath, namespace, err := parseModelDownloadArgs(namespace, detectedNamespace, args)
@@ -48,15 +47,10 @@ func modelDownloadCmd() *cobra.Command {
 			}
 			rasaCtl.Namespace = namespace
 
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
 			rasactlFlags.Model.Download.Name = modelName
 			rasactlFlags.Model.Download.FilePath = modelPath
 

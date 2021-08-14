@@ -16,11 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -37,21 +36,11 @@ func modelListCmd() *cobra.Command {
 		Use:     "list [DEPLOYMENT NAME]",
 		Short:   "list models stored in Rasa X / Enterprise",
 		Long:    modelListDesc,
-		Example: examples(modelListExample),
+		Example: templates.Examples(modelListExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
-
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()

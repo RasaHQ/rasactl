@@ -27,18 +27,8 @@ func statusCmd() *cobra.Command {
 		Use:   "status [DEPLOYMENT NAME]",
 		Short: "show deployment status",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-			}
-
-			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isNamespaceExist {
-				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			return nil

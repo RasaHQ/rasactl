@@ -21,6 +21,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -46,20 +47,11 @@ func upgradeCmd() *cobra.Command {
 		Use:          "upgrade [DEPLOYMENT NAME]",
 		Short:        "upgrade Rasa X deployment",
 		Long:         upgradeDesc,
-		Example:      examples(upgradeExample),
+		Example:      templates.Examples(upgradeExample),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-			}
-
-			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isNamespaceExist {
-				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()

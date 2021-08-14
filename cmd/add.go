@@ -20,6 +20,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -45,7 +46,7 @@ func addCmd() *cobra.Command {
 		Use:     "add NAMESPACE",
 		Short:   "add existing Rasa X deployment",
 		Long:    addDesc,
-		Example: examples(addExample),
+		Example: templates.Examples(addExample),
 		Args:    cobra.MinimumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
@@ -54,14 +55,8 @@ func addCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s namespace doesn't exist.\n", rasaCtl.Namespace)
-				return nil
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			if rasaCtl.KubernetesClient.IsNamespaceManageable() {

@@ -16,11 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -36,19 +35,12 @@ func modelUploadCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "upload [DEPLOYMENT NAME] MODEL-FILE",
 		Short:   "upload model to Rasa X / Enterprise",
-		Long:    modelUploadDesc,
-		Example: examples(modelUploadExample),
+		Long:    templates.LongDesc(modelUploadDesc),
+		Example: templates.Examples(modelUploadExample),
 		Args:    maximumNArgs(2),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			var modelFile string

@@ -23,6 +23,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -55,24 +56,15 @@ func connectRasaCmd() *cobra.Command {
 		Use:     "rasa [DEPLOYMENT NAME]",
 		Short:   "run Rasa OSS server and connect it to the Rasa X deployment",
 		Long:    connectRasaDesc,
-		Example: examples(connectRasaExample),
+		Example: templates.Examples(connectRasaExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-			}
 
 			if !utils.CommandExists("rasa") {
 				return errors.Errorf(errorPrint.Sprint("The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/"))
 			}
 
-			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isNamespaceExist {
-				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()

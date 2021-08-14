@@ -30,26 +30,15 @@ func openCmd() *cobra.Command {
 		Use:   "open [DEPLOYMENT NAME]",
 		Short: "open Rasa X in a web browser",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
-
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isNamespaceExist {
-				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
-			}
-
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {

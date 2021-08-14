@@ -16,11 +16,10 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -37,18 +36,12 @@ func modelDeleteCmd() *cobra.Command {
 		Use:     "delete [DEPLOYMENT NAME] MODEL-NAME",
 		Short:   "delete a model from Rasa X / Enterprise",
 		Long:    modelDeleteDesc,
-		Example: examples(modelDeleteExample),
-		Args:    maximumNArgs(2),
+		Example: templates.Examples(modelDeleteExample),
+		Args:    cobra.MaximumNArgs(2),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			var modelName string

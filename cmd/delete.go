@@ -22,6 +22,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -49,7 +50,7 @@ func deleteCmd() *cobra.Command {
 		Use:     "delete [DEPLOYMENT NAME]",
 		Short:   "delete Rasa X deployment",
 		Long:    deleteDesc,
-		Example: examples(deleteExample),
+		Example: templates.Examples(deleteExample),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if namespace == "" {
@@ -67,13 +68,8 @@ func deleteCmd() *cobra.Command {
 				}
 			}
 
-			isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isNamespaceExist {
-				return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()

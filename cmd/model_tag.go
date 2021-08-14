@@ -16,12 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -38,7 +37,7 @@ func modelTagCmd() *cobra.Command {
 		Use:     "tag [DEPLOYMENT NAME] MODEL-NAME TAG",
 		Short:   "tag a model in Rasa X / Enterprise",
 		Long:    modelTagDesc,
-		Example: examples(modelTagExample),
+		Example: templates.Examples(modelTagExample),
 		Args:    maximumNArgs(3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			detectedNamespace := utils.GetActiveNamespace(log)
@@ -48,15 +47,10 @@ func modelTagCmd() *cobra.Command {
 			}
 			rasaCtl.Namespace = namespace
 
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
 			rasactlFlags.Model.Tag.Model = modelName
 			rasactlFlags.Model.Tag.Name = modelTag
 

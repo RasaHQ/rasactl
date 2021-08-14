@@ -53,6 +53,7 @@ var rootCmd = &cobra.Command{
 	Short:   "rasactl provisions and manages Rasa X deployments.",
 	Long:    `rasactl provisions and manages Rasa X deployments.`,
 	Version: version.VERSION,
+
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
 		if len(args) != 0 {
@@ -68,8 +69,10 @@ var rootCmd = &cobra.Command{
 			Namespace: namespace,
 			Flags:     rasactlFlags,
 		}
-		if err := rasaCtl.InitClients(); err != nil {
-			return errors.Errorf(errorPrint.Sprintf("%s", err))
+		if cmd.CalledAs() != "help" {
+			if err := rasaCtl.InitClients(); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
 		}
 		return nil
 	},

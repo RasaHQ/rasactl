@@ -21,6 +21,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -37,12 +38,11 @@ func authLoginCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "login [DEPLOYMENT NAME]",
 		Short:   "authorize rasactl to access the Rasa X / Enterprise with user credentials",
-		Long:    authLoginDesc,
-		Example: examples(authLoginExample),
+		Long:    templates.LongDesc(authLoginDesc),
+		Example: templates.Examples(authLoginExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
@@ -56,16 +56,6 @@ func authLoginCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			isProjectExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
-			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
-			}
-
-			if !isProjectExist {
-				fmt.Printf("The %s project doesn't exist.\n", rasaCtl.Namespace)
-				return nil
-			}
-
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
 				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}

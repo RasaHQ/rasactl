@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"os"
-	"strings"
 	"syscall"
 
 	"github.com/kyokomi/emoji"
@@ -53,23 +52,6 @@ func maximumNArgs(n int) cobra.PositionalArgs {
 		}
 		return nil
 	}
-}
-
-func examples(s string) string {
-	trimmedText := strings.TrimSpace(s)
-	if trimmedText == "" {
-		return ""
-	}
-
-	const indent = `  `
-	inLines := strings.Split(trimmedText, "\n")
-	outLines := make([]string, 0, len(inLines))
-
-	for _, line := range inLines {
-		outLines = append(outLines, indent+strings.TrimSpace(line))
-	}
-
-	return strings.Join(outLines, "\n")
 }
 
 func parseModelDownloadArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
@@ -127,4 +109,20 @@ func parseModelTagArgs(namespace, detectedNamespace string, args []string) (stri
 	}
 
 	return "", "", "", nil
+}
+
+func checkIfNamespaceExists() error {
+	if namespace == "" {
+		return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+	}
+
+	isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
+	if err != nil {
+		return errors.Errorf(errorPrint.Sprintf("%s", err))
+	}
+
+	if !isNamespaceExist {
+		return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+	}
+	return nil
 }

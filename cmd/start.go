@@ -23,6 +23,7 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
@@ -61,8 +62,8 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:          "start [DEPLOYMENT NAME]",
 		Short:        "start a Rasa X deployment",
-		Long:         startDesc,
-		Example:      examples(startExample),
+		Long:         templates.LongDesc(startDesc),
+		Example:      templates.Examples(startExample),
 		SilenceUsage: true,
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
