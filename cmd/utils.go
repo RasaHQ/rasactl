@@ -28,17 +28,6 @@ func runOnClose(signal os.Signal) {
 	}
 }
 
-func noArgs(cmd *cobra.Command, args []string) error {
-	if len(args) > 0 {
-		return errors.Errorf(
-			"%q accepts no arguments\n\nUsage:  %s",
-			cmd.CommandPath(),
-			cmd.UseLine(),
-		)
-	}
-	return nil
-}
-
 func maximumNArgs(n int) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) > n {
@@ -54,7 +43,7 @@ func maximumNArgs(n int) cobra.PositionalArgs {
 	}
 }
 
-func parseModelDownloadArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
+func parseModelUpDownArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
 	var modelName, modelPath string
 	if namespace == "" {
 		return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
@@ -85,30 +74,33 @@ func parseModelDownloadArgs(namespace, detectedNamespace string, args []string) 
 
 func parseModelTagArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
 	var modelName, modelTag string
-	if namespace == "" {
-		return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-	} else if len(args) == 2 {
-		if args[0] == detectedNamespace {
-			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
-		} else if detectedNamespace != "" {
+	for {
+		switch {
+		case namespace == "":
+			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+		case len(args) == 2:
+			if args[0] == detectedNamespace {
+				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
+			} else if detectedNamespace != "" {
+				modelName = args[0]
+				return modelName, modelTag, detectedNamespace, nil
+			} else if detectedNamespace == "" {
+				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a tag name"))
+			}
+		case len(args) == 2 && detectedNamespace != "":
 			modelName = args[0]
+			modelTag = args[1]
 			return modelName, modelTag, detectedNamespace, nil
-		} else if detectedNamespace == "" {
-			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a tag name"))
+		case len(args) == 2 && detectedNamespace == "":
+			return "", "", "", errors.Errorf(errorPrint.Sprint("Not enough arguments"))
+		case len(args) == 3:
+			modelName = args[1]
+			modelTag = args[2]
+			return modelName, modelTag, namespace, nil
+		default:
+			return "", "", "", nil
 		}
-	} else if len(args) == 2 && detectedNamespace != "" {
-		modelName = args[0]
-		modelTag = args[1]
-		return modelName, modelTag, detectedNamespace, nil
-	} else if len(args) == 2 && detectedNamespace == "" {
-		return "", "", "", errors.Errorf(errorPrint.Sprint("Not enough arguments"))
-	} else if len(args) == 3 {
-		modelName = args[1]
-		modelTag = args[2]
-		return modelName, modelTag, namespace, nil
 	}
-
-	return "", "", "", nil
 }
 
 func checkIfNamespaceExists() error {

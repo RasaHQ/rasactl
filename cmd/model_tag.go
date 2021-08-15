@@ -25,9 +25,20 @@ import (
 
 const (
 	modelTagDesc = `
+	Rasa Enterprise allows multiple versions of an assistant to be run simultaneously and served to different users.
+	By default, two environments are defined:
+
+	- production
+	- worker
+
+	If you want to activate a model you have to tag it as 'production'.
+
+	Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
 `
 
 	modelTagExample = `
+	# Tag a model as 'production'
+	$ rasactl model tag my-model production
 `
 )
 
@@ -36,9 +47,9 @@ func modelTagCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "tag [DEPLOYMENT NAME] MODEL-NAME TAG",
 		Short:   "tag a model in Rasa X / Enterprise",
-		Long:    modelTagDesc,
+		Long:    templates.LongDesc(modelTagDesc),
 		Example: templates.Examples(modelTagExample),
-		Args:    maximumNArgs(3),
+		Args:    cobra.RangeArgs(2, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelName, modelTag, namespace, err := parseModelTagArgs(namespace, detectedNamespace, args)

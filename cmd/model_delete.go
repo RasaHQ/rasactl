@@ -37,7 +37,7 @@ func modelDeleteCmd() *cobra.Command {
 		Short:   "delete a model from Rasa X / Enterprise",
 		Long:    modelDeleteDesc,
 		Example: templates.Examples(modelDeleteExample),
-		Args:    cobra.MaximumNArgs(2),
+		Args:    cobra.RangeArgs(1, 2),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := checkIfNamespaceExists(); err != nil {

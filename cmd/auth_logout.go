@@ -26,9 +26,12 @@ import (
 
 const (
 	authLogoutDesc = `
+	It removes credentials from an external credentials store, such as the native keychain of the operating system.
 `
 
 	authLogoutExample = `
+	# Remove access credentials
+	$ rasactl auth logout
 `
 )
 

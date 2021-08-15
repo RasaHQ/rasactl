@@ -150,6 +150,8 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 		}
 		json.Unmarshal(body, &bodyData.Models)
 		return bodyData, nil
+	case 404:
+		return nil, fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
 		return nil, fmt.Errorf("%s", content)

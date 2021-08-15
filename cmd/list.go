@@ -27,7 +27,7 @@ func listCmd() *cobra.Command {
 		Use:     "list",
 		Short:   "list deployments",
 		Aliases: []string{"ls"},
-		Args:    noArgs,
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := rasaCtl.List(); err != nil {

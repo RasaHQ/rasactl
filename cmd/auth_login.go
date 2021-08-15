@@ -26,9 +26,22 @@ import (
 
 const (
 	authLoginDesc = `
+	Log in to Rasa X / Enterprise.
+	It stores credentials in an external credentials store, such as the native keychain of the operating system.
+
+	- Apple macOS Keychain Access for macOS
+	- D-Bus Secret Service for Linux
+	- Microsoft Windows Credential Manager for Windows
 `
 
 	authLoginExample = `
+	# Login to Rasa X / Enterprise.
+	$ rasactl auth login
+
+	# Provide a password using STDIN.
+	# You can login non-interactively by using the --password-stdin flag to provide a password through STDIN.
+	# Using STDIN prevents the password from ending up in the shell’s history.
+	$ rasactl auth login --username me --password-stdin
 `
 )
 

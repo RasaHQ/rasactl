@@ -41,11 +41,18 @@ func modelDownloadCmd() *cobra.Command {
 		Args:    cobra.MaximumNArgs(3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			detectedNamespace := utils.GetActiveNamespace(log)
-			modelName, modelPath, namespace, err := parseModelDownloadArgs(namespace, detectedNamespace, args)
+			modelName, modelPath, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
 			if err != nil {
 				return err
 			}
-			rasaCtl.Namespace = namespace
+			if detectedNamespace != "" {
+				rasaCtl.Namespace = namespace
+				rasaCtl.KubernetesClient.Namespace = namespace
+				rasaCtl.HelmClient.Namespace = namespace
+				if err := rasaCtl.HelmClient.New(); err != nil {
+					return err
+				}
+			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err

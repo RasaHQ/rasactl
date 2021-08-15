@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
@@ -24,32 +25,40 @@ import (
 
 const (
 	modelUploadDesc = `
+	Upload a model to Rasa X / Enterprise.
 `
 
 	modelUploadExample = `
+	# Upload the model.tar.gz model file to Rasa X / Enterprise.
+	$ rasactl model upload model.tar.gz
 `
 )
 
 func modelUploadCmd() *cobra.Command {
-	// cmd represents the status command
+	// cmd represents the model upload command
 	cmd := &cobra.Command{
 		Use:     "upload [DEPLOYMENT NAME] MODEL-FILE",
 		Short:   "upload model to Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelUploadDesc),
 		Example: templates.Examples(modelUploadExample),
-		Args:    maximumNArgs(2),
+		Args:    cobra.RangeArgs(1, 2),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := checkIfNamespaceExists(); err != nil {
+			detectedNamespace := utils.GetActiveNamespace(log)
+			modelFile, _, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
+			if err != nil {
 				return err
 			}
+			if detectedNamespace != "" {
+				rasaCtl.Namespace = namespace
+				rasaCtl.KubernetesClient.Namespace = namespace
+				rasaCtl.HelmClient.Namespace = namespace
+				if err := rasaCtl.HelmClient.New(); err != nil {
+					return err
+				}
+			}
 
-			var modelFile string
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-			} else if len(args) == 1 {
-				modelFile = args[0]
-			} else if len(args) == 2 {
-				modelFile = args[1]
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
 			}
 
 			rasactlFlags.Model.Upload.File = modelFile

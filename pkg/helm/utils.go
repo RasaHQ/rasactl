@@ -60,6 +60,7 @@ func (h *Helm) GetValues() (map[string]interface{}, error) {
 		h.Log.V(1).Error(err, "Getting all values",
 			"releaseName", h.Configuration.ReleaseName,
 			"namespace", h.Namespace,
+			"helmClient", fmt.Sprintf("%#v", h),
 		)
 		return values, err
 	}
