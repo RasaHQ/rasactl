@@ -19,5 +19,18 @@ changelog:
       - (?i)foo
 
 builds:
-  - ldflags:
+  - id: darwin
+    env:
+      - CGO_ENABLED=1
+      - CGO_CFLAGS=-mmacosx-version-min=10.11
+    goos:
+      - darwin
+    ldflags:
+    - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+  - id: linux
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - linux
+    ldflags:
     - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
