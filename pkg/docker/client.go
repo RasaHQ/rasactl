@@ -182,7 +182,9 @@ func (d *Docker) getKubeadmToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	token.ReadFrom(at.Reader)
+	if _, err := token.ReadFrom(at.Reader); err != nil {
+		return "", err
+	}
 	at.Close()
 
 	r := strings.TrimSuffix(string(bytes.Trim(token.Bytes(), "\x01\x00\x00\x00\x00\x00\x00\x18")), "\n")

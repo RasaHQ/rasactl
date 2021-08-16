@@ -28,6 +28,9 @@ func (r *RasaX) progressBarBytes(maxBytes int64, description ...string) *progres
 		progressbar.OptionSetPredictTime(true),
 		progressbar.OptionClearOnFinish(),
 	)
-	bar.RenderBlank()
+	if err := bar.RenderBlank(); err != nil {
+		r.Log.V(1).Error(err, "Can't render a progress bar")
+		return nil
+	}
 	return bar
 }

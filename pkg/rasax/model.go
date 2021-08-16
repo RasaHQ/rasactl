@@ -51,7 +51,10 @@ func (r *RasaX) ModelUpload() error {
 		return err
 	}
 
-	io.Copy(part, file)
+	if _, err := io.Copy(part, file); err != nil {
+		return err
+	}
+
 	writer.Close()
 	//buffer
 	url := fmt.Sprintf("%s/api/projects/default/models", r.URL)
@@ -121,7 +124,11 @@ func (r *RasaX) ModelDownload() error {
 			resp.ContentLength,
 			fmt.Sprintf("Downloading %s", r.Flags.Model.Download.Name),
 		)
-		io.Copy(io.MultiWriter(f, bar), resp.Body)
+
+		if _, err := io.Copy(io.MultiWriter(f, bar), resp.Body); err != nil {
+			return err
+		}
+
 		fmt.Println("Model has been downloaded successfully.")
 	case 404:
 		return fmt.Errorf("model '%s' not found", r.Flags.Model.Download.Name)
@@ -158,7 +165,9 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(body, &bodyData.Models)
+		if err := json.Unmarshal(body, &bodyData.Models); err != nil {
+			return nil, err
+		}
 		return bodyData, nil
 	case 401:
 		return nil, fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")

@@ -52,7 +52,9 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(body, &bodyData)
+		if err := json.Unmarshal(body, &bodyData); err != nil {
+			return nil, err
+		}
 		return bodyData, nil
 
 	case 401:

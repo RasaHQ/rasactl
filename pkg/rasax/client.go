@@ -33,8 +33,12 @@ import (
 
 // RasaX defines Rasa X client.
 type RasaX struct {
+	// BearerToken stores a bearer token.
 	BearerToken string
-	Flags       *types.RasaCtlFlags
+
+	// Flags defines the command flags.
+	Flags *types.RasaCtlFlags
+
 	// URL is a Rasa X URL
 	URL string
 
@@ -99,7 +103,9 @@ func (r *RasaX) GetHealthEndpoint() (*rtypes.HealthEndpointsResponse, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(body, &bodyData)
+		if err := json.Unmarshal(body, &bodyData); err != nil {
+			return nil, err
+		}
 		return bodyData, nil
 
 	} else {
@@ -126,7 +132,9 @@ func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
 		if err != nil {
 			return nil, err
 		}
-		json.Unmarshal(body, &bodyData)
+		if err := json.Unmarshal(body, &bodyData); err != nil {
+			return nil, err
+		}
 		return bodyData, nil
 
 	} else {
