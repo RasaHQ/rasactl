@@ -82,9 +82,11 @@ jobs:
       matrix:
         include:
           - os: darwin
-            arch: [amd64, arm64]
+            arch: amd64
+          - os: darwin
+            arch: arm64
           - os: linux
-            arch: [amd64]
+            arch: amd64
 
     steps:
       - uses: actions/download-artifact@v2
