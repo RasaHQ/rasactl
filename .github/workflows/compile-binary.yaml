@@ -41,7 +41,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: macos-latest
+            id: darwin
+          - os: ubuntu-latest
+            id: linux
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -63,4 +67,9 @@ jobs:
           install-only: true
 
       - name: Build
-        run: goreleaser build --single-target --snapshot
+        run: goreleaser build --id ${{ matrix.id }} --snapshot
+
+      - uses: 'actions/upload-artifact@v2'
+        with:
+          name: ${{ matrix.id }}
+          path: ${{ github.workspace }}/dist
