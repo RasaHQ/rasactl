@@ -42,7 +42,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-11
             id: darwin
           - os: ubuntu-latest
             id: linux

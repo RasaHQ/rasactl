@@ -71,7 +71,9 @@ func CheckNetworkError(err error) (NetworkError, error) {
 func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
 	for _, m := range maps {
-		mergo.Map(&result, m, mergo.WithOverride)
+		if err := mergo.Map(&result, m, mergo.WithOverride); err != nil {
+			continue
+		}
 	}
 	return result
 }

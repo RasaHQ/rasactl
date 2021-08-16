@@ -6,7 +6,6 @@ import (
 
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 // HandleSignals receives a signal from the channel and runs an action depends on the type of the signal.
@@ -25,21 +24,6 @@ func runOnClose(signal os.Signal) {
 		os.Exit(143)
 	default:
 		os.Exit(0)
-	}
-}
-
-func maximumNArgs(n int) cobra.PositionalArgs {
-	return func(cmd *cobra.Command, args []string) error {
-		if len(args) > n {
-			return errors.Errorf(
-				"%q accepts at most %d %s\n\nUsage:  %s",
-				cmd.CommandPath(),
-				n,
-				"arguments",
-				cmd.UseLine(),
-			)
-		}
-		return nil
 	}
 }
 
