@@ -1,0 +1,117 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: macos-11
+            id: darwin
+          - os: ubuntu-latest
+            id: linux
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          install-only: true
+
+      - name: Build
+        run: goreleaser build --id ${{ matrix.id }} --snapshot
+
+      - uses: 'actions/upload-artifact@v2'
+        with:
+          name: ${{ matrix.id }}
+          path: ${{ github.workspace }}/dist
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Get release version
+        id: release_version
+        run: |
+          echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_version.outputs.version }}
+          release_name: ${{ steps.release_version.outputs.version }}
+          body: ""
+          draft: false
+          prerelease: false
+
+  upload:
+    name: Upload Assets
+    runs-on: ubuntu-latest
+    needs: [release]
+    strategy:
+      matrix:
+        include:
+          - os: darwin
+            arch: amd64
+          - os: darwin
+            arch: arm64
+          - os: linux
+            arch: amd64
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.os }}
+          path: ${{ github.workspace }}/dist
+
+      - run: sha256sum ./dist/${{ matrix.os }}_${{ matrix.os }}_${{ matrix.arch }}/rasactl > rasactl_${{ matrix.os }}_${{ matrix.arch }}.sha256sum
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./dist/${{ matrix.os }}_${{ matrix.os }}_${{ matrix.arch }}/rasactl
+          asset_name: rasactl_${{ matrix.os }}_${{ matrix.arch }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: rasactl_${{ matrix.os }}_${{ matrix.arch }}.sha256sum
+          asset_name: rasactl_${{ matrix.os }}_${{ matrix.arch }}.sha256sum
+          asset_content_type: application/text

@@ -1,0 +1,10 @@
+rasax:
+  name: "eu.gcr.io/rasa-ci-cd/ci-build-rasa-x"
+  tag: "0.42.0-pr5494"
+eventService:
+  name: "eu.gcr.io/rasa-ci-cd/ci-build-rasa-x"
+  tag: "0.42.0-pr5494"
+dbMigrationService:
+  ignoreVersionCheck: true
+  name: "eu.gcr.io/rasa-ci-cd/ci-build-rasa-x"
+  tag: "0.42.0-pr5494"
