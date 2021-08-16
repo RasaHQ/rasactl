@@ -100,9 +100,12 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: darwin
+          path: ${{ github.workspace }}/dist
 
       - uses: actions/download-artifact@v2
         with:
           name: linux
+          path: ${{ github.workspace }}/dist
 
-      - run: ls -la
+      - name: Release
+        run: goreleaser release --auto-snapshot
