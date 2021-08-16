@@ -27,9 +27,12 @@ builds:
       - darwin
     ldflags:
     - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+
   - id: linux
     env:
       - CGO_ENABLED=1
+    goarch:
+      - amd64
     goos:
       - linux
     ldflags:
