@@ -83,6 +83,7 @@ func parseModelTagArgs(namespace, detectedNamespace string, args []string) (stri
 				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
 			} else if detectedNamespace != "" {
 				modelName = args[0]
+				modelTag = args[1]
 				return modelName, modelTag, detectedNamespace, nil
 			} else if detectedNamespace == "" {
 				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a tag name"))

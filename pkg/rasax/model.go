@@ -54,7 +54,9 @@ func (r *RasaX) ModelUpload() error {
 	io.Copy(part, file)
 	writer.Close()
 	//buffer
-	request, err := http.NewRequest("POST", fmt.Sprintf("%s/api/projects/default/models", r.URL), &body)
+	url := fmt.Sprintf("%s/api/projects/default/models", r.URL)
+	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
+	request, err := http.NewRequest("POST", url, &body)
 	if err != nil {
 		return err
 	}
@@ -72,6 +74,8 @@ func (r *RasaX) ModelUpload() error {
 	switch response.StatusCode {
 	case 201:
 		fmt.Println("Successfully uploaded.")
+	case 401:
+		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	case 409:
 		fmt.Println("A model with that name already exists.")
 	default:
@@ -83,8 +87,10 @@ func (r *RasaX) ModelUpload() error {
 }
 
 func (r *RasaX) ModelDownload() error {
+	url := fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Download.Name)
+	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("GET",
-		fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Download.Name), nil)
+		url, nil)
 	if err != nil {
 		return err
 	}
@@ -119,6 +125,8 @@ func (r *RasaX) ModelDownload() error {
 		fmt.Println("Model has been downloaded successfully.")
 	case 404:
 		return fmt.Errorf("model '%s' not found", r.Flags.Model.Download.Name)
+	case 401:
+		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("%s", content)
@@ -128,7 +136,9 @@ func (r *RasaX) ModelDownload() error {
 
 func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 	bodyData := &rtypes.ModelsListEndpointResponse{}
-	request, err := http.NewRequest("GET", fmt.Sprintf("%s/api/projects/default/models", r.URL), nil)
+	url := fmt.Sprintf("%s/api/projects/default/models", r.URL)
+	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +160,7 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 		}
 		json.Unmarshal(body, &bodyData.Models)
 		return bodyData, nil
-	case 404:
+	case 401:
 		return nil, fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
@@ -159,9 +169,9 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 }
 
 func (r *RasaX) ModelTag() error {
-	r.Log.Info("Sending a request to Rasa X")
-	request, err := http.NewRequest("PUT",
-		fmt.Sprintf("%s/api/projects/default/models/%s/tags/%s", r.URL, r.Flags.Model.Tag.Model, r.Flags.Model.Tag.Name), nil)
+	url := fmt.Sprintf("%s/api/projects/default/models/%s/tags/%s", r.URL, r.Flags.Model.Tag.Model, r.Flags.Model.Tag.Name)
+	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
+	request, err := http.NewRequest("PUT", url, nil)
 	if err != nil {
 		return err
 	}
@@ -179,6 +189,8 @@ func (r *RasaX) ModelTag() error {
 	case 204:
 		fmt.Println("Model has been tagged successfully.")
 		return nil
+	case 401:
+		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("%s", content)
@@ -186,9 +198,9 @@ func (r *RasaX) ModelTag() error {
 }
 
 func (r *RasaX) ModelDelete() error {
-	r.Log.Info("Sending a request to Rasa X")
-	request, err := http.NewRequest("DELETE",
-		fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Delete.Name), nil)
+	url := fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Delete.Name)
+	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
+	request, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return err
 	}
@@ -206,6 +218,8 @@ func (r *RasaX) ModelDelete() error {
 	case 204:
 		fmt.Println("Model has been deleted successfully.")
 		return nil
+	case 401:
+		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	case 404:
 		return fmt.Errorf("model '%s' not found", r.Flags.Model.Delete.Name)
 	default:

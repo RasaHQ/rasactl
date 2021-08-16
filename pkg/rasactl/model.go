@@ -24,8 +24,26 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/status"
 )
 
-func (r *RasaCtl) ModelUpload() error {
+func (r *RasaCtl) checkIfRasaOSSProductionIsConnected() error {
 	r.initRasaXClient()
+
+	resp, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
+	if resp.Rasa.Production == "0.0.0" {
+		return fmt.Errorf("rasa server is not connected to the production environment")
+	}
+
+	return nil
+}
+
+func (r *RasaCtl) ModelUpload() error {
+
+	if err := r.checkIfRasaOSSProductionIsConnected(); err != nil {
+		return err
+	}
 
 	token, err := r.getAuthToken()
 	if err != nil {
@@ -40,7 +58,18 @@ func (r *RasaCtl) ModelUpload() error {
 }
 
 func (r *RasaCtl) ModelDelete() error {
-	r.initRasaXClient()
+	if err := r.checkIfRasaOSSProductionIsConnected(); err != nil {
+		return err
+	}
+
+	resp, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
+	if resp.Rasa.Production == "0.0.0" {
+		return fmt.Errorf("rasa server is not connected to the production environment")
+	}
 
 	token, err := r.getAuthToken()
 	if err != nil {
@@ -55,7 +84,9 @@ func (r *RasaCtl) ModelDelete() error {
 }
 
 func (r *RasaCtl) ModelDownload() error {
-	r.initRasaXClient()
+	if err := r.checkIfRasaOSSProductionIsConnected(); err != nil {
+		return err
+	}
 
 	token, err := r.getAuthToken()
 	if err != nil {
@@ -70,7 +101,9 @@ func (r *RasaCtl) ModelDownload() error {
 }
 
 func (r *RasaCtl) ModelTag() error {
-	r.initRasaXClient()
+	if err := r.checkIfRasaOSSProductionIsConnected(); err != nil {
+		return err
+	}
 
 	token, err := r.getAuthToken()
 	if err != nil {
@@ -88,7 +121,9 @@ func (r *RasaCtl) ModelList() error {
 	data := [][]string{}
 	header := []string{"Name", "Version", "Compatible", "Tags", "Hash", "Trained At"}
 
-	r.initRasaXClient()
+	if err := r.checkIfRasaOSSProductionIsConnected(); err != nil {
+		return err
+	}
 
 	token, err := r.getAuthToken()
 	if err != nil {
@@ -108,11 +143,15 @@ func (r *RasaCtl) ModelList() error {
 
 	for _, model := range models.Models {
 		sec, dec := math.Modf(model.TrainedAt)
+		tags := "none"
+		if len(model.Tags) != 0 {
+			tags = strings.Join(model.Tags, ",")
+		}
 		data = append(data, []string{
 			model.Model,
 			model.Version,
 			fmt.Sprintf("%t", model.IsCompatible),
-			strings.Join(model.Tags, ","),
+			tags,
 			model.Hash,
 			time.Unix(int64(sec), int64(dec*(1e9))).Format("02 Jan 06 15:04 MST"),
 		})

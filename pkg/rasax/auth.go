@@ -27,7 +27,6 @@ import (
 )
 
 func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, error) {
-	urlAddress := r.getURL()
 	values := map[string]string{
 		"username": username,
 		"password": password,
@@ -35,7 +34,7 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 
 	jsonValue, _ := json.Marshal(values)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth", urlAddress), bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth", r.URL), bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return nil, err
 	}
@@ -61,5 +60,31 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 
 	default:
 		return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
+	}
+}
+
+// ValidateToken validates token and returns true if a given token is valid.
+func (r *RasaX) ValidateToken(token string) bool {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/config", r.URL), nil)
+	if err != nil {
+		r.Log.V(1).Info("Can't validate token", "error", err)
+		return false
+	}
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+	resp, err := r.client.Do(req)
+	if err != nil {
+		r.Log.V(1).Info("Can't validate token", "error", err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case 200:
+		return true
+	case 401:
+		r.Log.Info("Token is invalid", "token", token)
+		return false
+	default:
+		return false
 	}
 }

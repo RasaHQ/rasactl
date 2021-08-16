@@ -56,7 +56,15 @@ func modelTagCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			rasaCtl.Namespace = namespace
+
+			if detectedNamespace != "" {
+				rasaCtl.Namespace = namespace
+				rasaCtl.KubernetesClient.Namespace = namespace
+				rasaCtl.HelmClient.Namespace = namespace
+				if err := rasaCtl.HelmClient.New(); err != nil {
+					return err
+				}
+			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
