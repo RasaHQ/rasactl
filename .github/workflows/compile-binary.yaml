@@ -24,6 +24,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/checkout@v2
+        with:
+          repository: tczekajlo/golang-cross-example-sysroot
+          path: sysroot
+
       - name: Get the version
         id: get_version
         run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
@@ -40,6 +45,7 @@ jobs:
             -e CGO_ENABLED=1 -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -e VERSION=${{ env.VERSION }} \
             -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -v `pwd`:/go/src/rasactl \
+            -v `pwd`/sysroot:/sysroot \
             -w /go/src/rasactl \
             troian/golang-cross:v1.16.7 \
             --rm-dist --skip-validate --skip-publish
