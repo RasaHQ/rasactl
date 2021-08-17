@@ -37,9 +37,9 @@ jobs:
         run: |
           docker run \
             --rm \
-            -e CGO_ENABLED=1 -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}\
+            -e CGO_ENABLED=1 -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
             -v `pwd`:/go/src/rasactl \
-            -w /go/src/$(PACKAGE_NAME) \
+            -w /go/src/rasactl \
             troian/golang-cross:v1.16.7 \
             --rm-dist --skip-validate --skip-publish
 
