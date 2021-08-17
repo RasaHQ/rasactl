@@ -1,11 +1,9 @@
-name: goreleaser
+name: Release
 
 on:
   push:
     tags:
       - '*'
-  pull_request:
-
 
 jobs:
   golangci:
@@ -46,7 +44,7 @@ jobs:
           install-only: true
 
       - name: Build
-        run: goreleaser build --id ${{ matrix.id }} --snapshot
+        run: goreleaser build --id ${{ matrix.id }}
 
       - uses: 'actions/upload-artifact@v2'
         with:
