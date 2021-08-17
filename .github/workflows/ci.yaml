@@ -2,7 +2,12 @@ name: Continuous Integration
 
 on:
   push:
+    branches:
+    - 'main'
+    tags:
+    - '**'
   pull_request:
+    types: [opened, synchronize, labeled]
 
 
 jobs:
@@ -45,8 +50,3 @@ jobs:
 
       - name: Build
         run: goreleaser build --id ${{ matrix.id }} --snapshot
-
-      - uses: 'actions/upload-artifact@v2'
-        with:
-          name: ${{ matrix.id }}
-          path: ${{ github.workspace }}/dist
