@@ -18,14 +18,41 @@ changelog:
       - typo
       - (?i)foo
 
+
 builds:
-  - ldflags:
-    - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
-    ignore:
-      - goos: linux
-        goarch: 386
-      - goos: linux
-        goarch: arm64
+  - id: darwin
+    binary: rasactl
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CC=o64-clang
+      - CXX=o64-clang++
+    flags:
+      - -mod=readonly
+    ldflags:
+       - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+  - id: linux
+    binary: rasactl
+    goos:
+      - linux
+    goarch:
+      - amd64
+    flags:
+      - -mod=readonly
+    ldflags:
+      - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+
+archives:
+  - id: rasactl
+    builds:
+      - darwin
+      - linux
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    wrap_in_directory: true
+
 #  - id: darwin
 #    env:
 #      - CGO_ENABLED=1
