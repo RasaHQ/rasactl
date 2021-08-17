@@ -109,6 +109,8 @@ jobs:
       - name: Prepare tar.gz
         run: tar -C dist/${{ matrix.os }}_${{ matrix.os }}_${{ matrix.arch }} -czf rasactl_${{ env.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz rasactl
 
+      - run: sha256sum rasactl_${{ env.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz > rasactl_${{ env.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz.sha256sum
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -127,4 +129,14 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: rasactl_${{ matrix.os }}_${{ matrix.arch }}.sha256sum
           asset_name: rasactl_${{ matrix.os }}_${{ matrix.arch }}.sha256sum
+          asset_content_type: application/text
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: rasactl_${{ env.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz.sha256sum
+          asset_name: rasactl_${{ env.VERSION }}_${{ matrix.os }}_${{ matrix.arch }}.tar.gz.sha256sum
           asset_content_type: application/text
