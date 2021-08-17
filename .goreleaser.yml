@@ -21,6 +21,11 @@ changelog:
 builds:
   - ldflags:
     - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+    ignore:
+      - goos: linux
+        goarch: 386
+      - goos: linux
+        goarch: arm64
 #  - id: darwin
 #    env:
 #      - CGO_ENABLED=1
@@ -39,3 +44,27 @@ builds:
 #      - linux
 #    ldflags:
 #    - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+
+brews:
+  - name: rasactl
+    tap:
+      owner: RasaHQ
+      name: homebrew-rasactl
+      token: "{{ .Env.RASABOT_GITHUB_TOKEN }}"
+
+    test: |
+      system "#{bin}/rasactl --version"
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: rasabot
+      email: rasabot@rasa.com
+
+    folder: Formula
+
+    homepage: "https://github.com/RasaHQ/rasactl"
+
+    # Template of your app's description.
+    # Default is empty.
+    description: "rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster and manages Rasa X / Enterprise deployments."
