@@ -83,11 +83,7 @@ func (k *Kubernetes) New() error {
 	}
 	k.clientset = clientset
 
-	backendType, err := k.detectBackend()
-	if err != nil {
-		return err
-	}
-	k.BackendType = backendType
+	k.BackendType = k.detectBackend()
 
 	return nil
 }
@@ -109,7 +105,9 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 
 	url := "UNKNOWN"
 
-	if nginxServiceType == "LoadBalancer" && nginxIsEnabled && (k.BackendType != types.KubernetesBackendLocal || k.CloudProvider.Name != types.CloudProviderUnknown) {
+	if nginxServiceType == "LoadBalancer" &&
+		nginxIsEnabled &&
+		(k.BackendType != types.KubernetesBackendLocal || k.CloudProvider.Name != types.CloudProviderUnknown) {
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {
 			return url, err
@@ -120,7 +118,9 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ipAddress, port)
 
 		return url, nil
-	} else if nginxServiceType == "NodePort" && nginxIsEnabled && k.BackendType == types.KubernetesBackendLocal && k.CloudProvider.Name != types.CloudProviderUnknown {
+	} else if nginxServiceType == "NodePort" &&
+		nginxIsEnabled &&
+		k.BackendType == types.KubernetesBackendLocal && k.CloudProvider.Name != types.CloudProviderUnknown {
 
 		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
 		if err != nil {

@@ -27,11 +27,8 @@ func statusCmd() *cobra.Command {
 		Use:   "status [DEPLOYMENT NAME]",
 		Short: "show deployment status",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := checkIfNamespaceExists(); err != nil {
-				return err
-			}
-
-			return nil
+			err := checkIfNamespaceExists()
+			return err
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {

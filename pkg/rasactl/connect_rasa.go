@@ -45,7 +45,7 @@ func (r *RasaCtl) ConnectRasa() error {
 		return err
 	}
 
-	configDir := string(stateData[types.StateSecretProjectPath])
+	configDir := string(stateData[types.StateProjectPath])
 	if configDir == "" {
 		configDir = fmt.Sprintf("/tmp/rasactl-%s", r.Namespace)
 
@@ -89,10 +89,13 @@ func (r *RasaCtl) ConnectRasa() error {
 
 	r.Log.Info("Connecting Rasa Server to Rasa X")
 	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal {
-		r.HelmClient.Values = utils.MergeMaps(helm.ValuesRabbitMQNodePort(), helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX(), r.HelmClient.Values)
+		r.HelmClient.Values = utils.MergeMaps(helm.ValuesRabbitMQNodePort(),
+			helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX(), r.HelmClient.Values)
 		r.Log.V(1).Info("Merging values", "result", r.HelmClient.Values)
 	} else {
-		return errors.Errorf("It looks like you're not using kind as a backend for Kubernetes cluster, the connect rasa command is available only if you use kind.")
+		return errors.Errorf(
+			"It looks like you're not using kind as a backend for Kubernetes cluster, the connect rasa command is available only if you use kind.",
+		)
 	}
 
 	r.Log.Info("Upgrading configuration for Rasa X deployment")
@@ -174,7 +177,7 @@ func (r *RasaCtl) ConnectRasa() error {
 	return nil
 }
 
-func (r *RasaCtl) runRasaServer(environment string, args []string, done chan bool, ready chan bool) *exec.Cmd {
+func (r *RasaCtl) runRasaServer(environment string, args []string, done chan bool, ready chan bool) {
 
 	cmd := exec.Command("rasa", args...)
 	stdout, err := cmd.StderrPipe()
@@ -205,7 +208,6 @@ func (r *RasaCtl) runRasaServer(environment string, args []string, done chan boo
 	fmt.Println("done", cmd.ProcessState)
 	done <- true
 
-	return cmd
 }
 
 func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
@@ -215,7 +217,7 @@ func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
 	}
 
 	creds := rtypes.CredentialsFile{}
-	creds.Rasa.Url = fmt.Sprintf("%s/api", url)
+	creds.Rasa.URL = fmt.Sprintf("%s/api", url)
 
 	r.Log.Info("Saving credentials.yaml configuration file", "file", file)
 
@@ -223,10 +225,8 @@ func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(file, data, 0644); err != nil {
-		return err
-	}
-	return nil
+	err = ioutil.WriteFile(file, data, 0644)
+	return err
 }
 
 func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
@@ -266,14 +266,14 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 
 	endpoints := rtypes.EndpointsFile{
 		Models: rtypes.EndpointModelSpec{
-			Url:                  fmt.Sprintf("%s/api/projects/default/models/tags/production", url),
+			URL:                  fmt.Sprintf("%s/api/projects/default/models/tags/production", url),
 			Token:                token,
 			WaitTimeBetweenPulls: 10,
 		},
 		TrackerStore: rtypes.EndpointTrackerStoreSpec{
 			Type:     "sql",
 			Dialect:  "postgresql",
-			Url:      "127.0.0.1",
+			URL:      "127.0.0.1",
 			Port:     psqlNodePort,
 			Username: usernamePsql,
 			Password: passwordPsql,
@@ -282,7 +282,7 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 		},
 		EventBroker: rtypes.EndpointEventBrokerSpec{
 			Type:     "pika",
-			Url:      "127.0.0.1",
+			URL:      "127.0.0.1",
 			Port:     rabbitNodePort,
 			Username: usernameRabbit,
 			Password: passwordRabbit,
@@ -296,8 +296,6 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(file, data, 0644); err != nil {
-		return err
-	}
-	return nil
+	err = ioutil.WriteFile(file, data, 0644)
+	return err
 }

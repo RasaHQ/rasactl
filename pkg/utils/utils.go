@@ -115,7 +115,9 @@ func DeleteHostToEtcHosts(host string) error {
 func ValidateName(name string) error {
 
 	if !validName.MatchString(name) {
-		return errors.Errorf("Invalid name: \"%s\": a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '%s')",
+		return errors.Errorf(
+			"Invalid name: \"%s\": a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', "+
+				"and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '%s')",
 			name, validName.String())
 	}
 
@@ -137,9 +139,11 @@ func IsURLAccessible(address string) bool {
 		},
 	}
 	req, _ := http.NewRequest("GET", address, nil)
-	if _, err := client.Do(req); err != nil {
+	res, err := client.Do(req)
+	if err != nil {
 		return false
 	}
+	defer res.Body.Close()
 	return true
 }
 
@@ -201,10 +205,9 @@ func AskForConfirmation(s string, retry int, in io.Reader) (bool, error) {
 
 		if response == "yes" || response == "no" {
 			return strings.ToLower(strings.TrimSpace(res)) == "yes", nil
-		} else {
-			fmt.Println("You have to put 'yes' or 'no'")
-			continue
 		}
+		fmt.Println("You have to put 'yes' or 'no'")
+		continue
 	}
 
 	return false, nil
@@ -244,7 +247,7 @@ func ReadCredentials(flags *types.RasaCtlFlags) (string, string, error) {
 		password = pass
 	} else {
 		fmt.Print("Password: ")
-		bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+		bytePassword, err := term.ReadPassword(syscall.Stdin)
 		if err != nil {
 			return "", "", err
 		}

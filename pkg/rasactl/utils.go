@@ -26,9 +26,6 @@ func (r *RasaCtl) writeStatusFile(path string) error {
 
 	r.Log.Info("Writing a status file", "file", file)
 
-	if err := ioutil.WriteFile(file, d, 0644); err != nil {
-		return err
-	}
-
-	return nil
+	err := ioutil.WriteFile(file, d, 0644)
+	return err
 }

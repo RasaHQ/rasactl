@@ -157,7 +157,8 @@ func (d *Docker) copyJoinConfigurationToContainer(container container.ContainerC
 	}
 	defer preparedArchive.Close()
 
-	if err := d.Client.CopyToContainer(d.ctx, container.ID, dstDir, preparedArchive, types.CopyToContainerOptions{}); err != nil {
+	if err := d.Client.CopyToContainer(d.ctx,
+		container.ID, dstDir, preparedArchive, types.CopyToContainerOptions{}); err != nil {
 		return err
 	}
 
@@ -366,27 +367,21 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 // it is forcefully terminated (killed).
 func (d *Docker) StopKindNode(hostname string) error {
 	timeout := time.Minute * 1
-	if err := d.Client.ContainerStop(d.ctx, hostname, &timeout); err != nil {
-		return err
-	}
-	return nil
+	err := d.Client.ContainerStop(d.ctx, hostname, &timeout)
+	return err
 }
 
 // StartKindNode starts a kind node that was previously stopped.
 func (d *Docker) StartKindNode(hostname string) error {
-	if err := d.Client.ContainerStart(d.ctx, hostname, types.ContainerStartOptions{}); err != nil {
-		return err
-	}
-	return nil
+	err := d.Client.ContainerStart(d.ctx, hostname, types.ContainerStartOptions{})
+	return err
 }
 
 // DeleteKindNode deletes a kind node.
 func (d *Docker) DeleteKindNode(hostname string) error {
-	if err := d.Client.ContainerRemove(d.ctx, hostname, types.ContainerRemoveOptions{
+	err := d.Client.ContainerRemove(d.ctx, hostname, types.ContainerRemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
-	}); err != nil {
-		return err
-	}
-	return nil
+	})
+	return err
 }

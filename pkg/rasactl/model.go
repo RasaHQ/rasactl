@@ -51,10 +51,8 @@ func (r *RasaCtl) ModelUpload() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	if err := r.RasaXClient.ModelUpload(); err != nil {
-		return err
-	}
-	return nil
+	err = r.RasaXClient.ModelUpload()
+	return err
 }
 
 func (r *RasaCtl) ModelDelete() error {
@@ -77,10 +75,8 @@ func (r *RasaCtl) ModelDelete() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	if err := r.RasaXClient.ModelDelete(); err != nil {
-		return err
-	}
-	return nil
+	err = r.RasaXClient.ModelDelete()
+	return err
 }
 
 func (r *RasaCtl) ModelDownload() error {
@@ -94,10 +90,8 @@ func (r *RasaCtl) ModelDownload() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	if err := r.RasaXClient.ModelDownload(); err != nil {
-		return err
-	}
-	return nil
+	err = r.RasaXClient.ModelDownload()
+	return err
 }
 
 func (r *RasaCtl) ModelTag() error {
@@ -111,10 +105,8 @@ func (r *RasaCtl) ModelTag() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	if err := r.RasaXClient.ModelTag(); err != nil {
-		return err
-	}
-	return nil
+	err = r.RasaXClient.ModelTag()
+	return err
 }
 
 func (r *RasaCtl) ModelList() error {

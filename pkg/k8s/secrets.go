@@ -36,8 +36,8 @@ func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 		},
 		Type: "rasa.com/rasactl.state",
 		Data: map[string][]byte{
-			types.StateSecretProjectPath:     []byte(projectPath),
-			types.StateSecretHelmReleaseName: []byte(k.Helm.ReleaseName),
+			types.StateProjectPath:     []byte(projectPath),
+			types.StateHelmReleaseName: []byte(k.Helm.ReleaseName),
 		},
 	}
 
@@ -60,20 +60,20 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 	for _, d := range data {
 		switch t := d.(type) {
 		case *rtypes.VersionEndpointResponse:
-			secret.Data[types.StateSecretRasaXVersion] = []byte(t.RasaX)
-			secret.Data[types.StateSecretRasaWorkerVersion] = []byte(t.Rasa.Worker)
+			secret.Data[types.StateRasaXVersion] = []byte(t.RasaX)
+			secret.Data[types.StateRasaWorkerVersion] = []byte(t.Rasa.Worker)
 
 			enterprise := "inactive"
 			if t.Enterprise {
 				enterprise = "active"
 			}
-			secret.Data[types.StateSecretEnterprise] = []byte(enterprise)
+			secret.Data[types.StateEnterprise] = []byte(enterprise)
 
 		case *release.Release:
-			secret.Data[types.StateSecretHelmChartName] = []byte(t.Chart.Name())
-			secret.Data[types.StateSecretHelmChartVersion] = []byte(t.Chart.Metadata.Version)
-			secret.Data[types.StateSecretHelmReleaseName] = []byte(t.Name)
-			secret.Data[types.StateSecretHelmReleaseStatus] = []byte(t.Info.Status)
+			secret.Data[types.StateHelmChartName] = []byte(t.Chart.Name())
+			secret.Data[types.StateHelmChartVersion] = []byte(t.Chart.Metadata.Version)
+			secret.Data[types.StateHelmReleaseName] = []byte(t.Name)
+			secret.Data[types.StateHelmReleaseStatus] = []byte(t.Info.Status)
 		}
 	}
 	k.Log.Info("Updating secret with the deployment state", "secret", secret.Name, "namespace", k.Namespace, "data", secret.Data)
@@ -98,10 +98,9 @@ func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 
 // DeleteSecretWithState deletes the rasactl secret.
 func (k *Kubernetes) DeleteSecretWithState() error {
-	if err := k.clientset.CoreV1().Secrets(k.Namespace).Delete(context.TODO(), secretName, metav1.DeleteOptions{}); err != nil {
-		return err
-	}
-	return nil
+	err := k.clientset.CoreV1().Secrets(k.Namespace).Delete(context.TODO(),
+		secretName, metav1.DeleteOptions{})
+	return err
 }
 
 // GetPostgreSQLCreds returns credentials for the postgresql deployment.

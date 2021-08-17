@@ -40,7 +40,10 @@ func AzureGetExternalIP() string {
 		},
 		Timeout: time.Second * 20,
 	}
-	req, _ := http.NewRequest("GET", "http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2017-08-01&format=text", nil)
+	req, _ := http.NewRequest(
+		"GET",
+		"http://169.254.169.254/metadata/instance/network/interface/0/ipv4/ipAddress/0/publicIpAddress?api-version=2017-08-01&format=text",
+		nil)
 	req.Header.Add("Metadata", "true")
 	resp, err := client.Do(req)
 	if err != nil {

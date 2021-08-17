@@ -52,9 +52,6 @@ func (r *RasaCtl) Start() error {
 	}
 	r.RasaXClient.Token = token
 
-	if err := r.checkDeploymentStatus(); err != nil {
-		return err
-	}
-
-	return nil
+	err = r.checkDeploymentStatus()
+	return err
 }

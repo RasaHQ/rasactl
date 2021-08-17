@@ -110,11 +110,8 @@ func (h *Helm) New() error {
 		KubeConfig: &h.kubeConfig,
 	}
 
-	if err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog); err != nil {
-		return err
-	}
-
-	return nil
+	err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
+	return err
 }
 
 func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
@@ -153,7 +150,8 @@ func (h *Helm) updateRepository() error {
 		go func(re *repo.ChartRepository) {
 			defer wg.Done()
 			if _, err := re.DownloadIndexFile(); err != nil {
-				errResult = errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s\n", re.Config.Name, re.Config.URL, err)
+				errResult = errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s\n",
+					re.Config.Name, re.Config.URL, err)
 			}
 		}(re)
 	}

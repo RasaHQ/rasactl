@@ -69,7 +69,8 @@ func (h *Helm) Install() error {
 	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), valuesRabbitMQErlangCookie(), h.Values)
 
 	// Add additional values for local PVC
-	if (h.Flags.Start.ProjectPath != "" || h.Flags.Start.Project) && h.KubernetesBackendType == types.KubernetesBackendLocal {
+	if (h.Flags.Start.ProjectPath != "" || h.Flags.Start.Project) &&
+		h.KubernetesBackendType == types.KubernetesBackendLocal {
 		h.Values = utils.MergeMaps(valuesMountHostPath(h.PVCName), h.Values)
 		h.Values = utils.MergeMaps(valuesUseDedicatedKindNode(h.Namespace), h.Values)
 		h.Log.V(1).Info("Merging values", "result", h.Values)
@@ -87,7 +88,8 @@ func (h *Helm) Install() error {
 			return err
 		}
 		h.Log.V(1).Info("Adding host", "host", host, "ip", ip)
-	} else if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name != types.CloudProviderUnknown {
+	} else if h.KubernetesBackendType == types.KubernetesBackendLocal &&
+		h.CloudProvider.Name != types.CloudProviderUnknown {
 		h.Values = utils.MergeMaps(h.Values, valuesEnableRasaProduction())
 		h.Values = utils.MergeMaps(valuesNginxNodePort(), h.Values)
 	}

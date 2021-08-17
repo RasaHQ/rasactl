@@ -39,9 +39,9 @@ func (r *RasaCtl) Status() error {
 		return err
 	}
 	r.HelmClient.Configuration = &types.HelmConfigurationSpec{
-		ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+		ReleaseName: string(stateData[types.StateHelmReleaseName]),
 	}
-	r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+	r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
 
 	d = append(d, []string{"Name:", r.Namespace})
 	d = append(d, []string{"Status:", statusProject})
@@ -57,9 +57,9 @@ func (r *RasaCtl) Status() error {
 
 	versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {
-		d = append(d, []string{"Version:", string(stateData[types.StateSecretRasaXVersion])})
-		d = append(d, []string{"Enterprise:", string(stateData[types.StateSecretEnterprise])})
-		d = append(d, []string{"Rasa worker version:", string(stateData[types.StateSecretRasaWorkerVersion])})
+		d = append(d, []string{"Version:", string(stateData[types.StateRasaXVersion])})
+		d = append(d, []string{"Enterprise:", string(stateData[types.StateEnterprise])})
+		d = append(d, []string{"Rasa worker version:", string(stateData[types.StateRasaWorkerVersion])})
 	} else {
 		enterprise := "inactive"
 		if versionEndpoint.Enterprise {
@@ -72,8 +72,8 @@ func (r *RasaCtl) Status() error {
 	}
 
 	projectPath := "not defined"
-	if string(stateData[types.StateSecretProjectPath]) != "" {
-		projectPath = string(stateData[types.StateSecretProjectPath])
+	if string(stateData[types.StateProjectPath]) != "" {
+		projectPath = string(stateData[types.StateProjectPath])
 	}
 	d = append(d, []string{"Project path:", projectPath})
 

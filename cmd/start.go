@@ -87,11 +87,13 @@ func startCmd() *cobra.Command {
 			}
 
 			if !isDeployed {
-				if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal && rasaCtl.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
+				if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal &&
+					rasaCtl.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
 					if os.Getuid() != 0 {
 						return errors.Errorf(
 							warnPrint.Sprintf(
-								"Administrator permissions required, please run the command with sudo.\n%s needs administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
+								"Administrator permissions required, please run the command with sudo.\n%s needs "+
+									"administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
 								cmd.CommandPath(),
 							),
 						)

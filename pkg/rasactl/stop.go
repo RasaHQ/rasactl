@@ -33,7 +33,7 @@ func (r *RasaCtl) Stop() error {
 		return err
 	}
 
-	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateSecretProjectPath]) != "" {
+	if r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateProjectPath]) != "" {
 		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 		if err := r.DockerClient.StopKindNode(nodeName); err != nil {
 			return err

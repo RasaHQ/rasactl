@@ -35,7 +35,7 @@ func (h *Helm) ReadValuesFile() error {
 		if err != nil {
 			return err
 		}
-		err = yaml.Unmarshal([]byte(valuesFile), &h.Values)
+		err = yaml.Unmarshal(valuesFile, &h.Values)
 		if err != nil {
 			return err
 		}

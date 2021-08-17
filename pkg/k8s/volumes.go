@@ -48,11 +48,9 @@ func (k *Kubernetes) DeleteVolume() error {
 	}
 
 	pv := fmt.Sprintf("rasactl-pv-%s", k.Namespace)
-	if err := k.deletePV(pv); err != nil {
-		return err
-	}
+	err := k.deletePV(pv)
 
-	return nil
+	return err
 }
 
 func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) {
@@ -69,7 +67,7 @@ func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) 
 			StorageClassName: "standard",
 			AccessModes:      []apiv1.PersistentVolumeAccessMode{"ReadWriteOnce"},
 			Capacity: apiv1.ResourceList{
-				apiv1.ResourceName(apiv1.ResourceStorage): resource.MustParse("2Gi"),
+				apiv1.ResourceStorage: resource.MustParse("2Gi"),
 			},
 			PersistentVolumeSource: apiv1.PersistentVolumeSource{
 				HostPath: &apiv1.HostPathVolumeSource{
@@ -104,7 +102,7 @@ func (k *Kubernetes) createPVC(pv *apiv1.PersistentVolume) (*apiv1.PersistentVol
 			AccessModes: []apiv1.PersistentVolumeAccessMode{"ReadWriteOnce"},
 			Resources: apiv1.ResourceRequirements{
 				Requests: apiv1.ResourceList{
-					apiv1.ResourceName(apiv1.ResourceStorage): resource.MustParse(pv.Spec.Capacity.Storage().String()),
+					apiv1.ResourceStorage: resource.MustParse(pv.Spec.Capacity.Storage().String()),
 				},
 			},
 			VolumeName: pv.Name,

@@ -104,11 +104,8 @@ func (r *RasaCtl) InitClients() error {
 		return err
 	}
 
-	if err := r.GetKindControlPlaneNodeInfo(); err != nil {
-		return err
-	}
-
-	return nil
+	err := r.GetKindControlPlaneNodeInfo()
+	return err
 }
 
 // CheckDeploymentStatus checks if a given deployment is deployed and running.
@@ -197,7 +194,7 @@ func (r *RasaCtl) startOrInstall() error {
 		r.Spinner.Message(msg)
 		r.Log.Info(msg)
 
-		if string(state[types.StateSecretProjectPath]) != "" {
+		if string(state[types.StateProjectPath]) != "" {
 			if r.DockerClient.Kind.ControlPlaneHost != "" {
 				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 				if err := r.DockerClient.StartKindNode(nodeName); err != nil {

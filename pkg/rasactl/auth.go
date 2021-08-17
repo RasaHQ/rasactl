@@ -76,15 +76,13 @@ func (r *RasaCtl) AuthLogout() error {
 		Helper:    helpers.Helper,
 	}
 
-	r.Log.Info("Deleteing credentials from the store", "name", "rasactl-login", "namespace", r.Namespace)
+	r.Log.Info("Deleting credentials from the store", "name", "rasactl-login", "namespace", r.Namespace)
 	if err := credsStore.Delete("rasactl-login"); err != nil {
 		return err
 	}
-	r.Log.Info("Deleteing credentials from the store", "name", "rasactl-token", "namespace", r.Namespace)
-	if err := credsStore.Delete("rasactl-token"); err != nil {
-		return err
-	}
-	return nil
+	r.Log.Info("Deleting credentials from the store", "name", "rasactl-token", "namespace", r.Namespace)
+	err := credsStore.Delete("rasactl-token")
+	return err
 }
 
 func (r *RasaCtl) isJWTExpired(token string) bool {
@@ -106,9 +104,10 @@ func (r *RasaCtl) isJWTExpired(token string) bool {
 		now := time.Now()
 
 		return now.Before(tm)
-	} else {
-		r.Log.Error(err, "Can't parse a JWT token")
 	}
+
+	r.Log.Error(err, "Can't parse a JWT token")
+
 	return false
 }
 

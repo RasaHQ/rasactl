@@ -18,7 +18,7 @@ package rasa
 // CredentialsFile defines the credential.yaml file used by Rasa OSS.
 type CredentialsFile struct {
 	Rasa struct {
-		Url string `yaml:"url"`
+		URL string `yaml:"url"`
 	} `yaml:"rasa"`
 	Rest string `yaml:"rest"`
 }
@@ -32,7 +32,7 @@ type EndpointsFile struct {
 
 // EndpointModelSpec specifies a configuration for a model server.
 type EndpointModelSpec struct {
-	Url                  string `yaml:"url"`
+	URL                  string `yaml:"url"`
 	Token                string `yaml:"token"`
 	WaitTimeBetweenPulls int    `yaml:"wait_time_between_pulls"`
 }
@@ -41,7 +41,7 @@ type EndpointModelSpec struct {
 type EndpointTrackerStoreSpec struct {
 	Type     string `yaml:"type"`
 	Dialect  string `yaml:"dialect"`
-	Url      string `yaml:"url"`
+	URL      string `yaml:"url"`
 	Port     int32  `yaml:"port"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
@@ -52,7 +52,7 @@ type EndpointTrackerStoreSpec struct {
 // EndpointEventBrokerSpec stores specification for Event Broker configuration.
 type EndpointEventBrokerSpec struct {
 	Type     string   `yaml:"type"`
-	Url      string   `yaml:"url"`
+	URL      string   `yaml:"url"`
 	Port     int32    `yaml:"port"`
 	Username string   `yaml:"username"`
 	Password string   `yaml:"password"`

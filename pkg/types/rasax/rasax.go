@@ -66,7 +66,7 @@ type RasaSpecEnvironments struct {
 
 // EnvironmentsConfugrationSpec stores specification or a given environment.
 type EnvironmentsConfigurationSpec struct {
-	Url   string `yaml:"url"`
+	URL   string `yaml:"url"`
 	Token string `yaml:"token"`
 }
 

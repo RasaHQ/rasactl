@@ -44,10 +44,10 @@ func (r *RasaCtl) List() error {
 			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
 		}
 		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
-			ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+			ReleaseName: string(stateData[types.StateHelmReleaseName]),
 		}
 		r.HelmClient.Namespace = namespace
-		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
 
 		isRunning, err := r.KubernetesClient.IsRasaXRunning()
 		if err != nil {
@@ -87,9 +87,9 @@ func (r *RasaCtl) List() error {
 		} else {
 			data = append(data, []string{current, namespace, status,
 				"0.0.0",
-				string(stateData[types.StateSecretRasaWorkerVersion]),
-				string(stateData[types.StateSecretEnterprise]),
-				string(stateData[types.StateSecretRasaXVersion]),
+				string(stateData[types.StateRasaWorkerVersion]),
+				string(stateData[types.StateEnterprise]),
+				string(stateData[types.StateRasaXVersion]),
 			},
 			)
 		}

@@ -68,9 +68,9 @@ func modelUploadCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+				ReleaseName: string(stateData[types.StateHelmReleaseName]),
 			}
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
 
 			return nil
 		},

@@ -27,7 +27,7 @@ import (
 	ktypes "k8s.io/apimachinery/pkg/types"
 )
 
-func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
+func (k *Kubernetes) detectBackend() types.KubernetesBackendType {
 
 	var backend types.KubernetesBackendType
 
@@ -46,7 +46,7 @@ func (k *Kubernetes) detectBackend() (types.KubernetesBackendType, error) {
 
 	k.Log.V(1).Info("Detected Kubernetes backend", "type", backend, "host", host)
 
-	return backend, nil
+	return backend
 }
 
 // IsNamespaceExist checks if a namespace exists.
@@ -109,7 +109,8 @@ func (k *Kubernetes) AddNamespaceLabel() error {
 
 	payloadBytes, _ := json.Marshal(payload)
 	k.Log.V(1).Info("Adding label", "namespace", k.Namespace, "payload", string(payloadBytes))
-	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace, ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
+	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace,
+		ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -129,7 +130,8 @@ func (k *Kubernetes) DeleteNamespaceLabel() error {
 
 	payloadBytes, _ := json.Marshal(payload)
 	k.Log.V(1).Info("Deleting label", "namespace", k.Namespace, "payload", string(payloadBytes))
-	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace, ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
+	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace,
+		ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
 		return err
 	}
 	return nil
@@ -137,24 +139,21 @@ func (k *Kubernetes) DeleteNamespaceLabel() error {
 
 // DeleteNode deletes a given Kubernetes node.
 func (k *Kubernetes) DeleteNode(node string) error {
-	if err := k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{}); err != nil {
-		return err
-	}
-	return nil
+	err := k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{})
+	return err
 }
 
 // DeleteNamespace deletes the active namespace.
 func (k *Kubernetes) DeleteNamespace() error {
-	if err := k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{}); err != nil {
-		return err
-	}
-	return nil
+	err := k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{})
+	return err
 }
 
 // GetNamespaces returns namespaces that are managed by rasactl.
 func (k *Kubernetes) GetNamespaces() ([]string, error) {
 	result := []string{}
-	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(), metav1.ListOptions{LabelSelector: "rasactl=true"})
+	namespaces, err := k.clientset.CoreV1().Namespaces().List(context.TODO(),
+		metav1.ListOptions{LabelSelector: "rasactl=true"})
 	if err != nil {
 		return nil, err
 	}

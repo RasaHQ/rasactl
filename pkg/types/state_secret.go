@@ -16,12 +16,12 @@ limitations under the License.
 package types
 
 const (
-	StateSecretRasaXVersion      string = "rasa-x-version"
-	StateSecretRasaWorkerVersion string = "rasa-worker-version"
-	StateSecretProjectPath       string = "project-path"
-	StateSecretEnterprise        string = "enterprise"
-	StateSecretHelmChartName     string = "helm-chart-name"
-	StateSecretHelmReleaseName   string = "helm-release-name"
-	StateSecretHelmChartVersion  string = "helm-chart-version"
-	StateSecretHelmReleaseStatus string = "helm-release-status"
+	StateRasaXVersion      string = "rasa-x-version"
+	StateRasaWorkerVersion string = "rasa-worker-version"
+	StateProjectPath       string = "project-path"
+	StateEnterprise        string = "enterprise"
+	StateHelmChartName     string = "helm-chart-name"
+	StateHelmReleaseName   string = "helm-release-name"
+	StateHelmChartVersion  string = "helm-chart-version"
+	StateHelmReleaseStatus string = "helm-release-status"
 )

@@ -60,7 +60,11 @@ func connectRasaCmd() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if !utils.CommandExists("rasa") {
-				return errors.Errorf(errorPrint.Sprint("The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/"))
+				return errors.Errorf(
+					errorPrint.Sprint(
+						"The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/",
+					),
+				)
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
@@ -73,12 +77,12 @@ func connectRasaCmd() *cobra.Command {
 			}
 
 			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateSecretHelmReleaseName]),
+				ReleaseName: string(stateData[types.StateHelmReleaseName]),
 				ReuseValues: true,
 				Timeout:     time.Minute * 10,
 			}
 
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateSecretHelmReleaseName])
+			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {

@@ -108,9 +108,8 @@ func (r *RasaX) GetHealthEndpoint() (*rtypes.HealthEndpointsResponse, error) {
 		}
 		return bodyData, nil
 
-	} else {
-		return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 	}
+	return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 }
 
 func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
@@ -137,7 +136,6 @@ func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
 		}
 		return bodyData, nil
 
-	} else {
-		return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 	}
+	return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 }

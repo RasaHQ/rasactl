@@ -40,11 +40,11 @@ func (k *Kubernetes) UpdateRasaXConfig(token string) error {
 	configSpec := types.EnvironmentsConfigurationFile{
 		Rasa: types.RasaSpecEnvironments{
 			Production: types.EnvironmentsConfigurationSpec{
-				Url:   urlProduction,
+				URL:   urlProduction,
 				Token: token,
 			},
 			Worker: types.EnvironmentsConfigurationSpec{
-				Url:   urlWorker,
+				URL:   urlWorker,
 				Token: token,
 			},
 		},

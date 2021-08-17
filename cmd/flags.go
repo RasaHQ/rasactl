@@ -15,15 +15,18 @@ func addStartUpgradeFlags(cmd *cobra.Command) {
 
 func addStartFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
-	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.ProjectPath, "project-path", "", "absolute path to the project directory directory mounted in kind")
-	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Start.Project, "project", "p", false, "use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
+	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.ProjectPath, "project-path", "",
+		"absolute path to the project directory directory mounted in kind")
+	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Start.Project, "project", "p", false,
+		"use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
 	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")
 	cmd.PersistentFlags().BoolVar(&rasactlFlags.Start.RasaXPasswordStdin, "rasa-x-password-stdin", false, "read the Rasa X password from stdin")
 }
 
 func addUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&helmConfiguration.Atomic, "atomic", false, "if set, upgrade process rolls back changes made in case of failed upgrade")
-	cmd.Flags().BoolVar(&helmConfiguration.ReuseValues, "reuse-values", true, "when upgrading, reuse the last release's values and merge in any overrides")
+	cmd.Flags().BoolVar(&helmConfiguration.ReuseValues, "reuse-values", true,
+		"when upgrading, reuse the last release's values and merge in any overrides")
 }
 
 func addDeleteFlags(cmd *cobra.Command) {
@@ -32,7 +35,8 @@ func addDeleteFlags(cmd *cobra.Command) {
 }
 
 func addStatusFlags(cmd *cobra.Command) {
-	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Status.Details, "details", "d", false, "show detailed information, such as running pods, helm chart status")
+	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Status.Details, "details", "d", false,
+		"show detailed information, such as running pods, helm chart status")
 }
 
 func addAddFlags(cmd *cobra.Command) {
@@ -41,7 +45,8 @@ func addAddFlags(cmd *cobra.Command) {
 
 func addConnectRasaFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVarP(&rasactlFlags.ConnectRasa.Port, "port", "p", 5005, "port to run the Rasa server at")
-	cmd.Flags().BoolVar(&rasactlFlags.ConnectRasa.RunSeparateWorker, "run-saparate-worker", false, "runs a separate Rasa server for the worker environment")
+	cmd.Flags().BoolVar(&rasactlFlags.ConnectRasa.RunSeparateWorker, "run-saparate-worker", false,
+		"runs a separate Rasa server for the worker environment")
 	cmd.Flags().StringSliceVar(&rasactlFlags.ConnectRasa.ExtraArgs, "extra-args", nil, "extra arguments for Rasa server")
 }
 

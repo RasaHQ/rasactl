@@ -67,7 +67,11 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXP
 			msg = append(msg, fmt.Sprintf("Rasa production version: %s", version.Rasa.Production))
 		}
 
-		msg = append(msg, fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s", version.Rasa.Worker, version.RasaX, rasaXPassword))
+		msg = append(msg,
+			fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s",
+				version.Rasa.Worker,
+				version.RasaX,
+				rasaXPassword))
 
 		GreenBox(
 			"Rasa X",
