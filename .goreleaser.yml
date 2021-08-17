@@ -42,6 +42,41 @@ builds:
       - linux
     goarch:
       - amd64
+    env:
+      - CGO_FLAGS=--sysroot=/sysroot/linux/amd64
+      - CGO_LDFLAGS=--sysroot=/sysroot/linux/amd64
+      - PKG_CONFIG_SYSROOT_DIR=/sysroot/linux/amd64
+      - PKG_CONFIG_PATH=/sysroot/linux/amd64/usr/lib/x86_64-linux-gnu/pkgconfig
+    flags:
+      - -mod=readonly
+    ldflags:
+      - -s -w -X main.version={{.Version}}
+archives:
+  - id: golang-cross
+    builds:
+      - darwin-amd64
+      - linux-armhf
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format: zip
+    wrap_in_directory: true
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
+release:
+  github:
+    owner: troian
+    name: golang-cross-example
+  prerelease: auto
+  draft: false
+
     flags:
       - -mod=readonly
     ldflags:
