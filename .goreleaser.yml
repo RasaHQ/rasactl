@@ -19,7 +19,7 @@ changelog:
       - (?i)foo
 
 builds:
-  ldflags:
+  - ldflags:
     - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
 #  - id: darwin
 #    env:
