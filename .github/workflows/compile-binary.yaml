@@ -37,7 +37,6 @@ jobs:
         run: |
           docker run \
             --rm \
-            --privileged \
             -e CGO_ENABLED=1 -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -e VERSION=${{ env.VERSION }} \
             -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -v `pwd`:/go/src/rasactl \
