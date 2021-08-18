@@ -24,11 +24,13 @@ Coming soon
 ```text
 Available Commands:
   add         add existing Rasa X deployment
+  auth        manage credentials for Rasa X / Enterprise
   completion  generate the autocompletion script for the specified shell
   connect     connect a component to Rasa X
   delete      delete Rasa X deployment
   help        Help about any command
   list        list deployments
+  model       manage models for Rasa X / Enterprise
   open        open Rasa X in a web browser
   start       start a Rasa X deployment
   status      show deployment status
@@ -93,6 +95,8 @@ The `stop` command stops a running Rasa X / Enterprise deployment.
 
 The `delete` command deletes a Rasa X / Enterprise deployment.
 
+You can use the `--prune` flag to remove a namespace where Rasa X deployment is located.
+
 ### The `list` command list Rasa X / Enterprise deployments
 
 The `list` command list deployments.
@@ -135,6 +139,126 @@ Global Flags:
       --kubeconfig string   absolute path to the kubeconfig file (default "/Users/tczekajlo/.kube/config")
       --verbose             enable verbose output
 ```
+
+### The `auth login` command
+
+Log in to Rasa X / Enterprise. It stores credentials in an external credentials store, such as the native keychain of the operating system.
+
+*  Apple macOS Keychain Access for macOS
+*  pass for Linux
+*  Microsoft Windows Credential Manager for Windows
+
+***Notice*** For Linux is used `pass` as a credential storage, `pass` requires to be installed and configured before you use the `rasactl auth` command. Below you can find an example of `pass` installation and configuration.
+
+`pass` instalation and configuration for Linux Ubuntu.
+
+1. Install `pass`.
+
+```text
+sudo apt-get install pass
+```
+
+2. Generate a GPG key.
+
+```text
+$  gpg --gen-key
+gpg (GnuPG) 2.2.19; Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+gpg: directory '/home/ubuntu/.gnupg' created
+gpg: keybox '/home/ubuntu/.gnupg/pubring.kbx' created
+Note: Use "gpg --full-generate-key" for a full featured key generation dialog.
+
+GnuPG needs to construct a user ID to identify your key.
+
+Real name: rasactl
+Email address:
+You selected this USER-ID:
+    "rasactl"
+
+Change (N)ame, (E)mail, or (O)kay/(Q)uit? O
+[...]
+public and secret key created and signed.
+```
+
+3. Init `pass`.
+
+```text
+$ pass init rasactl
+mkdir: created directory '/home/ubuntu/.password-store/'
+Password store initialized for rasactl
+```
+
+Now you can use `rasactl auth` on Linux.
+
+```text
+$ rasactl ls
+CURRENT	NAME             	STATUS 	RASA PRODUCTION	RASA WORKER	ENTERPRISE	VERSION
+       	wonderful-gagarin	Running	2.8.1          	2.8.1      	inactive  	0.42.0
+$ rasactl auth login wonderful-gagarin
+Username: me
+Password:
+Successfully logged.
+```
+
+***Troubleshooting*** If you see `Error: exit status 2: gpg: decryption failed: No secret key` error you should export the following environment variable `export GPG_TTY="$(tty)"`.
+
+### The `auth logout` command
+
+Removes access credentials for an account.
+
+## Model Managment Commands
+
+It's possible to manage models via `rasactl`, below is a list of commands that help with managing model.
+
+```text
+$ rasactl help model
+manage models for Rasa X / Enterprise
+
+Usage:
+  rasactl model [command]
+
+Available Commands:
+  delete      delete a model from Rasa X / Enterprise
+  download    download a model from Rasa X / Enterprise
+  list        list models stored in Rasa X / Enterprise
+  tag         tag a model in Rasa X / Enterprise
+  upload      upload model to Rasa X / Enterprise
+```
+
+### The `model delete` command
+
+Delete a model from Rasa X / Enterprise.
+
+### The `model download` command
+
+Download a model from Rasa X / Enterprise to your local machine.
+
+```text
+Usage:
+  rasactl model download [DEPLOYMENT NAME] MODEL-NAME [DESTINATION] [flags]
+
+Examples:
+  # Download the 'model' model.
+  # If the destination is not defined, the model will be stored in a current working directory.
+  $ rasactl model download deployment-name model
+
+  # Download the 'model' model and store it in the /tmp directory.
+  $ rasactl model download deployment-name model /tmp/model.tar.gz
+```
+
+### The `model list` command
+
+List all models stored in Rasa X / Enterprise.
+
+### The `model tag` command
+
+Create a tag and assign it to a given model.
+
+### The `model upload` command
+
+Upload a model to Rasa X / Enterprise.
 
 ## Examples of usage
 
@@ -230,6 +354,60 @@ dbMigrationService:
 
 ```bash
 $ rasactl upgrade deployment-name --values-file values.yaml
+```
+
+### Deploy Rasa X in one of the public cloud providers
+
+The following example shows how to deploy Rasa X in one of the public cloud provider. In the example GCP (Google Cloud Platform) is used.
+
+1. Create a VM with Linux, details information on how to create a VM you can find [here](https://cloud.google.com/compute/docs/instances/create-start-instance).
+2. [Install rasactl.](#installation)
+3. Start a new deployment by executing `rasactl start` command.
+4. After several minutes you should see details of your deployment.
+
+```text
+$ rasactl start
+∙∙∙ Ready!
+
+╭ Rasa X ────────────────────────────────╮
+│                                        │
+│    URL: http://35.184.183.164:30012    │
+│    Rasa production version: 2.8.1      │
+│    Rasa worker version: 2.8.1          │
+│    Rasa X version: 0.42.0              │
+│    Rasa X password: rasaxlocal         │
+│                                        │
+╰────────────────────────────────────────╯
+```
+
+***Important!*** Rasa X deployment will be exposed to the public on one of the service node port (30000-30100). Remember to add a rule to firewall configuration that allows for access to the Rasa X deployment.
+
+
+### Upload a model to Rasa X
+
+The following example shows how to download an existing model and upload it via `rasactl`.
+
+1. Download a model.
+
+```text
+$ curl -L https://github.com/RasaHQ/rasa-x-demo/blob/master/models/model.tar.gz?raw=true --output model.tar.gz
+[...]
+```
+
+2. Upload the download model to Rasa X.
+
+```text
+$ rasactl model upload [deployment name] model.tar.gz
+
+Successfully uploaded.
+```
+
+You can use the `rasa model list` command to list all available models, e.g
+
+```text
+$ rasactl model list [deployment name]
+NAME 	VERSION	COMPATIBLE	TAGS	HASH                            	TRAINED AT
+model	2.8.2  	true      	none	093dfaad610d330e5f36e6d7dc104d86	05 Aug 21 13:16 UTC
 ```
 
 ## Development

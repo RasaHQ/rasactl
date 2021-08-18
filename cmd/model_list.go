@@ -31,9 +31,10 @@ const (
 func modelListCmd() *cobra.Command {
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "list [DEPLOYMENT NAME]",
-		Short: "list models stored in Rasa X / Enterprise",
-		Long:  templates.LongDesc(modelListDesc),
+		Use:     "list [DEPLOYMENT NAME]",
+		Short:   "list models stored in Rasa X / Enterprise",
+		Long:    templates.LongDesc(modelListDesc),
+		Aliases: []string{"ls"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := checkIfNamespaceExists(); err != nil {

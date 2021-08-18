@@ -25,9 +25,16 @@ import (
 
 const (
 	modelDownloadDesc = `
+Download a model from Rasa X / Enterprise to your local machine.
 `
 
 	modelDownloadExample = `
+	# Download the 'model' model.
+	# If the destination is not defined, the model will be stored in a current working directory.
+	$ rasactl model download deployment-name model
+
+	# Download the 'model' model and store it in the /tmp directory.
+	$ rasactl model download deployment-name model /tmp/model.tar.gz
 `
 )
 
@@ -36,7 +43,7 @@ func modelDownloadCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "download [DEPLOYMENT NAME] MODEL-NAME [DESTINATION]",
 		Short:   "download a model from Rasa X / Enterprise",
-		Long:    modelDownloadDesc,
+		Long:    templates.LongDesc(modelDownloadDesc),
 		Example: templates.Examples(modelDownloadExample),
 		Args:    cobra.MaximumNArgs(3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {

@@ -24,9 +24,12 @@ import (
 
 const (
 	modelDeleteDesc = `
+Delete a model from Rasa X / Enterprise.
 `
 
 	modelDeleteExample = `
+	# Delete the 'model' model.
+	$ rasactl model delete deployment-name model
 `
 )
 
@@ -35,9 +38,10 @@ func modelDeleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete [DEPLOYMENT NAME] MODEL-NAME",
 		Short:   "delete a model from Rasa X / Enterprise",
-		Long:    modelDeleteDesc,
+		Long:    templates.LongDesc(modelDeleteDesc),
 		Example: templates.Examples(modelDeleteExample),
 		Args:    cobra.RangeArgs(1, 2),
+		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := checkIfNamespaceExists(); err != nil {

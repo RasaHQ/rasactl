@@ -33,18 +33,12 @@ func (r *RasaCtl) Start() error {
 		return err
 	}
 
-	// Init Rasa X client
-	r.initRasaXClient()
-
 	if err := r.startOrInstall(); err != nil {
 		return err
 	}
 
-	url, err := r.GetRasaXURL()
-	if err != nil {
-		return err
-	}
-	r.RasaXClient.URL = url
+	// Init Rasa X client
+	r.initRasaXClient()
 
 	token, err := r.GetRasaXToken()
 	if err != nil {

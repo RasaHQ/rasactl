@@ -25,7 +25,7 @@ import (
 
 const (
 	modelUploadDesc = `
-	Upload a model to Rasa X / Enterprise.
+Upload a model to Rasa X / Enterprise.
 `
 
 	modelUploadExample = `
@@ -42,6 +42,7 @@ func modelUploadCmd() *cobra.Command {
 		Long:    templates.LongDesc(modelUploadDesc),
 		Example: templates.Examples(modelUploadExample),
 		Args:    cobra.RangeArgs(1, 2),
+		Aliases: []string{"up"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelFile, _, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)

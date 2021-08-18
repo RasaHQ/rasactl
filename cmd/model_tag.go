@@ -25,15 +25,15 @@ import (
 
 const (
 	modelTagDesc = `
-	Rasa Enterprise allows multiple versions of an assistant to be run simultaneously and served to different users.
-	By default, two environments are defined:
+Rasa Enterprise allows multiple versions of an assistant to be run simultaneously and served to different users.
+By default, two environments are defined:
 
-	- production
-	- worker
+- production
+- worker
 
-	If you want to activate a model you have to tag it as 'production'.
+If you want to activate a model you have to tag it as 'production'.
 
-	Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
+Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
 `
 
 	modelTagExample = `
