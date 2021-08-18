@@ -30,7 +30,7 @@ const (
 	It stores credentials in an external credentials store, such as the native keychain of the operating system.
 
 	- Apple macOS Keychain Access for macOS
-	- D-Bus Secret Service for Linux
+	- pass for Linux
 	- Microsoft Windows Credential Manager for Windows
 `
 
