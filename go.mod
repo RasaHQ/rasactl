@@ -6,8 +6,8 @@ require (
 	github.com/Delta456/box-cli-maker/v2 v2.2.1
 	github.com/briandowns/spinner v1.16.0
 	github.com/danieljoos/wincred v1.1.1 // indirect
-	github.com/docker/docker v17.12.0-ce-rc1.0.20200618181300-9dc6525e6118+incompatible
-	github.com/docker/docker-credential-helpers v0.6.3
+	github.com/docker/docker v20.10.8+incompatible
+	github.com/docker/docker-credential-helpers v0.6.4
 	github.com/fatih/color v1.12.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
@@ -16,7 +16,9 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/olekukonko/tablewriter v0.0.4
+	github.com/moby/sys/mount v0.2.0 // indirect
+	github.com/olekukonko/tablewriter v0.0.5
+	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/browser v0.0.0-20210706143420-7d21f8c997e2
 	github.com/pkg/errors v0.9.1
 	github.com/schollz/progressbar/v3 v3.8.2

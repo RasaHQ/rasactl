@@ -97,9 +97,36 @@ The `delete` command deletes a Rasa X / Enterprise deployment.
 
 You can use the `--prune` flag to remove a namespace where Rasa X deployment is located.
 
-### The `list` command list Rasa X / Enterprise deployments
+### The `list` command
 
-The `list` command list deployments.
+List all deployments.
+
+```text
+$ rasactl list
+CURRENT	NAME         	STATUS 	RASA PRODUCTION	RASA WORKER	ENTERPRISE	VERSION
+       	hopeful-haibt	Running	2.8.1          	2.8.1      	inactive  	0.42.0
+*      	vibrant-yalow	Running	2.8.1          	2.8.1      	inactive  	0.42.0
+```
+
+The `*` in the `CURRENT` field indicates a deployment that is used as default. It means that every time when you execute `rasactl` command without defining the deployment name, the deployment marked with `*` is used.
+
+A deployment is marked as `CURRENT` if in a current working directory is located the `.rasactl` file that includes a deployment name. The file is automatically created if you run the `rasactl start` command with the `--project` or `--project-path` flag.
+
+### The `status` command
+
+Show status of the deployment.
+
+```text
+$ rasactl status vibrant-yalow
+Name:                   	vibrant-yalow
+Status:                 	Running
+URL:                    	http://vibrant-yalow.rasactl.localhost
+Version:                	0.42.0
+Enterprise:             	inactive
+Rasa production version:	2.8.1
+Rasa worker version:    	2.8.1
+Project path:           	/home/ubuntu/test
+```
 
 ### The `connect rasa` command
 
@@ -148,9 +175,9 @@ Log in to Rasa X / Enterprise. It stores credentials in an external credentials 
 *  pass for Linux
 *  Microsoft Windows Credential Manager for Windows
 
-***Notice*** For Linux is used `pass` as a credential storage, `pass` requires to be installed and configured before you use the `rasactl auth` command. Below you can find an example of `pass` installation and configuration.
+***Notice*** For Linux is used `pass` as credential storage, `pass` requires to be installed and configured before you use the `rasactl auth` command. Below you can find an example of `pass` installation and configuration.
 
-`pass` instalation and configuration for Linux Ubuntu.
+`pass` installation and configuration for Linux Ubuntu.
 
 1. Install `pass`.
 
@@ -208,9 +235,9 @@ Successfully logged.
 
 Removes access credentials for an account.
 
-## Model Managment Commands
+## Model Management Commands
 
-It's possible to manage models via `rasactl`, below is a list of commands that help with managing model.
+It's possible to manage models via `rasactl`, below is a list of commands that help with managing models.
 
 ```text
 $ rasactl help model

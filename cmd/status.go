@@ -18,14 +18,32 @@ package cmd
 import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
+)
+
+const (
+	statusDesc = `
+Show status of the deployment.
+`
+
+	statusExample = `
+	# Show status for the 'example' deployment.
+	$ rasactl status example
+
+	# Show status for the 'example' deployment along with details.
+	$ rasactl status example --details
+
+`
 )
 
 func statusCmd() *cobra.Command {
 
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:   "status [DEPLOYMENT NAME]",
-		Short: "show deployment status",
+		Use:     "status [DEPLOYMENT NAME]",
+		Short:   "show deployment status",
+		Long:    templates.LongDesc(statusDesc),
+		Example: templates.Examples(statusExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			err := checkIfNamespaceExists()
 			return err

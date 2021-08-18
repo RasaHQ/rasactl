@@ -339,7 +339,10 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		},
 		hostConfig, &network.NetworkingConfig{
 			EndpointsConfig: map[string]*network.EndpointSettings{kindNetwork: {}},
-		}, hostname)
+		},
+		nil,
+		hostname,
+	)
 	if err != nil {
 		return resp, err
 	}
