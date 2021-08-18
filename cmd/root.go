@@ -69,7 +69,7 @@ var rootCmd = &cobra.Command{
 			Namespace: namespace,
 			Flags:     rasactlFlags,
 		}
-		if cmd.CalledAs() != "help" {
+		if cmd.CalledAs() != "help" && cmd.CalledAs() != "completion" {
 			if err := rasaCtl.InitClients(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
