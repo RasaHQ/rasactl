@@ -28,8 +28,6 @@ builds:
       - amd64
       - arm64
     env:
-      - PKG_CONFIG_SYSROOT_DIR=/sysroot/macos/amd64
-      - PKG_CONFIG_PATH=/sysroot/macos/amd64/usr/local/lib/pkgconfig
       - CC=o64-clang
       - CXX=o64-clang++
     flags:
@@ -42,11 +40,6 @@ builds:
       - linux
     goarch:
       - amd64
-    env:
-      - CGO_FLAGS=--sysroot=/sysroot/linux/amd64
-      - CGO_LDFLAGS=--sysroot=/sysroot/linux/amd64
-      - PKG_CONFIG_SYSROOT_DIR=/sysroot/linux/amd64
-      - PKG_CONFIG_PATH=/sysroot/linux/amd64/usr/lib/x86_64-linux-gnu/pkgconfig
     flags:
       - -mod=readonly
     ldflags:
@@ -59,6 +52,10 @@ archives:
       - linux
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     wrap_in_directory: true
+    files:
+      - README.md
+      - LICENSE.md
+      - completions/*
 
 #  - id: darwin
 #    env:
@@ -79,12 +76,23 @@ archives:
 #    ldflags:
 #    - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
 
+before:
+  hooks:
+    - go mod tidy
+    - ./scripts/completions.sh
+
 brews:
   - name: rasactl
     tap:
       owner: RasaHQ
       name: homebrew-rasactl
       token: "{{ .Env.RASABOT_GITHUB_TOKEN }}"
+
+    install: |-
+      bin.install "rasactl"
+      bash_completion.install "completions/goreleaser.bash" => "rasactl"
+      zsh_completion.install "completions/goreleaser.zsh" => "_rasactl"
+      fish_completion.install "completions/goreleaser.fish"
 
     test: |
       system "#{bin}/rasactl --version"
