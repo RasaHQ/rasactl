@@ -10,6 +10,41 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 - connect a local Rasa Server to Rasa X / Enterprise
 - mount a local Rasa project to Rasa X / Enterprise deployment
 
+## Table of Contents
+
+- [rasactl](#rasactl)
+  - [Features](#features)
+  - [Table of Contents](#table-of-contents)
+  - [Prequimentes](#prequimentes)
+  - [Installation](#installation)
+  - [Commands](#commands)
+    - [The `start` command](#the-start-command)
+    - [The `stop` command](#the-stop-command)
+    - [The `delete` command](#the-delete-command)
+    - [The `list` command](#the-list-command)
+    - [The `status` command](#the-status-command)
+    - [The `connect rasa` command](#the-connect-rasa-command)
+    - [The `auth login` command](#the-auth-login-command)
+    - [The `auth logout` command](#the-auth-logout-command)
+  - [Model Management Commands](#model-management-commands)
+    - [The `model delete` command](#the-model-delete-command)
+    - [The `model download` command](#the-model-download-command)
+    - [The `model list` command](#the-model-list-command)
+    - [The `model tag` command](#the-model-tag-command)
+    - [The `model upload` command](#the-model-upload-command)
+  - [Examples of usage](#examples-of-usage)
+    - [Run Rasa X / Enterprise with a local Rasa Server](#run-rasa-x--enterprise-with-a-local-rasa-server)
+    - [Run Rasa X / Enterprise with mounted a local Rasa project](#run-rasa-x--enterprise-with-mounted-a-local-rasa-project)
+    - [Upgrade Rasa X / Enterprise version](#upgrade-rasa-x--enterprise-version)
+    - [Deploy Rasa X in one of the public cloud providers](#deploy-rasa-x-in-one-of-the-public-cloud-providers)
+    - [Upload a model to Rasa X](#upload-a-model-to-rasa-x)
+  - [Development](#development)
+    - [How to run it?](#how-to-run-it)
+    - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
+    - [Deploy Rasa X with mounted a local path](#deploy-rasa-x-with-mounted-a-local-path)
+  - [Open Rasa X in a web browser](#open-rasa-x-in-a-web-browser)
+  - [Deploy Rasa X with mounted a local path and a custom Docker image](#deploy-rasa-x-with-mounted-a-local-path-and-a-custom-docker-image)
+
 ## Prequimentes
 
 - Kubernetes cluster >= 1.14+
