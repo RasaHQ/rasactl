@@ -49,5 +49,6 @@ jobs:
             -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -e GPG_FINGERPRINT=${{ steps.import_gpg.outputs.fingerprint }} \
             -v `pwd`:/go/src/rasactl \
+            -v /home/runner/.gnupg:/root/.gnupg \
             -w /go/src/rasactl \
             ghcr.io/tczekajlo/golang-cross:v1.17.0 --snapshot
