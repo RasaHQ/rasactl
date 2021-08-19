@@ -59,7 +59,6 @@ func (r *RasaCtl) Status() error {
 	if err != nil {
 		d = append(d, []string{"Version:", string(stateData[types.StateRasaXVersion])})
 		d = append(d, []string{"Enterprise:", string(stateData[types.StateEnterprise])})
-		d = append(d, []string{"Rasa worker version:", string(stateData[types.StateRasaWorkerVersion])})
 	} else {
 		enterprise := "inactive"
 		if versionEndpoint.Enterprise {

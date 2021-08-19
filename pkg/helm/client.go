@@ -33,6 +33,11 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
 
+const (
+	cachePath            = "/tmp/.helmcache"
+	repositoryConfigPath = "/tmp/.helmrepo"
+)
+
 // Helm represents a helm client.
 type Helm struct {
 	settings *cli.EnvSettings
@@ -81,6 +86,8 @@ func (h *Helm) New() error {
 	var driverIsSet bool
 
 	h.settings = cli.New()
+	h.settings.RepositoryCache = cachePath
+	h.settings.RepositoryConfig = repositoryConfigPath
 	h.rasaXChartName = "rasa-x"
 	h.kubeConfig = viper.GetString("kubeconfig")
 

@@ -444,7 +444,6 @@ $ rasactl start
 ╭ Rasa X ────────────────────────────────╮
 │                                        │
 │    URL: http://35.184.183.164:30012    │
-│    Rasa worker version: 2.8.1          │
 │    Rasa X version: 0.42.0              │
 │    Rasa X password: rasaxlocal         │
 │                                        │

@@ -64,13 +64,13 @@ func PrintRasaXStatus(version *rtypes.VersionEndpointResponse, url string, flags
 
 		msg := []string{fmt.Sprintf("URL: %s", url)}
 
-		if version.Rasa.Production != "0.0.0" {
+		if version.Rasa.Production != "0.0.0" && version.Rasa.Worker != "0.0.0" {
 			msg = append(msg, fmt.Sprintf("Rasa production version: %s", version.Rasa.Production))
+			msg = append(msg, fmt.Sprintf("Rasa worker version: %s", version.Rasa.Worker))
 		}
 
 		msg = append(msg,
-			fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s",
-				version.Rasa.Worker,
+			fmt.Sprintf("Rasa X version: %s\nRasa X password: %s",
 				version.RasaX,
 				flags.Start.RasaXPassword,
 			),
