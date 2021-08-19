@@ -75,6 +75,7 @@ func (h *Helm) Upgrade() error {
 	if err != nil {
 		return err
 	}
+	h.setCacheDirectory(cachePath)
 
 	var msg string
 	if !h.Configuration.StartProject {

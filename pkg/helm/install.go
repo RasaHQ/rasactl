@@ -102,6 +102,7 @@ func (h *Helm) Install() error {
 	if err != nil {
 		return err
 	}
+	h.setCacheDirectory(cachePath)
 
 	msg := fmt.Sprintf("Installation has beed finished, status: %s", rel.Info.Status)
 	h.Log.Info(msg, "releaseName", client.ReleaseName, "namespace", client.Namespace)

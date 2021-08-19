@@ -46,7 +46,7 @@ func openCmd() *cobra.Command {
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s project is not running.\n", rasaCtl.Namespace)
+				fmt.Printf("The %s deployment is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
 

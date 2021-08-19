@@ -18,6 +18,8 @@ package helm
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
@@ -97,4 +99,20 @@ func (h *Helm) GetStatus() (*release.Release, error) {
 	}
 
 	return release, nil
+}
+
+func (h *Helm) setCacheDirectory(path string) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return
+	}
+
+	filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
+		if err == nil {
+			h.Log.V(1).Info("Changing permissions", "file", name, "mode", "0766")
+			err = os.Chmod(name, 0766)
+		} else {
+			h.Log.V(1).Error(err, "Can't change permissions")
+		}
+		return err
+	})
 }

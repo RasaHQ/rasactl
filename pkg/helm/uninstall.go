@@ -37,6 +37,7 @@ func (h *Helm) Uninstall() error {
 	if err != nil {
 		return err
 	}
+	h.setCacheDirectory(cachePath)
 
 	h.Log.Info(msg, "releaseName", rel.Release.Name, "namespace", h.Namespace)
 

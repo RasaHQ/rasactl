@@ -60,11 +60,10 @@ func startCmd() *cobra.Command {
 
 	// cmd represents the start command
 	cmd := &cobra.Command{
-		Use:          "start [DEPLOYMENT NAME]",
-		Short:        "start a Rasa X deployment",
-		Long:         templates.LongDesc(startDesc),
-		Example:      templates.Examples(startExample),
-		SilenceUsage: true,
+		Use:     "start [DEPLOYMENT NAME]",
+		Short:   "start a Rasa X deployment",
+		Long:    templates.LongDesc(startDesc),
+		Example: templates.Examples(startExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaCtl.HelmClient.Configuration = helmConfiguration

@@ -33,7 +33,7 @@ func (k *Kubernetes) ScaleDown() error {
 		var err error
 		var scale *autoscalingv1.Scale
 
-		k.Log.V(1).Info("Scaling down", "deployment", deployment.Name)
+		k.Log.Info("Scaling down", "deployment", deployment.Name)
 		scale, err = k.clientset.AppsV1().Deployments(k.Namespace).GetScale(context.TODO(), deployment.Name, metav1.GetOptions{})
 		if err != nil {
 			return err
@@ -54,7 +54,7 @@ func (k *Kubernetes) ScaleDown() error {
 		var err error
 		var scale *autoscalingv1.Scale
 
-		k.Log.V(1).Info("Scaling down", "statefulsets", statefulsets.Name)
+		k.Log.Info("Scaling down", "statefulsets", statefulsets.Name)
 		scale, err = k.clientset.AppsV1().StatefulSets(k.Namespace).GetScale(context.TODO(), statefulsets.Name, metav1.GetOptions{})
 		if err != nil {
 			return err

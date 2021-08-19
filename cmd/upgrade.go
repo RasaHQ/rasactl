@@ -44,11 +44,10 @@ func upgradeCmd() *cobra.Command {
 
 	// cmd represents the upgrade command
 	cmd := &cobra.Command{
-		Use:          "upgrade [DEPLOYMENT NAME]",
-		Short:        "upgrade Rasa X deployment",
-		Long:         upgradeDesc,
-		Example:      templates.Examples(upgradeExample),
-		SilenceUsage: true,
+		Use:     "upgrade [DEPLOYMENT NAME]",
+		Short:   "upgrade Rasa X deployment",
+		Long:    upgradeDesc,
+		Example: templates.Examples(upgradeExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
@@ -72,7 +71,7 @@ func upgradeCmd() *cobra.Command {
 			}
 
 			if !isRunning {
-				fmt.Printf("Rasa X for the %s project is not running.\n", rasaCtl.Namespace)
+				fmt.Printf("The %s deployment is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
 

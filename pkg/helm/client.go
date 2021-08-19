@@ -130,6 +130,7 @@ func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 			URL:  repEntry.URL,
 		}
 		r, err := repo.NewChartRepository(&rep, getter.All(h.settings))
+		r.CachePath = h.settings.RepositoryCache
 		if err != nil {
 			return repos, err
 		}
