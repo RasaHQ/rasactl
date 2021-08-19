@@ -59,7 +59,7 @@ func openCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprintf("Can't open the URL %s in your web browser: %s", url, err))
 			}
 
-			fmt.Printf("The URL %s has been opened in your web browser\n", url)
+			fmt.Printf("The %s URL has been opened in your web browser\n", url)
 			rasaCtl.Spinner.Stop()
 			return nil
 		},

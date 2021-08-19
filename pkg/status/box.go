@@ -20,7 +20,8 @@ import (
 	"strings"
 
 	"github.com/Delta456/box-cli-maker/v2"
-	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
@@ -58,7 +59,7 @@ func YellowBox(tittle string, msg string) {
 }
 
 // PrintRasaXStatus prints a box with details for Rasa X deployment.
-func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXPassword string) {
+func PrintRasaXStatus(version *rtypes.VersionEndpointResponse, url string, flags *types.RasaCtlFlags) {
 	if !utils.IsDebugOrVerboseEnabled() {
 
 		msg := []string{fmt.Sprintf("URL: %s", url)}
@@ -71,7 +72,9 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXP
 			fmt.Sprintf("Rasa worker version: %s\nRasa X version: %s\nRasa X password: %s",
 				version.Rasa.Worker,
 				version.RasaX,
-				rasaXPassword))
+				flags.Start.RasaXPassword,
+			),
+		)
 
 		GreenBox(
 			"Rasa X",
@@ -85,5 +88,7 @@ func PrintRasaXStatus(version *types.VersionEndpointResponse, url string, rasaXP
 				fmt.Sprintf("It looks like the %s URL is not accessible, check if all needed firewall rules are in place", url),
 			)
 		}
+
+		checkVersionConstrains(version, flags)
 	}
 }

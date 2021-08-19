@@ -291,7 +291,11 @@ func (r *RasaCtl) checkDeploymentStatus() error {
 
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		// Print the status box only if it's a new Rasa X deployment
-		status.PrintRasaXStatus(rasaXVersion, r.RasaXClient.URL, r.Flags.Start.RasaXPassword)
+		status.PrintRasaXStatus(
+			rasaXVersion,
+			r.RasaXClient.URL,
+			r.Flags,
+		)
 	}
 	return nil
 }

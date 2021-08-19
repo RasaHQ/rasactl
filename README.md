@@ -17,6 +17,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
   - [Table of Contents](#table-of-contents)
   - [Prequimentes](#prequimentes)
   - [Installation](#installation)
+    - [Linux / macOS](#linux--macos)
   - [Commands](#commands)
     - [The `start` command](#the-start-command)
     - [The `stop` command](#the-stop-command)
@@ -42,8 +43,9 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
     - [How to run it?](#how-to-run-it)
     - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
     - [Deploy Rasa X with mounted a local path](#deploy-rasa-x-with-mounted-a-local-path)
-  - [Open Rasa X in a web browser](#open-rasa-x-in-a-web-browser)
-  - [Deploy Rasa X with mounted a local path and a custom Docker image](#deploy-rasa-x-with-mounted-a-local-path-and-a-custom-docker-image)
+    - [Open Rasa X in a web browser](#open-rasa-x-in-a-web-browser)
+    - [Deploy Rasa X with mounted a local path and a custom Docker image](#deploy-rasa-x-with-mounted-a-local-path-and-a-custom-docker-image)
+  - [License](#license)
 
 ## Prequimentes
 
@@ -52,7 +54,15 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 
 ## Installation
 
-Coming soon
+### Linux / macOS
+
+- Binary downloads of `rasactl` can be found on [the Releases page](https://github.com/rasahq/rasactl/releases/latest).
+- Using `brew`
+
+```text
+$ brew tap rasahq/rasactl
+$ brew install rasactl
+```
 
 ## Commands
 
@@ -434,7 +444,6 @@ $ rasactl start
 ╭ Rasa X ────────────────────────────────╮
 │                                        │
 │    URL: http://35.184.183.164:30012    │
-│    Rasa production version: 2.8.1      │
 │    Rasa worker version: 2.8.1          │
 │    Rasa X version: 0.42.0              │
 │    Rasa X password: rasaxlocal         │
@@ -442,8 +451,7 @@ $ rasactl start
 ╰────────────────────────────────────────╯
 ```
 
-***Important!*** Rasa X deployment will be exposed to the public on one of the service node port (30000-30100). Remember to add a rule to firewall configuration that allows for access to the Rasa X deployment.
-
+***Important!*** Rasa X deployment will be exposed to the public on one of the service node port (`30000-30100`). Remember to add a rule to firewall configuration that allows for access to the Rasa X deployment.
 
 ### Upload a model to Rasa X
 
@@ -473,6 +481,8 @@ model	2.8.2  	true      	none	093dfaad610d330e5f36e6d7dc104d86	05 Aug 21 13:16 U
 ```
 
 ## Development
+
+ToDO: this section will be rewrite. It's waiting for `Makefile`.
 
 Below you can find a setup required for developing `rasactl` locally.
 
@@ -539,13 +549,13 @@ $ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 $ sudo ./rasactl start -p
 ```
 
-## Open Rasa X in a web browser
+### Open Rasa X in a web browser
 
 ```
 $ ./rasactl open
 ```
 
-## Deploy Rasa X with mounted a local path and a custom Docker image
+### Deploy Rasa X with mounted a local path and a custom Docker image
 
 1. Create a namespace
 
@@ -577,3 +587,8 @@ $ kubectl -n my-test patch serviceaccount default -p '{"imagePullSecrets": [{"na
 ```
 $ ./rasactl start my-test -p --values-file testdata/test-image.yaml
 ```
+
+## License
+
+Licensed under the Apache License, Version 2.0.
+Copyright 2021 Rasa Technologies GmbH. [Copy of the license](LICENSE.txt).
