@@ -57,6 +57,13 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 ### Linux / macOS
 
 - Binary downloads of `rasactl` can be found on [the Releases page](https://github.com/rasahq/rasactl/releases/latest).
+
+```text
+$ curl -L https://github.com/RasaHQ/rasactl/releases/download/0.0.7/rasactl_0.0.7_darwin_amd64.tar.gz
+$ tar -zxvf rasactl_0.0.7_darwin_amd64.tar.gz
+$ cp rasactl_0.0.7_darwin_amd64/rasactl /usr/local/bin/
+```
+
 - Using `brew`
 
 ```text
