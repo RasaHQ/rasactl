@@ -437,7 +437,7 @@ $ rasactl upgrade deployment-name --values-file values.yaml
 
 ### Deploy Rasa X in one of the public cloud providers
 
-The following example shows how to deploy Rasa X in one of the public cloud provider. In the example GCP (Google Cloud Platform) is used.
+The following example shows how to deploy Rasa X in one of the major cloud providers. In the example, GCP (Google Cloud Platform) is used.
 
 1. Create a VM with Linux, details information on how to create a VM you can find [here](https://cloud.google.com/compute/docs/instances/create-start-instance).
 2. [Install rasactl.](#installation)
