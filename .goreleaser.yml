@@ -95,3 +95,7 @@ brews:
 signs:
   - artifacts: checksum
     args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+
+release:
+  footer: |
+    This release was signed with `59FD 4D71 6D9 EA15 7980 87A5 BC1A EDA3 1757 EA04E`.

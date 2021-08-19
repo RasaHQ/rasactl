@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - '*'
-  pull_request:
 
 
 jobs:
@@ -51,4 +50,4 @@ jobs:
             -v `pwd`:/go/src/rasactl \
             -v /home/runner/.gnupg:/root/.gnupg \
             -w /go/src/rasactl \
-            ghcr.io/tczekajlo/golang-cross:v1.17.0 --snapshot
+            ghcr.io/tczekajlo/golang-cross:v1.17.0
