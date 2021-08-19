@@ -50,4 +50,4 @@ jobs:
             -e GPG_FINGERPRINT=${{ steps.import_gpg.outputs.fingerprint }} \
             -v `pwd`:/go/src/rasactl \
             -w /go/src/rasactl \
-            ghcr.io/tczekajlo/golang-cross:v1.17.0
+            ghcr.io/tczekajlo/golang-cross:v1.17.0 --snapshot
