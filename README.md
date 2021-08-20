@@ -129,6 +129,7 @@ Flags:
   -p, --project                       use the current working directory as a project directory, the flag is ignored if the --project-path flag is used
       --project-path string           absolute path to the project directory directory mounted in kind
       --rasa-x-chart-version string   a helm chart version to use
+      --rasa-x-edge-release           use the latest edge release of Rasa X
       --rasa-x-password string        Rasa X password (default "rasaxlocal")
       --rasa-x-password-stdin         read the Rasa X password from stdin
       --rasa-x-release-name string    a helm release name to manage (default "rasa-x")

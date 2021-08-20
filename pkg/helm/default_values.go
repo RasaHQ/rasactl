@@ -190,3 +190,19 @@ func valuesRabbitMQErlangCookie() map[string]interface{} {
 
 	return values
 }
+
+func valuesUseEdgeReleaseRasaX() map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"tag": "latest",
+		},
+		"eventService": map[string]interface{}{
+			"tag": "latest",
+		},
+		"dbMigrationService": map[string]interface{}{
+			"tag": "latest",
+		},
+	}
+
+	return values
+}

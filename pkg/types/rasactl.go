@@ -38,6 +38,7 @@ type RasaCtlStartFlags struct {
 	Project            bool
 	RasaXPassword      string
 	RasaXPasswordStdin bool
+	UseEdgeRelease     bool
 }
 
 type RasaCtlDeleteFlags struct {
