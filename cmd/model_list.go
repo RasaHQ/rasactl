@@ -16,6 +16,8 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -53,6 +55,18 @@ func modelListCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// Check if a Rasa X deployment is running
+			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			if !isRunning {
+				fmt.Printf("The %s deployment is not running.\n", rasaCtl.Namespace)
+				return nil
+			}
+
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
 				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}

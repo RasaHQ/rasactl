@@ -55,3 +55,7 @@ func addAuthLoginFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().StringVarP(&rasactlFlags.Auth.Login.Username, "username", "u", "", "username")
 	cmd.PersistentFlags().StringVarP(&rasactlFlags.Auth.Login.Password, "password", "p", "", "password")
 }
+
+func configFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVar(&rasactlFlags.Config.CreateFile, "create-file", false, "create the configuration file if it doesn't exist")
+}

@@ -21,7 +21,7 @@ import (
 
 func modelCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the stop command
 	cmd := &cobra.Command{
 		Use:   "model",
 		Short: "manage models for Rasa X / Enterprise",

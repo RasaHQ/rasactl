@@ -24,6 +24,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
     - [The `delete` command](#the-delete-command)
     - [The `list` command](#the-list-command)
     - [The `status` command](#the-status-command)
+    - [The `config use-deployment` command](#the-config-use-deployment-command)
     - [The `connect rasa` command](#the-connect-rasa-command)
     - [The `auth login` command](#the-auth-login-command)
     - [The `auth logout` command](#the-auth-logout-command)
@@ -78,6 +79,7 @@ Available Commands:
   add         add existing Rasa X deployment
   auth        manage credentials for Rasa X / Enterprise
   completion  generate the autocompletion script for the specified shell
+  config      modify the configuration file
   connect     connect a component to Rasa X
   delete      delete Rasa X deployment
   help        Help about any command
@@ -179,6 +181,13 @@ Rasa production version:	2.8.1
 Rasa worker version:    	2.8.1
 Project path:           	/home/ubuntu/test
 ```
+
+### The `config use-deployment` command
+
+Sets the current-deployment in the configuration file.
+
+If you have multiple Rasa X deployments, and you are not in a project directory you have to explicitly define the deployment name during command execution.
+You can define a deployment that is used as a current one by using the `rasa config use-deployment` command.
 
 ### The `connect rasa` command
 

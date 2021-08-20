@@ -21,7 +21,7 @@ import (
 
 func authCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the auth command
 	cmd := &cobra.Command{
 		Use:   "auth",
 		Short: "manage credentials for Rasa X / Enterprise",

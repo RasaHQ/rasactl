@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/Delta456/box-cli-maker/v2 v2.2.1
-	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/Masterminds/semver/v3 v3.1.1
 	github.com/briandowns/spinner v1.16.0
 	github.com/danieljoos/wincred v1.1.1 // indirect
 	github.com/docker/docker v20.10.8+incompatible
@@ -19,7 +19,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/moby/sys/mount v0.2.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/browser v0.0.0-20210706143420-7d21f8c997e2
 	github.com/pkg/errors v0.9.1
 	github.com/schollz/progressbar/v3 v3.8.2

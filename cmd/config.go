@@ -19,22 +19,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func connectCmd() *cobra.Command {
+func configCmd() *cobra.Command {
 
-	// cmd represents the connect command
+	// cmd represents the config command
 	cmd := &cobra.Command{
-		Use:   "connect",
-		Short: "connect a component to Rasa X",
-		Args:  cobra.NoArgs,
+		Use:     "config",
+		Aliases: []string{"cfg", "conf"},
+		Short:   "modify the configuration file",
+		Args:    cobra.NoArgs,
 	}
 
-	cmd.AddCommand(connectRasaCmd())
+	cmd.AddCommand(configUseDeploymentCmd())
+
+	configFlags(cmd)
 
 	return cmd
 }
 
 func init() {
 
-	connectCmd := connectCmd()
-	rootCmd.AddCommand(connectCmd)
+	configCmd := configCmd()
+	rootCmd.AddCommand(configCmd)
 }

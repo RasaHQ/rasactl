@@ -89,7 +89,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLog)
+	cobra.OnInitialize(initLog, initConfig, getNamespace)
 
 	home, _ := homedir.Dir()
 
@@ -105,6 +105,9 @@ func init() {
 
 func initLog() {
 	log = logger.New(rasactlFlags)
+}
+
+func getNamespace() {
 	namespace = utils.GetActiveNamespace(log)
 }
 
@@ -113,6 +116,11 @@ func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
+		if rasactlFlags.Config.CreateFile {
+			f, _ := os.Create(cfgFile)
+			f.Close()
+		}
+
 	} else {
 		// Find home directory.
 		home, err := homedir.Dir()
@@ -124,12 +132,19 @@ func initConfig() {
 		// Search config in home directory with name ".rasactl" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".rasactl")
+
+		if rasactlFlags.Config.CreateFile {
+
+			file := strings.Join([]string{home, ".rasactl.yaml"}, "/")
+			f, _ := os.Create(file)
+			f.Close()
+		}
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		log.Info("Using config", "file", viper.ConfigFileUsed())
 	}
 }

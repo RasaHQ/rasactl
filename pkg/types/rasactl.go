@@ -26,6 +26,7 @@ type RasaCtlFlags struct {
 	Global       RasaCtlGlobalFlags
 	Auth         RasaCtlAuthFlags
 	Model        RasaCtlModelFlags
+	Config       RasaCtlConfigFlags
 }
 
 type RasaCtlStartUpgradeFlags struct {
@@ -82,4 +83,8 @@ type RasaCtlModelFlags struct {
 	Delete struct {
 		Name string
 	}
+}
+
+type RasaCtlConfigFlags struct {
+	CreateFile bool
 }

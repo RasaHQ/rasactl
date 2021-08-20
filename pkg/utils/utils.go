@@ -165,8 +165,9 @@ func readStatusFile(path string, log logr.Logger) (string, error) {
 	return string(data), nil
 }
 
-// GetActiveNamespace returns a active namespace, it checks the .rasactl file if exists
-// and read a namespace from the file.
+// GetActiveNamespace returns an active namespace, it checks the .rasactl file
+// if exists and reads a namespace from the file or it gets the current-deployment
+// from the rasactl configuration file.
 func GetActiveNamespace(log logr.Logger) string {
 	log.V(1).Info("Getting active namespace")
 	path, err := os.Getwd()
@@ -179,6 +180,11 @@ func GetActiveNamespace(log logr.Logger) string {
 	if err != nil {
 		log.V(1).Info("Can't get active namespace", "error", err)
 		return ""
+	}
+
+	if namespace == "" && viper.GetString("current-deployment") != "" {
+		log.V(1).Info("Using namespace name from the rasactl configuration file")
+		namespace = viper.GetString("current-deployment")
 	}
 
 	return strings.TrimSuffix(namespace, "\n")

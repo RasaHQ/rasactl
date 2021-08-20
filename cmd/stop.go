@@ -25,7 +25,7 @@ import (
 
 func stopCmd() *cobra.Command {
 
-	// cmd represents the open command
+	// cmd represents the stop command
 	cmd := &cobra.Command{
 		Use:   "stop [DEPLOYMENT NAME]",
 		Short: "stop Rasa X deployment",

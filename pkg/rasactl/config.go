@@ -13,28 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package rasactl
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-func connectCmd() *cobra.Command {
+// ConfigUseDeployment sets the current-deployment in the configuration file.
+func (r *RasaCtl) ConfigUseDeployment() error {
 
-	// cmd represents the connect command
-	cmd := &cobra.Command{
-		Use:   "connect",
-		Short: "connect a component to Rasa X",
-		Args:  cobra.NoArgs,
-	}
+	viper.SetDefault("current-deployment", r.Namespace)
 
-	cmd.AddCommand(connectRasaCmd())
-
-	return cmd
-}
-
-func init() {
-
-	connectCmd := connectCmd()
-	rootCmd.AddCommand(connectCmd)
+	return viper.WriteConfig()
 }
