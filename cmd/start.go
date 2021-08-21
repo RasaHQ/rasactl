@@ -18,21 +18,25 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
+	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
 )
 
 const (
-	startDesc = `
-This command creates a Rasa X deployment or starts stopped deployment if a given deployment already exists.
+	startDesc = `This command creates a Rasa X deployment or starts stopped deployment if a given deployment already exists.
 
 If the --project or --project-path is used, a Rasa X deployment will be using a local directory with Rasa project.
 
 If a deployment name is not defined, a random name is generated and used as a deployment name.
+
+If there is no existing deployment or you use the --project or --project-path flag a new deployment will be created,
+otherwise, you have to use the --create flags to create a deployment.
 `
 
 	startExample = `
@@ -53,6 +57,8 @@ If a deployment name is not defined, a random name is generated and used as a de
 	# Create a Rasa X deployment with a defined name.
 	$ rasactl start my-deployment
 
+	# Create a new deployment if there is already one or more deployments.
+	# rasactl start --create
 `
 )
 
@@ -62,7 +68,7 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start [DEPLOYMENT NAME]",
 		Short:   "start a Rasa X deployment",
-		Long:    templates.LongDesc(startDesc),
+		Long:    startDesc,
 		Example: templates.Examples(startExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
@@ -79,6 +85,36 @@ func startCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Get list of namespaces (deployments)
+			namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprint(err))
+			}
+
+			// Check if namespace exists only if the number of namespaces >= 2
+			// and a new deployment wasn't not requested
+			if len(namespaces) >= 2 && !rasactlFlags.Start.Create {
+				if err := checkIfNamespaceExists(); err != nil {
+					return err
+				}
+			} else if len(namespaces) == 0 || rasactlFlags.Start.Create ||
+				rasactlFlags.Start.Project || rasactlFlags.Start.ProjectPath != "" {
+				if namespace == "" {
+					namespace = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
+					rasaCtl.Namespace = namespace
+					if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
+						return err
+					}
+				}
+			}
+
+			if !rasactlFlags.Start.Project && rasactlFlags.Start.ProjectPath == "" {
+				// If there is only one deployment then set it as default
+				if err := setDeploymentIfOnlyOne(cmd); err != nil {
+					return err
+				}
+			}
+
 			isDeployed, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

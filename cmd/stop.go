@@ -30,6 +30,10 @@ func stopCmd() *cobra.Command {
 		Use:   "stop [DEPLOYMENT NAME]",
 		Short: "stop Rasa X deployment",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

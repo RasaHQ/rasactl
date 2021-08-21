@@ -34,6 +34,7 @@ type RasaCtlStartUpgradeFlags struct {
 }
 
 type RasaCtlStartFlags struct {
+	Create             bool
 	ProjectPath        string
 	Project            bool
 	RasaXPassword      string

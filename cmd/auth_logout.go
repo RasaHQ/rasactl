@@ -44,6 +44,11 @@ func authLogoutCmd() *cobra.Command {
 		Long:    authLogoutDesc,
 		Example: templates.Examples(authLogoutExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			// If there is only one deployment then set it as default
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

@@ -108,6 +108,16 @@ func (r *RasaCtl) InitClients() error {
 	return err
 }
 
+// SetNamespaceClients sets namespace for initialized clients.
+func (r *RasaCtl) SetNamespaceClients(namespace string) error {
+	r.Log.V(1).Info("Setting namespace for clients", "namespace", namespace)
+	r.KubernetesClient.Namespace = namespace
+	r.DockerClient.Namespace = namespace
+
+	err := r.HelmClient.SetNamespace(namespace)
+	return err
+}
+
 // CheckDeploymentStatus checks if a given deployment is deployed and running.
 //
 // It returns 'true' as the first value if the deployment is deployed, and 'true'

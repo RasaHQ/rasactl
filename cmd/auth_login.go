@@ -54,9 +54,15 @@ func authLoginCmd() *cobra.Command {
 		Long:    templates.LongDesc(authLoginDesc),
 		Example: templates.Examples(authLoginExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			// If there is only one deployment then set it as default
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
+
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

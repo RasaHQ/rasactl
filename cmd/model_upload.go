@@ -46,6 +46,14 @@ func modelUploadCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"up"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := parseNamespaceModelUploadCommand(args); err != nil {
+				return err
+			}
+
+			if err := checkIfNamespaceExists(); err != nil {
+				return err
+			}
+
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelFile, _, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
 			if err != nil {
@@ -53,15 +61,9 @@ func modelUploadCmd() *cobra.Command {
 			}
 			if detectedNamespace != "" {
 				rasaCtl.Namespace = namespace
-				rasaCtl.KubernetesClient.Namespace = namespace
-				rasaCtl.HelmClient.Namespace = namespace
-				if err := rasaCtl.HelmClient.New(); err != nil {
+				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
 					return err
 				}
-			}
-
-			if err := checkIfNamespaceExists(); err != nil {
-				return err
 			}
 
 			rasactlFlags.Model.Upload.File = modelFile

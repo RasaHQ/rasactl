@@ -97,12 +97,6 @@ Available Commands:
 The `start` creates a Rasa X deployment or starts stopped deployment if a given deployment already exists.
 
 ```text
-This command creates a Rasa X deployment or starts stopped deployment if a given deployment already exists.
-
-If the --project or --project-path is used, a Rasa X deployment will be using a local directory with Rasa project.
-
-If a deployment name is not defined, a random name is generated and used as a deployment name.
-
 Usage:
   rasactl start [DEPLOYMENT NAME] [flags]
 
@@ -124,10 +118,14 @@ Examples:
   # Create a Rasa X deployment with a defined name.
   $ rasactl start my-deployment
 
+  # Create a new deployment if there is already one or more deployments.
+  # rasactl start --create
+
 Flags:
+      --create                        create a new deployment. If --project or --project-path is set, or there is no existing deployment, the flag is not required to create a new deployment
   -h, --help                          help for start
-  -p, --project                       use the current working directory as a project directory, the flag is ignored if the --project-path flag is used
-      --project-path string           absolute path to the project directory directory mounted in kind
+  -p, --project                       use the current working directory as a project directory, the flag is ignored if --project-path is used
+      --project-path string           absolute path to the project directory mounted in kind
       --rasa-x-chart-version string   a helm chart version to use
       --rasa-x-edge-release           use the latest edge release of Rasa X
       --rasa-x-password string        Rasa X password (default "rasaxlocal")
@@ -140,6 +138,7 @@ Global Flags:
       --config string       config file (default is $HOME/.rasactl.yaml)
       --debug               enable debug output
       --kubeconfig string   absolute path to the kubeconfig file (default "/Users/tczekajlo/.kube/config")
+      --verbose             enable verbose output
 ```
 
 ### The `stop` command
@@ -165,7 +164,11 @@ CURRENT	NAME         	STATUS 	RASA PRODUCTION	RASA WORKER	ENTERPRISE	VERSION
 
 The `*` in the `CURRENT` field indicates a deployment that is used as default. It means that every time when you execute `rasactl` command without defining the deployment name, the deployment marked with `*` is used.
 
-A deployment is marked as `CURRENT` if in a current working directory is located the `.rasactl` file that includes a deployment name. The file is automatically created if you run the `rasactl start` command with the `--project` or `--project-path` flag.
+A deployment is marked as `CURRENT` if:
+
+- in a current working directory is located the `.rasactl` file that includes a deployment name. The file is automatically created if you run the `rasactl start` command with the `--project` or `--project-path` flag
+- there is only one deployment
+- you set the current deployment by using the `rasactl config use-deployment` command
 
 ### The `status` command
 

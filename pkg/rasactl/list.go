@@ -37,7 +37,9 @@ func (r *RasaCtl) List() error {
 	}
 
 	for _, namespace := range namespaces {
-		r.KubernetesClient.Namespace = namespace
+		if err := r.SetNamespaceClients(namespace); err != nil {
+			return err
+		}
 
 		stateData, err := r.KubernetesClient.ReadSecretWithState()
 		if err != nil {
@@ -46,7 +48,6 @@ func (r *RasaCtl) List() error {
 		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
 			ReleaseName: string(stateData[types.StateHelmReleaseName]),
 		}
-		r.HelmClient.Namespace = namespace
 		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
 
 		isRunning, err := r.KubernetesClient.IsRasaXRunning()
@@ -63,12 +64,7 @@ func (r *RasaCtl) List() error {
 			current = "*"
 		}
 
-		url, err := r.GetRasaXURL()
-		if err != nil {
-			return err
-		}
 		r.initRasaXClient()
-		r.RasaXClient.URL = url
 
 		versionEndpoint, err := r.RasaXClient.GetVersionEndpoint()
 		if err == nil {

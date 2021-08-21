@@ -45,6 +45,9 @@ func modelDeleteCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := parseNamespaceModelDeleteCommand(args); err != nil {
+				return err
+			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err

@@ -115,6 +115,8 @@ func (r *RasaX) ModelDownload() error {
 		}
 		file = fmt.Sprintf("%s/%s.tar.gz", dir, r.Flags.Model.Download.Name)
 	}
+	r.Log.Info("Starting to download the model",
+		"storePath", file, "model", r.Flags.Model.Download.Name)
 	f, _ := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0644)
 	defer f.Close()
 
@@ -198,6 +200,8 @@ func (r *RasaX) ModelTag() error {
 	case 204:
 		fmt.Println("Model has been tagged successfully.")
 		return nil
+	case 404:
+		return fmt.Errorf("model '%s' not found", r.Flags.Model.Tag.Model)
 	case 401:
 		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:

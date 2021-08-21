@@ -121,6 +121,18 @@ func (h *Helm) New() error {
 	return err
 }
 
+// SetNamespace sets namespace for initialized client.
+func (h *Helm) SetNamespace(namespace string) error {
+	h.Namespace = namespace
+	genericcliopts := &genericclioptions.ConfigFlags{
+		Namespace:  &h.Namespace,
+		KubeConfig: &h.kubeConfig,
+	}
+
+	err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
+	return err
+}
+
 func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 	var repos []*repo.ChartRepository
 

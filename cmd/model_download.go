@@ -47,8 +47,12 @@ func modelDownloadCmd() *cobra.Command {
 		Short:   "download a model from Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelDownloadDesc),
 		Example: templates.Examples(modelDownloadExample),
-		Args:    cobra.MaximumNArgs(3),
+		Args:    cobra.RangeArgs(1, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := parseNamespaceModelDownloadCommand(args); err != nil {
+				return err
+			}
+
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelName, modelPath, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
 			if err != nil {
@@ -56,9 +60,7 @@ func modelDownloadCmd() *cobra.Command {
 			}
 			if detectedNamespace != "" {
 				rasaCtl.Namespace = namespace
-				rasaCtl.KubernetesClient.Namespace = namespace
-				rasaCtl.HelmClient.Namespace = namespace
-				if err := rasaCtl.HelmClient.New(); err != nil {
+				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
 					return err
 				}
 			}

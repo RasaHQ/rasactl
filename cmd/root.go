@@ -26,7 +26,6 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/RasaHQ/rasactl/pkg/version"
-	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
@@ -58,10 +57,6 @@ var rootCmd = &cobra.Command{
 
 		if len(args) != 0 {
 			namespace = args[0]
-		}
-
-		if namespace == "" && cmd.CalledAs() == "start" {
-			namespace = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
 		}
 
 		rasaCtl = &rasactl.RasaCtl{

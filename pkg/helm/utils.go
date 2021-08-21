@@ -17,6 +17,7 @@ package helm
 
 import (
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -106,10 +107,14 @@ func (h *Helm) setCacheDirectory(path string) {
 		return
 	}
 
-	filepath.Walk(path, func(name string, info os.FileInfo, err error) error {
+	filepath.WalkDir(path, func(name string, info fs.DirEntry, err error) error {
+		var chmod fs.FileMode = 0766
 		if err == nil {
-			h.Log.V(1).Info("Changing permissions", "file", name, "mode", "0766")
-			err = os.Chmod(name, 0766)
+			if info.IsDir() {
+				chmod = 0777
+			}
+			h.Log.V(1).Info("Changing permissions", "file", name, "mode", chmod)
+			err = os.Chmod(name, chmod)
 		} else {
 			h.Log.V(1).Error(err, "Can't change permissions")
 		}

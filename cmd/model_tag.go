@@ -53,6 +53,10 @@ func modelTagCmd() *cobra.Command {
 		Example: templates.Examples(modelTagExample),
 		Args:    cobra.RangeArgs(2, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := parseNamespaceModelTagCommand(args); err != nil {
+				return err
+			}
+
 			detectedNamespace := utils.GetActiveNamespace(log)
 			modelName, modelTag, namespace, err := parseModelTagArgs(namespace, detectedNamespace, args)
 			if err != nil {
@@ -61,9 +65,7 @@ func modelTagCmd() *cobra.Command {
 
 			if detectedNamespace != "" {
 				rasaCtl.Namespace = namespace
-				rasaCtl.KubernetesClient.Namespace = namespace
-				rasaCtl.HelmClient.Namespace = namespace
-				if err := rasaCtl.HelmClient.New(); err != nil {
+				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
 					return err
 				}
 			}

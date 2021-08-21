@@ -45,6 +45,10 @@ func statusCmd() *cobra.Command {
 		Long:    templates.LongDesc(statusDesc),
 		Example: templates.Examples(statusExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			err := checkIfNamespaceExists()
 			return err
 		},

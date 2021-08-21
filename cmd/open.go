@@ -30,6 +30,11 @@ func openCmd() *cobra.Command {
 		Use:   "open [DEPLOYMENT NAME]",
 		Short: "open Rasa X in a web browser",
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			// If there is only one deployment then set it as default
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

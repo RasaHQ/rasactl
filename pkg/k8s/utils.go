@@ -159,6 +159,9 @@ func (k *Kubernetes) GetNamespaces() ([]string, error) {
 	}
 
 	for _, namespace := range namespaces.Items {
+		if namespace.Status.Phase != v1.NamespaceActive {
+			continue
+		}
 		result = append(result, namespace.Name)
 	}
 

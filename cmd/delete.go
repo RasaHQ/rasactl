@@ -70,6 +70,11 @@ func deleteCmd() *cobra.Command {
 				}
 			}
 
+			// If there is only one deployment then set it as default
+			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+				return err
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

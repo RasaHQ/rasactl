@@ -9,19 +9,25 @@ import (
 func addStartUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*10, "time to wait for Rasa X to be ready")
 	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
-	cmd.Flags().BoolVar(&rasactlFlags.Start.UseEdgeRelease, "rasa-x-edge-release", false, "use the latest edge release of Rasa X")
-
 	cmd.PersistentFlags().StringVar(&rasactlFlags.StartUpgrade.ValuesFile, "values-file", "", "absolute path to the values file")
 }
 
 func addStartFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
+
 	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.ProjectPath, "project-path", "",
-		"absolute path to the project directory directory mounted in kind")
+		"absolute path to the project directory mounted in kind")
+
 	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Start.Project, "project", "p", false,
-		"use the current working directory as a project directory, the flag is ignored if the --project-path flag is used")
+		"use the current working directory as a project directory, the flag is ignored if --project-path is used")
+
 	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")
 	cmd.PersistentFlags().BoolVar(&rasactlFlags.Start.RasaXPasswordStdin, "rasa-x-password-stdin", false, "read the Rasa X password from stdin")
+	cmd.Flags().BoolVar(&rasactlFlags.Start.UseEdgeRelease, "rasa-x-edge-release", false, "use the latest edge release of Rasa X")
+	cmd.Flags().BoolVar(&rasactlFlags.Start.Create, "create", false,
+		"create a new deployment. If --project or --project-path is set, or there is no existing deployment,"+
+			" the flag is not required to create a new deployment")
+
 }
 
 func addUpgradeFlags(cmd *cobra.Command) {
