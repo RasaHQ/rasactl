@@ -45,7 +45,8 @@ func checkIfNamespaceExists() error {
 	return nil
 }
 
-func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) { //nolint:golint,gocyclo
+//nolint:golint,gocyclo
+func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 	isInRange := true
 	isMaxArgs := false
 	var ns string
