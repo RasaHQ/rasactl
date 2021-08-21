@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -9,7 +8,6 @@ import (
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 )
 
 // HandleSignals receives a signal from the channel and runs an action depends on the type of the signal.
@@ -31,26 +29,6 @@ func runOnClose(signal os.Signal) {
 	}
 }
 
-func setDeploymentIfOnlyOne(cmd *cobra.Command) error {
-	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
-	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
-	}
-
-	// If there is only one deployment then use it as the default
-	if (namespace == "" && len(namespaces) == 1) ||
-		(cmd.CalledAs() == "start" && len(namespaces) == 1 && !rasactlFlags.Start.Create) {
-
-		namespace = namespaces[0]
-		rasaCtl.Namespace = namespace
-		log.Info("Setting default namespace", "namespace", namespace)
-		if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func checkIfNamespaceExists() error {
 	if namespace == "" {
 		return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
@@ -67,9 +45,9 @@ func checkIfNamespaceExists() error {
 	return nil
 }
 
-func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
-	var isInRange bool = true
-	var isMaxArgs bool = false
+func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) { //nolint:golint,gocyclo
+	isInRange := true
+	isMaxArgs := false
 	var ns string
 	var currentNamespace string
 
@@ -88,7 +66,6 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 
 	// Check args range
 	if len(args) < minArgs || len(args) > maxArgs {
-		fmt.Println("dupa range")
 		isInRange = false
 	}
 
@@ -130,11 +107,13 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 		ns = currentNamespace
 	case numNamespaces >= 2 && len(args) == 0 && currentNamespace != "":
 		ns = currentNamespace
+	case numNamespaces >= 2 && (minArgs+1 == len(args)) && currentNamespace == "":
+		ns = args[0]
+		args = args[1:]
 	case numNamespaces >= 2 && len(args) == 0 && currentNamespace == "":
 		ns = ""
 	case numNamespaces >= 2 && !isMaxArgs && currentNamespace == "":
 		ns = ""
-		return nil, fmt.Errorf("can't find default deployment, you have to pass all arguments")
 	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "":
 		ns = currentNamespace
 	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs != len(args):
@@ -150,8 +129,6 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 	for i := 0; i < maxArgs-len(args); i++ {
 		args = append(args, "")
 	}
-
-	fmt.Printf("current namespace: %s, namespace: %s, args: %s, len: %d\n", currentNamespace, ns, args, len(args))
 
 	// The valid namespace is returned as the first element in the args array
 	namespace = ns
