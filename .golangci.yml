@@ -22,9 +22,6 @@ linters:
     - unused
     - varcheck
 
-  disable:
-    - errcheck
-
 run:
   timeout: 5m
 

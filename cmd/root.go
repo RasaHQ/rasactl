@@ -88,8 +88,11 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&rasactlFlags.Global.Debug, "debug", false, "enable debug output")
 	rootCmd.PersistentFlags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
 
+	//nolint:golint,errcheck
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	//nolint:golint,errcheck
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	//nolint:golint,errcheck
 	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
 }
 

@@ -107,6 +107,7 @@ func (h *Helm) setCacheDirectory(path string) {
 		return
 	}
 
+	//nolint:golint,errcheck
 	filepath.WalkDir(path, func(name string, info fs.DirEntry, err error) error {
 		var chmod fs.FileMode = 0766
 		if err == nil {
