@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"syscall"
 
+	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -25,81 +28,6 @@ func runOnClose(signal os.Signal) {
 		os.Exit(143)
 	default:
 		os.Exit(0)
-	}
-}
-
-func parseModelUpDownArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
-	var modelName, modelPath string
-	for {
-		switch {
-		case namespace == "":
-			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-		case len(args) == 1:
-			if args[0] == detectedNamespace {
-				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
-			} else if detectedNamespace != "" {
-				modelName = args[0]
-				return modelName, modelPath, detectedNamespace, nil
-			} else if detectedNamespace == "" && namespace != "" {
-				modelName = args[0]
-				return modelName, modelPath, namespace, nil
-			} else if detectedNamespace == "" {
-				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
-			}
-		case len(args) == 2 && detectedNamespace != "":
-			modelName = args[0]
-			modelPath = args[1]
-			return modelName, modelPath, detectedNamespace, nil
-		case len(args) == 2 && detectedNamespace == "" && args[0] != namespace:
-			modelName = args[0]
-			modelPath = args[1]
-			return modelName, modelPath, namespace, nil
-		case len(args) == 2 && detectedNamespace == "" && args[0] == namespace:
-			modelName = args[1]
-			return modelName, modelPath, namespace, nil
-		case len(args) == 3:
-			modelName = args[1]
-			modelPath = args[2]
-			return modelName, modelPath, namespace, nil
-		default:
-			return "", "", "", nil
-		}
-	}
-}
-
-func parseModelTagArgs(namespace, detectedNamespace string, args []string) (string, string, string, error) {
-	var modelName, modelTag string
-	for {
-		switch {
-		case namespace == "":
-			return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-		case len(args) == 2:
-			if args[0] == detectedNamespace {
-				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a model name"))
-			} else if detectedNamespace == "" && namespace != "" {
-				modelName = args[0]
-				modelTag = args[1]
-				return modelName, modelTag, namespace, nil
-			} else if detectedNamespace != "" {
-				modelName = args[0]
-				modelTag = args[1]
-				return modelName, modelTag, detectedNamespace, nil
-			} else if detectedNamespace == "" {
-				return "", "", "", errors.Errorf(errorPrint.Sprint("You have to pass a tag name"))
-			}
-		case len(args) == 2 && detectedNamespace != "":
-			modelName = args[0]
-			modelTag = args[1]
-			return modelName, modelTag, detectedNamespace, nil
-		case len(args) == 2 && detectedNamespace == "":
-			return "", "", "", errors.Errorf(errorPrint.Sprint("Not enough arguments"))
-		case len(args) == 3:
-			modelName = args[1]
-			modelTag = args[2]
-			return modelName, modelTag, namespace, nil
-		default:
-			return "", "", "", nil
-		}
 	}
 }
 
@@ -139,118 +67,99 @@ func checkIfNamespaceExists() error {
 	return nil
 }
 
-func parseNamespaceModelDeleteCommand(args []string) error {
+func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
+	var isInRange bool = true
+	var isMaxArgs bool = false
+	var ns string
+	var currentNamespace string
+
 	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
-	}
-	for {
-		switch {
-		case len(namespaces) == 1 && len(args) == 1 && args[0] != namespaces[0]:
-			namespace = namespaces[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		case len(namespaces) == 1 && args[0] != namespaces[0] && len(args) == 2:
-			namespace = args[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		default:
-			return nil
-		}
-	}
-}
-
-func parseNamespaceModelDownloadCommand(args []string) error {
-	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
-	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
-	}
-	for {
-		switch {
-		case len(namespaces) == 1 && len(args) == 1 && args[0] != namespaces[0]:
-			namespace = namespaces[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		case len(namespaces) == 1 && args[0] != namespaces[0] && len(args) == 2:
-			namespace = namespaces[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		case len(namespaces) == 1 && args[0] != namespaces[0] && len(args) == 3:
-			namespace = args[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		default:
-			return nil
-		}
-	}
-}
-
-func parseNamespaceModelUploadCommand(args []string) error {
-	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
-	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
+		return nil, errors.Errorf(errorPrint.Sprint(err))
 	}
 
-	for {
-		switch {
-		case len(namespaces) == 1 && len(args) == 1 && args[0] != namespaces[0]:
-			namespace = namespaces[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		case len(namespaces) == 1 && args[0] != namespaces[0] && len(args) == 2:
-			namespace = args[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		default:
-			return nil
-		}
+	numNamespaces := len(namespaces)
+	// Check if namespace is defined by .rasactl or the configuration file
+	if namespace != "" {
+		currentNamespace = namespace
+	} else if namespace == "" && numNamespaces == 1 {
+		currentNamespace = namespaces[0]
 	}
-}
 
-func parseNamespaceModelTagCommand(args []string) error {
-	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
-	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
+	// Check args range
+	if len(args) < minArgs || len(args) > maxArgs {
+		fmt.Println("dupa range")
+		isInRange = false
 	}
-	for {
-		switch {
-		case len(namespaces) == 1 && len(args) == 2 && args[0] != namespaces[0]:
-			namespace = namespaces[0]
-			rasaCtl.Namespace = namespaces[0]
-			if err := rasaCtl.SetNamespaceClients(namespaces[0]); err != nil {
-				return err
-			}
-			return nil
-		case len(namespaces) == 1 && args[0] != namespaces[0] && len(args) == 3:
-			namespace = args[0]
-			rasaCtl.Namespace = namespace
-			if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-				return err
-			}
-			return nil
-		default:
-			return nil
-		}
+
+	// Check if the number of args is equal to maxArgs
+	if len(args) == maxArgs {
+		isMaxArgs = true
 	}
+
+	// Check if a new deployment is requested
+	newDeployment := false
+	if rasactlFlags.Start.Create || rasactlFlags.Start.Project ||
+		rasactlFlags.Start.ProjectPath != "" {
+		newDeployment = true
+	}
+
+	switch {
+	case numNamespaces == 0 && len(args) == 1:
+		ns = args[0]
+	case numNamespaces == 0 && len(args) == 0:
+		ns = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
+	case numNamespaces >= 0 && len(args) == 0 && newDeployment:
+		ns = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
+	case numNamespaces == 1 && len(args) == 0 && !newDeployment:
+		// use default namespace, example: rasactl command
+		ns = currentNamespace
+	case numNamespaces == 1 && isInRange && isMaxArgs && minArgs != len(args):
+		// use default namespace, example: rasactl command arg1
+		// the number of args is equal to maxArgs
+		ns = args[0]
+		args = args[1:]
+	case numNamespaces == 1 && isInRange && isMaxArgs && minArgs == len(args):
+		// use default namespace, example: rasactl command arg1
+		// the number of args is equal to maxArgs
+		ns = args[0]
+		args = []string{}
+	case numNamespaces == 1 && isInRange && !isMaxArgs:
+		// use default namespace, example: rasactl command arg1
+		// the number of args is not equal to maxArgs
+		ns = currentNamespace
+	case numNamespaces >= 2 && len(args) == 0 && currentNamespace != "":
+		ns = currentNamespace
+	case numNamespaces >= 2 && len(args) == 0 && currentNamespace == "":
+		ns = ""
+	case numNamespaces >= 2 && !isMaxArgs && currentNamespace == "":
+		ns = ""
+		return nil, fmt.Errorf("can't find default deployment, you have to pass all arguments")
+	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "":
+		ns = currentNamespace
+	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs != len(args):
+		ns = args[0]
+		args = args[1:]
+	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs == len(args):
+		ns = args[0]
+		args = []string{}
+	}
+	args = append([]string{ns}, args...)
+
+	// extend index up to maxArgs
+	for i := 0; i < maxArgs-len(args); i++ {
+		args = append(args, "")
+	}
+
+	fmt.Printf("current namespace: %s, namespace: %s, args: %s, len: %d\n", currentNamespace, ns, args, len(args))
+
+	// The valid namespace is returned as the first element in the args array
+	namespace = ns
+	rasaCtl.Namespace = ns
+	log.Info("Setting namespace", "namespace", ns)
+	if err := rasaCtl.SetNamespaceClients(ns); err != nil {
+		return nil, err
+	}
+
+	return args, nil
 }

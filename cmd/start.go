@@ -18,11 +18,9 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
-	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
@@ -70,6 +68,7 @@ func startCmd() *cobra.Command {
 		Short:   "start a Rasa X deployment",
 		Long:    startDesc,
 		Example: templates.Examples(startExample),
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaCtl.HelmClient.Configuration = helmConfiguration
@@ -85,6 +84,10 @@ func startCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
 			// Get list of namespaces (deployments)
 			namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 			if err != nil {
@@ -93,24 +96,9 @@ func startCmd() *cobra.Command {
 
 			// Check if namespace exists only if the number of namespaces >= 2
 			// and a new deployment wasn't not requested
-			if len(namespaces) >= 2 && !rasactlFlags.Start.Create {
+			if len(namespaces) != 0 && !rasactlFlags.Start.Create &&
+				!rasactlFlags.Start.Project && rasactlFlags.Start.ProjectPath == "" {
 				if err := checkIfNamespaceExists(); err != nil {
-					return err
-				}
-			} else if len(namespaces) == 0 || rasactlFlags.Start.Create ||
-				rasactlFlags.Start.Project || rasactlFlags.Start.ProjectPath != "" {
-				if namespace == "" {
-					namespace = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
-					rasaCtl.Namespace = namespace
-					if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-						return err
-					}
-				}
-			}
-
-			if !rasactlFlags.Start.Project && rasactlFlags.Start.ProjectPath == "" {
-				// If there is only one deployment then set it as default
-				if err := setDeploymentIfOnlyOne(cmd); err != nil {
 					return err
 				}
 			}

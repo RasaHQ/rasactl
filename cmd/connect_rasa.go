@@ -56,6 +56,7 @@ func connectRasaCmd() *cobra.Command {
 		Use:     "rasa [DEPLOYMENT NAME]",
 		Short:   "run Rasa OSS server and connect it to the Rasa X deployment",
 		Long:    connectRasaDesc,
+		Args:    cobra.MaximumNArgs(1),
 		Example: templates.Examples(connectRasaExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
@@ -67,9 +68,8 @@ func connectRasaCmd() *cobra.Command {
 				)
 			}
 
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {

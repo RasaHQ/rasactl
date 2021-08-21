@@ -47,14 +47,15 @@ func deleteCmd() *cobra.Command {
 
 	// cmd represents the delete command
 	cmd := &cobra.Command{
-		Use:     "delete [DEPLOYMENT NAME]",
+		Use:     "delete DEPLOYMENT-NAME",
 		Short:   "delete Rasa X deployment",
 		Long:    templates.LongDesc(deleteDesc),
 		Example: templates.Examples(deleteExample),
+		Args:    cobra.ExactArgs(1),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return err
 			}
 
 			if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal &&
@@ -68,11 +69,6 @@ func deleteCmd() *cobra.Command {
 						),
 					)
 				}
-			}
-
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {

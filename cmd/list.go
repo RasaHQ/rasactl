@@ -44,9 +44,8 @@ func listCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
+			if _, err := parseArgs(args, 0, 0); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := rasaCtl.List(); err != nil {

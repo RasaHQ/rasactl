@@ -44,8 +44,9 @@ func statusCmd() *cobra.Command {
 		Short:   "show deployment status",
 		Long:    templates.LongDesc(statusDesc),
 		Example: templates.Examples(statusExample),
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
+			if _, err := parseArgs(args, 1, 1); err != nil {
 				return err
 			}
 

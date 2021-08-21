@@ -48,7 +48,12 @@ func upgradeCmd() *cobra.Command {
 		Short:   "upgrade Rasa X deployment",
 		Long:    upgradeDesc,
 		Example: templates.Examples(upgradeExample),
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

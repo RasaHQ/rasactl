@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
@@ -53,21 +52,15 @@ func modelTagCmd() *cobra.Command {
 		Example: templates.Examples(modelTagExample),
 		Args:    cobra.RangeArgs(2, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := parseNamespaceModelTagCommand(args); err != nil {
-				return err
+			args, err := parseArgs(args, 2, 3)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			detectedNamespace := utils.GetActiveNamespace(log)
-			modelName, modelTag, namespace, err := parseModelTagArgs(namespace, detectedNamespace, args)
+			modelName := args[1]
+			modelTag := args[2]
 			if err != nil {
 				return err
-			}
-
-			if detectedNamespace != "" {
-				rasaCtl.Namespace = namespace
-				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-					return err
-				}
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {

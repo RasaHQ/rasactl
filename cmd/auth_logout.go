@@ -42,11 +42,11 @@ func authLogoutCmd() *cobra.Command {
 		Use:     "logout [DEPLOYMENT NAME]",
 		Short:   "remove access credentials for an account",
 		Long:    authLogoutDesc,
+		Args:    cobra.MaximumNArgs(1),
 		Example: templates.Examples(authLogoutExample),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {

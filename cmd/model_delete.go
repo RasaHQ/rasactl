@@ -45,24 +45,16 @@ func modelDeleteCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := parseNamespaceModelDeleteCommand(args); err != nil {
-				return err
+			args, err := parseArgs(args, 1, 2)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
 
-			var modelName string
-			if namespace == "" {
-				return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
-			} else if len(args) == 1 {
-				modelName = args[0]
-			} else if len(args) == 2 {
-				modelName = args[1]
-			}
-
-			rasactlFlags.Model.Delete.Name = modelName
+			rasactlFlags.Model.Delete.Name = args[1]
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {

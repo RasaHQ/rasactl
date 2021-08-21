@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
@@ -49,28 +48,17 @@ func modelDownloadCmd() *cobra.Command {
 		Example: templates.Examples(modelDownloadExample),
 		Args:    cobra.RangeArgs(1, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := parseNamespaceModelDownloadCommand(args); err != nil {
-				return err
-			}
-
-			detectedNamespace := utils.GetActiveNamespace(log)
-			modelName, modelPath, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
+			args, err := parseArgs(args, 1, 3)
 			if err != nil {
-				return err
-			}
-			if detectedNamespace != "" {
-				rasaCtl.Namespace = namespace
-				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-					return err
-				}
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
 
-			rasactlFlags.Model.Download.Name = modelName
-			rasactlFlags.Model.Download.FilePath = modelPath
+			rasactlFlags.Model.Download.Name = args[1]
+			rasactlFlags.Model.Download.FilePath = args[2]
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
@@ -84,6 +72,7 @@ func modelDownloadCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			// Check if a Rasa X deployment is running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {

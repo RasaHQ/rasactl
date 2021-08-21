@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
@@ -46,24 +45,18 @@ func modelUploadCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"up"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if err := parseNamespaceModelUploadCommand(args); err != nil {
-				return err
+			args, err := parseArgs(args, 1, 2)
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
 
-			detectedNamespace := utils.GetActiveNamespace(log)
-			modelFile, _, namespace, err := parseModelUpDownArgs(namespace, detectedNamespace, args)
+			modelFile := args[1]
 			if err != nil {
 				return err
-			}
-			if detectedNamespace != "" {
-				rasaCtl.Namespace = namespace
-				if err := rasaCtl.SetNamespaceClients(namespace); err != nil {
-					return err
-				}
 			}
 
 			rasactlFlags.Model.Upload.File = modelFile
@@ -76,10 +69,10 @@ func modelUploadCmd() *cobra.Command {
 				ReleaseName: string(stateData[types.StateHelmReleaseName]),
 			}
 			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
-
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			// Check if a Rasa X deployment is running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {

@@ -47,7 +47,7 @@ func addCmd() *cobra.Command {
 		Short:   "add existing Rasa X deployment",
 		Long:    addDesc,
 		Example: templates.Examples(addExample),
-		Args:    cobra.MinimumNArgs(1),
+		Args:    cobra.ExactArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
 			rasaCtl.HelmClient.Configuration = helmConfiguration
@@ -55,6 +55,10 @@ func addCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}

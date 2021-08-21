@@ -36,11 +36,11 @@ func modelListCmd() *cobra.Command {
 		Use:     "list [DEPLOYMENT NAME]",
 		Short:   "list models stored in Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelListDesc),
+		Args:    cobra.MaximumNArgs(1),
 		Aliases: []string{"ls"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {

@@ -55,14 +55,9 @@ var rootCmd = &cobra.Command{
 
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 
-		if len(args) != 0 {
-			namespace = args[0]
-		}
-
 		rasaCtl = &rasactl.RasaCtl{
-			Log:       log,
-			Namespace: namespace,
-			Flags:     rasactlFlags,
+			Log:   log,
+			Flags: rasactlFlags,
 		}
 
 		if !strings.Contains(cmd.CommandPath(), "help") && !strings.Contains(cmd.CommandPath(), "completion") {

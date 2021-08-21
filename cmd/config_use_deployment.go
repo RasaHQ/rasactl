@@ -40,9 +40,8 @@ func configUseDeploymentCmd() *cobra.Command {
 		Example: templates.Examples(configUseDeploymentExample),
 		Args:    cobra.ExactArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// If there is only one deployment then set it as default
-			if err := setDeploymentIfOnlyOne(cmd); err != nil {
-				return err
+			if _, err := parseArgs(args, 1, 1); err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return checkIfNamespaceExists()
