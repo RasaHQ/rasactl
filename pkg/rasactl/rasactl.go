@@ -33,7 +33,7 @@ import (
 // RasaCtl defines the rasactl client.
 type RasaCtl struct {
 	// KubernetesClient defines the Kubernetes client.
-	KubernetesClient *k8s.Kubernetes
+	KubernetesClient k8s.KubernetesClient
 
 	// HelmClient defines the helm client.
 	HelmClient *helm.Helm
@@ -72,15 +72,18 @@ func (r *RasaCtl) InitClients() error {
 	cloudProvider.New()
 	r.CloudProvider = cloudProvider
 
-	r.KubernetesClient = &k8s.Kubernetes{
-		Namespace:     r.Namespace,
-		Log:           r.Log,
-		CloudProvider: r.CloudProvider,
-		Flags:         r.Flags,
-	}
-	if err := r.KubernetesClient.New(); err != nil {
+	kubernetesClient, err := k8s.New(
+		&k8s.Kubernetes{
+			Namespace:     r.Namespace,
+			Log:           r.Log,
+			CloudProvider: r.CloudProvider,
+			Flags:         r.Flags,
+		},
+	)
+	if err != nil {
 		return err
 	}
+	r.KubernetesClient = kubernetesClient
 
 	r.HelmClient = &helm.Helm{
 		Log:           r.Log,
