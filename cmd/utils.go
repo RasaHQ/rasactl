@@ -147,6 +147,7 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 	// The valid namespace is returned as the first element in the args array
 
 	namespace = ns
+	rasaCtl.Namespace = namespace
 	log.Info("Setting namespace", "namespace", ns)
 	if err := rasaCtl.SetNamespaceClients(ns); err != nil {
 		return nil, err

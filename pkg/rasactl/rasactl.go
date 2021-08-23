@@ -120,7 +120,6 @@ func (r *RasaCtl) InitClients() error {
 // SetNamespaceClients sets namespace for initialized clients.
 func (r *RasaCtl) SetNamespaceClients(namespace string) error {
 	r.Log.V(1).Info("Setting namespace for clients", "namespace", namespace)
-	r.Namespace = namespace
 	r.KubernetesClient.SetNamespace(namespace)
 	r.DockerClient.SetNamespace(namespace)
 
