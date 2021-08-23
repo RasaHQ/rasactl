@@ -76,7 +76,7 @@ func (r *RasaCtl) Delete() error {
 		}
 	}
 
-	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
+	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaCtlLocalDomain)
 		err := utils.DeleteHostToEtcHosts(host)
 		if err != nil && !force {

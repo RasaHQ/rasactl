@@ -87,7 +87,7 @@ func connectRasaCmd() *cobra.Command {
 				Timeout:     time.Minute * 10,
 			}
 
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {

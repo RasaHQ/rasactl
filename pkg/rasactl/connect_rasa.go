@@ -88,7 +88,7 @@ func (r *RasaCtl) ConnectRasa() error {
 	}
 
 	r.Log.Info("Connecting Rasa Server to Rasa X")
-	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal {
+	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal {
 		r.HelmClient.Values = utils.MergeMaps(helm.ValuesRabbitMQNodePort(),
 			helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX(), r.HelmClient.Values)
 		r.Log.V(1).Info("Merging values", "result", r.HelmClient.Values)

@@ -13,6 +13,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-logr/logr v0.4.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.1.2
 	github.com/imdario/mergo v0.3.12
 	github.com/kyokomi/emoji v2.2.4+incompatible

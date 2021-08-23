@@ -33,7 +33,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-type KubernetesClient interface {
+type KubernetesInterface interface {
 	GetRasaXURL() (string, error)
 	GetRasaXToken() (string, error)
 	CreateNamespace() error
@@ -62,6 +62,11 @@ type KubernetesClient interface {
 	PodStatus(conditions []v1.PodCondition) string
 	CreateVolume(hostPath string) (string, error)
 	DeleteVolume() error
+	GetBackendType() types.KubernetesBackendType
+	SetNamespace(namespace string)
+	SetHelmValues(values map[string]interface{})
+	SetHelmReleaseName(release string)
+	GetCloudProvider() *cloud.Provider
 }
 
 // Kubernetes represents Kubernetes client.
@@ -99,7 +104,7 @@ type HelmSpec struct {
 }
 
 // New initializes a new Kubernetes client.
-func New(client *Kubernetes) (KubernetesClient, error) {
+func New(client *Kubernetes) (KubernetesInterface, error) {
 	client.Log.Info("Initializing Kubernetes client")
 	client.kubeconfig = viper.GetString("kubeconfig")
 	config, err := clientcmd.BuildConfigFromFlags("", client.kubeconfig)
@@ -117,6 +122,31 @@ func New(client *Kubernetes) (KubernetesClient, error) {
 	client.BackendType = client.detectBackend()
 
 	return client, nil
+}
+
+// GetBackendType returns the backend type.
+func (k *Kubernetes) GetBackendType() types.KubernetesBackendType {
+	return k.BackendType
+}
+
+// SetNamespace sets Namespace field.
+func (k *Kubernetes) SetNamespace(namespace string) {
+	k.Namespace = namespace
+}
+
+// SetHelmValues sets helm values.
+func (k *Kubernetes) SetHelmValues(values map[string]interface{}) {
+	k.Helm.Values = values
+}
+
+// SetHelmReleaseName sets helm release name.
+func (k *Kubernetes) SetHelmReleaseName(release string) {
+	k.Helm.ReleaseName = release
+}
+
+// GetCloudProvider returns CloudProvider field.
+func (k *Kubernetes) GetCloudProvider() *cloud.Provider {
+	return k.CloudProvider
 }
 
 // GetRasaXURL returns URL for a given deployment.

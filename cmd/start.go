@@ -70,7 +70,7 @@ func startCmd() *cobra.Command {
 		Example: templates.Examples(startExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			if rasactlFlags.Start.RasaXPasswordStdin {
@@ -109,8 +109,8 @@ func startCmd() *cobra.Command {
 			}
 
 			if !isDeployed {
-				if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal &&
-					rasaCtl.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
+				if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
+					rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
 					if os.Getuid() != 0 {
 						return errors.Errorf(
 							warnPrint.Sprintf(

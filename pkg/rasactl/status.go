@@ -41,7 +41,7 @@ func (r *RasaCtl) Status() error {
 	r.HelmClient.Configuration = &types.HelmConfigurationSpec{
 		ReleaseName: string(stateData[types.StateHelmReleaseName]),
 	}
-	r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+	r.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 	d = append(d, []string{"Name:", r.Namespace})
 	d = append(d, []string{"Status:", statusProject})

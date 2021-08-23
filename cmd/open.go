@@ -38,7 +38,7 @@ func openCmd() *cobra.Command {
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
-			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			return nil

@@ -54,7 +54,7 @@ func modelListCmd() *cobra.Command {
 			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
 				ReleaseName: string(stateData[types.StateHelmReleaseName]),
 			}
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil
 		},

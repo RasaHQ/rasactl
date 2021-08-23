@@ -33,7 +33,7 @@ import (
 // RasaCtl defines the rasactl client.
 type RasaCtl struct {
 	// KubernetesClient defines the Kubernetes client.
-	KubernetesClient k8s.KubernetesClient
+	KubernetesClient k8s.KubernetesInterface
 
 	// HelmClient defines the helm client.
 	HelmClient *helm.Helm
@@ -95,7 +95,7 @@ func (r *RasaCtl) InitClients() error {
 	if err := r.HelmClient.New(); err != nil {
 		return err
 	}
-	r.HelmClient.KubernetesBackendType = r.KubernetesClient.BackendType
+	r.HelmClient.KubernetesBackendType = r.KubernetesClient.GetBackendType()
 
 	r.DockerClient = &docker.Docker{
 		Namespace: r.Namespace,
@@ -107,14 +107,14 @@ func (r *RasaCtl) InitClients() error {
 		return err
 	}
 
-	err := r.GetKindControlPlaneNodeInfo()
+	err = r.GetKindControlPlaneNodeInfo()
 	return err
 }
 
 // SetNamespaceClients sets namespace for initialized clients.
 func (r *RasaCtl) SetNamespaceClients(namespace string) error {
 	r.Log.V(1).Info("Setting namespace for clients", "namespace", namespace)
-	r.KubernetesClient.Namespace = namespace
+	r.KubernetesClient.SetNamespace(namespace)
 	r.DockerClient.Namespace = namespace
 
 	err := r.HelmClient.SetNamespace(namespace)
@@ -236,7 +236,7 @@ func (r *RasaCtl) GetAllHelmValues() error {
 	if err != nil {
 		return err
 	}
-	r.KubernetesClient.Helm.Values = allValues
+	r.KubernetesClient.SetHelmValues(allValues)
 	r.HelmClient.Values = allValues
 
 	return nil

@@ -49,7 +49,7 @@ func addCmd() *cobra.Command {
 		Example: templates.Examples(addExample),
 		Args:    cobra.ExactArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			rasaCtl.KubernetesClient.Helm.ReleaseName = helmConfiguration.ReleaseName
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 
 			return nil

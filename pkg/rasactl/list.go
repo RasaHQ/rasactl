@@ -48,7 +48,7 @@ func (r *RasaCtl) List() error {
 		r.HelmClient.Configuration = &types.HelmConfigurationSpec{
 			ReleaseName: string(stateData[types.StateHelmReleaseName]),
 		}
-		r.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+		r.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 		isRunning, err := r.KubernetesClient.IsRasaXRunning()
 		if err != nil {

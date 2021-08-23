@@ -64,7 +64,7 @@ func upgradeCmd() *cobra.Command {
 			}
 			rasaCtl.HelmClient.Configuration = helmConfiguration
 			rasaCtl.HelmClient.Configuration.ReleaseName = string(stateData[types.StateHelmReleaseName])
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil
 		},

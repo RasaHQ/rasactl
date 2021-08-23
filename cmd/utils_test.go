@@ -3,38 +3,33 @@ package cmd
 import (
 	"testing"
 
+	// mock
+
+	"github.com/RasaHQ/rasactl/pkg/k8s/fake"
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
+	"github.com/golang/mock/gomock"
 )
 
-type mockKubernetesClient interface {
-}
-
 func TestParseArgs(t *testing.T) {
-	t.Parallel()
-
-	var k8sClient mockKubernetesClient
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
 	initLog()
 	initConfig()
-	namespace = ""
+	getNamespace()
+
+	m := fake.NewMockKubernetesInterface(ctrl)
+	m.EXPECT().GetNamespaces().Return([]string{}, nil)
+	m.EXPECT().SetNamespace(gomock.Any())
 
 	rasaCtl = &rasactl.RasaCtl{
 		Log:              log,
 		Flags:            rasactlFlags,
-		KubernetesClient: &k8sClient,
+		KubernetesClient: m,
 	}
 
-	// rasactl command
 	args := []string{}
+	namespace = ""
 	parseArgs(args, 0, 0)
-
-	// rasactl command [deployment]
-	args = []string{}
-	namespace = "ns-test"
-	parseArgs(args, 1, 1)
-
-	// rasactl command arg1
-	args = []string{"args"}
-	parseArgs(args, 1, 1)
 
 }

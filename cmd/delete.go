@@ -58,8 +58,8 @@ func deleteCmd() *cobra.Command {
 				return err
 			}
 
-			if rasaCtl.KubernetesClient.BackendType == types.KubernetesBackendLocal &&
-				rasaCtl.KubernetesClient.CloudProvider.Name == types.CloudProviderUnknown {
+			if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
+				rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
 				if os.Getuid() != 0 {
 					return errors.Errorf(
 						warnPrint.Sprintf(
@@ -82,7 +82,7 @@ func deleteCmd() *cobra.Command {
 			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
 				ReleaseName: string(stateData[types.StateHelmReleaseName]),
 			}
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil
 		},
