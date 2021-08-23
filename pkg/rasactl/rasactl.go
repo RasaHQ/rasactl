@@ -33,16 +33,16 @@ import (
 // RasaCtl defines the rasactl client.
 type RasaCtl struct {
 	// KubernetesClient defines the Kubernetes client.
-	KubernetesClient *k8s.Kubernetes
+	KubernetesClient k8s.KubernetesInterface
 
 	// HelmClient defines the helm client.
-	HelmClient *helm.Helm
+	HelmClient helm.Interface
 
 	// RasaXClient defines the Rasa X client.
 	RasaXClient *rasax.RasaX
 
 	// DockerClient defines the Docker client.
-	DockerClient *docker.Docker
+	DockerClient docker.Interface
 
 	// Log defines logger.
 	Log logr.Logger
@@ -72,47 +72,56 @@ func (r *RasaCtl) InitClients() error {
 	cloudProvider.New()
 	r.CloudProvider = cloudProvider
 
-	r.KubernetesClient = &k8s.Kubernetes{
-		Namespace:     r.Namespace,
-		Log:           r.Log,
-		CloudProvider: r.CloudProvider,
-		Flags:         r.Flags,
-	}
-	if err := r.KubernetesClient.New(); err != nil {
+	kubernetesClient, err := k8s.New(
+		&k8s.Kubernetes{
+			Namespace:     r.Namespace,
+			Log:           r.Log,
+			CloudProvider: r.CloudProvider,
+			Flags:         r.Flags,
+		},
+	)
+	if err != nil {
 		return err
 	}
+	r.KubernetesClient = kubernetesClient
 
-	r.HelmClient = &helm.Helm{
-		Log:           r.Log,
-		Namespace:     r.Namespace,
-		Spinner:       r.Spinner,
-		CloudProvider: r.CloudProvider,
-		Flags:         r.Flags,
-	}
-	if err := r.HelmClient.New(); err != nil {
+	helmClient, err := helm.New(
+		&helm.Helm{
+			Log:           r.Log,
+			Namespace:     r.Namespace,
+			Spinner:       r.Spinner,
+			CloudProvider: r.CloudProvider,
+			Flags:         r.Flags,
+		},
+	)
+	if err != nil {
 		return err
 	}
-	r.HelmClient.KubernetesBackendType = r.KubernetesClient.BackendType
+	helmClient.SetKubernetesBackendType(r.KubernetesClient.GetBackendType())
+	r.HelmClient = helmClient
 
-	r.DockerClient = &docker.Docker{
-		Namespace: r.Namespace,
-		Log:       r.Log,
-		Spinner:   r.Spinner,
-		Flags:     r.Flags,
-	}
-	if err := r.DockerClient.New(); err != nil {
+	dockerClient, err := docker.New(
+		&docker.Docker{
+			Namespace: r.Namespace,
+			Log:       r.Log,
+			Spinner:   r.Spinner,
+			Flags:     r.Flags,
+		},
+	)
+	if err != nil {
 		return err
 	}
+	r.DockerClient = dockerClient
 
-	err := r.GetKindControlPlaneNodeInfo()
+	err = r.GetKindControlPlaneNodeInfo()
 	return err
 }
 
 // SetNamespaceClients sets namespace for initialized clients.
 func (r *RasaCtl) SetNamespaceClients(namespace string) error {
 	r.Log.V(1).Info("Setting namespace for clients", "namespace", namespace)
-	r.KubernetesClient.Namespace = namespace
-	r.DockerClient.Namespace = namespace
+	r.KubernetesClient.SetNamespace(namespace)
+	r.DockerClient.SetNamespace(namespace)
 
 	err := r.HelmClient.SetNamespace(namespace)
 	return err
@@ -145,7 +154,7 @@ func (r *RasaCtl) startOrInstall() error {
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
 		if projectPath != "" || r.Flags.Start.Project {
-			if r.DockerClient.Kind.ControlPlaneHost != "" {
+			if r.DockerClient.GetKind().ControlPlaneHost != "" {
 				if !r.Flags.Start.Project {
 					// check if the project path exists
 					if path, err := os.Stat(projectPath); err != nil {
@@ -156,14 +165,14 @@ func (r *RasaCtl) startOrInstall() error {
 						}
 						return err
 					}
-					r.DockerClient.ProjectPath = projectPath
+					r.DockerClient.SetProjectPath(projectPath)
 				} else {
 					// use a current working directory
 					wd, err := os.Getwd()
 					if err != nil {
 						return err
 					}
-					r.DockerClient.ProjectPath = wd
+					r.DockerClient.SetProjectPath(wd)
 					projectPath = wd
 				}
 
@@ -175,7 +184,7 @@ func (r *RasaCtl) startOrInstall() error {
 				if err != nil {
 					return err
 				}
-				r.HelmClient.PVCName = volume
+				r.HelmClient.SetPersistanceVolumeClaimName(volume)
 
 			} else {
 				return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
@@ -205,7 +214,7 @@ func (r *RasaCtl) startOrInstall() error {
 		r.Log.Info(msg)
 
 		if string(state[types.StateProjectPath]) != "" {
-			if r.DockerClient.Kind.ControlPlaneHost != "" {
+			if r.DockerClient.GetKind().ControlPlaneHost != "" {
 				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
 				if err := r.DockerClient.StartKindNode(nodeName); err != nil {
 					return err
@@ -213,7 +222,9 @@ func (r *RasaCtl) startOrInstall() error {
 			}
 		}
 		// Set configuration used for starting a stopped project.
-		r.HelmClient.Configuration.StartProject = true
+		helmConfig := r.HelmClient.GetConfiguration()
+		helmConfig.StartProject = true
+		r.HelmClient.SetConfiguration(helmConfig)
 
 		if err := r.HelmClient.Upgrade(); err != nil {
 			return err
@@ -229,12 +240,12 @@ func (r *RasaCtl) startOrInstall() error {
 // GetAllHelmValues gets all evaluated values for a given helm release,
 // and stores it in KubernetesClient.Helm.Values, HelmClient.Values.
 func (r *RasaCtl) GetAllHelmValues() error {
-	allValues, err := r.HelmClient.GetValues()
+	allValues, err := r.HelmClient.GetAllValues()
 	if err != nil {
 		return err
 	}
-	r.KubernetesClient.Helm.Values = allValues
-	r.HelmClient.Values = allValues
+	r.KubernetesClient.SetHelmValues(allValues)
+	r.HelmClient.SetValues(allValues)
 
 	return nil
 }
@@ -268,7 +279,7 @@ func (r *RasaCtl) initRasaXClient() {
 	r.RasaXClient = &rasax.RasaX{
 		Log:            r.Log,
 		SpinnerMessage: r.Spinner,
-		WaitTimeout:    r.HelmClient.Configuration.Timeout,
+		WaitTimeout:    r.HelmClient.GetConfiguration().Timeout,
 		Flags:          r.Flags,
 	}
 	r.RasaXClient.New()

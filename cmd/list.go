@@ -44,7 +44,7 @@ func listCmd() *cobra.Command {
 		Aliases: []string{"ls"},
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if _, err := parseArgs(args, 0, 0); err != nil {
+			if _, err := parseArgs(namespace, args, 0, 0, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

@@ -68,7 +68,7 @@ func connectRasaCmd() *cobra.Command {
 				)
 			}
 
-			if _, err := parseArgs(args, 1, 1); err != nil {
+			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
@@ -81,13 +81,15 @@ func connectRasaCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateHelmReleaseName]),
-				ReuseValues: true,
-				Timeout:     time.Minute * 10,
-			}
+			rasaCtl.HelmClient.SetConfiguration(
+				&types.HelmConfigurationSpec{
+					ReleaseName: string(stateData[types.StateHelmReleaseName]),
+					ReuseValues: true,
+					Timeout:     time.Minute * 10,
+				},
+			)
 
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {

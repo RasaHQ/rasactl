@@ -46,7 +46,7 @@ func statusCmd() *cobra.Command {
 		Example: templates.Examples(statusExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if _, err := parseArgs(args, 1, 1); err != nil {
+			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return err
 			}
 

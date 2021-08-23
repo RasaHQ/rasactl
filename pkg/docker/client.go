@@ -41,10 +41,21 @@ import (
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha4"
 )
 
+type Interface interface {
+	CreateKindNode(hostname string) (container.ContainerCreateCreatedBody, error)
+	StopKindNode(hostname string) error
+	StartKindNode(hostname string) error
+	DeleteKindNode(hostname string) error
+	SetNamespace(name string)
+	GetKind() KindSpec
+	SetKind(kind KindSpec)
+	SetProjectPath(path string)
+}
+
 // Docker represents a Docker client.
 type Docker struct {
 	Client       *client.Client
-	ctx          context.Context
+	Ctx          context.Context
 	Namespace    string
 	Log          logr.Logger
 	Spinner      *status.SpinnerMessage
@@ -67,16 +78,16 @@ const (
 )
 
 // New initializes Docker client.
-func (d *Docker) New() error {
-	d.Log.Info("Initializing Docker client")
-	d.ctx = context.Background()
+func New(c *Docker) (Interface, error) {
+	c.Log.Info("Initializing Docker client")
+	c.Ctx = context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	d.Client = cli
+	c.Client = cli
 
-	return nil
+	return c, nil
 }
 
 func (d *Docker) prepareKindJoinConfiguration() (string, error) {
@@ -157,7 +168,7 @@ func (d *Docker) copyJoinConfigurationToContainer(container container.ContainerC
 	}
 	defer preparedArchive.Close()
 
-	if err := d.Client.CopyToContainer(d.ctx,
+	if err := d.Client.CopyToContainer(d.Ctx,
 		container.ID, dstDir, preparedArchive, types.CopyToContainerOptions{}); err != nil {
 		return err
 	}
@@ -170,7 +181,7 @@ func (d *Docker) copyJoinConfigurationToContainer(container container.ContainerC
 
 func (d *Docker) getKubeadmToken() (string, error) {
 	token := new(bytes.Buffer)
-	execSpec, err := d.Client.ContainerExecCreate(d.ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
+	execSpec, err := d.Client.ContainerExecCreate(d.Ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
 		WorkingDir:   "/",
 		Cmd:          []string{"kubeadm", "token", "create", "--ttl", "180s"},
 		AttachStdout: true,
@@ -179,7 +190,7 @@ func (d *Docker) getKubeadmToken() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	at, err := d.Client.ContainerExecAttach(d.ctx, execSpec.ID, types.ExecStartCheck{})
+	at, err := d.Client.ContainerExecAttach(d.Ctx, execSpec.ID, types.ExecStartCheck{})
 	if err != nil {
 		return "", err
 	}
@@ -196,7 +207,7 @@ func (d *Docker) getKubeadmToken() (string, error) {
 }
 
 func (d *Docker) deleteKubeadmToken() error {
-	execSpec, err := d.Client.ContainerExecCreate(d.ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
+	execSpec, err := d.Client.ContainerExecCreate(d.Ctx, d.Kind.ControlPlaneHost, types.ExecConfig{
 		WorkingDir:   "/",
 		Cmd:          []string{"kubeadm", "token", "delete", d.kubeadmToken},
 		AttachStdout: true,
@@ -205,7 +216,7 @@ func (d *Docker) deleteKubeadmToken() error {
 	if err != nil {
 		return err
 	}
-	if err := d.Client.ContainerExecStart(d.ctx, execSpec.ID, types.ExecStartCheck{}); err != nil {
+	if err := d.Client.ContainerExecStart(d.Ctx, execSpec.ID, types.ExecStartCheck{}); err != nil {
 		return err
 	}
 
@@ -215,7 +226,7 @@ func (d *Docker) deleteKubeadmToken() error {
 }
 
 func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCreateCreatedBody) error {
-	execSpec, err := d.Client.ContainerExecCreate(d.ctx, container.ID, types.ExecConfig{
+	execSpec, err := d.Client.ContainerExecCreate(d.Ctx, container.ID, types.ExecConfig{
 		WorkingDir:   "/",
 		Cmd:          []string{"kubeadm", "join", "--config", "config.yaml", "--skip-phases=preflight", "-v", "6"},
 		AttachStdout: true,
@@ -224,7 +235,7 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 	if err != nil {
 		return err
 	}
-	cmdReader, err := d.Client.ContainerExecAttach(d.ctx, execSpec.ID, types.ExecStartCheck{})
+	cmdReader, err := d.Client.ContainerExecAttach(d.Ctx, execSpec.ID, types.ExecStartCheck{})
 	if err != nil {
 		return err
 	}
@@ -243,7 +254,7 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 
 	d.Spinner.Message("Waiting for kind node to join to the cluster")
 	for {
-		status, err := d.Client.ContainerExecInspect(d.ctx, execSpec.ID)
+		status, err := d.Client.ContainerExecInspect(d.Ctx, execSpec.ID)
 		if err != nil {
 			panic(err)
 		}
@@ -262,7 +273,7 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 
 func (d *Docker) getKindNetwork() (string, error) {
 
-	inspect, err := d.Client.ContainerInspect(d.ctx, d.Kind.ControlPlaneHost)
+	inspect, err := d.Client.ContainerInspect(d.Ctx, d.Kind.ControlPlaneHost)
 	if err != nil {
 		return "", err
 	}
@@ -275,7 +286,7 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 	kindImage := fmt.Sprintf("%s%s", kindImagePrefix, d.Kind.Version)
 
 	d.Log.Info("Pulling image", "image", kindImage)
-	imagePull, err := d.Client.ImagePull(d.ctx, kindImage, types.ImagePullOptions{})
+	imagePull, err := d.Client.ImagePull(d.Ctx, kindImage, types.ImagePullOptions{})
 	if err != nil {
 		return container.ContainerCreateCreatedBody{}, err
 	}
@@ -329,7 +340,7 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		return container.ContainerCreateCreatedBody{}, err
 	}
 
-	resp, err := d.Client.ContainerCreate(d.ctx,
+	resp, err := d.Client.ContainerCreate(d.Ctx,
 		&container.Config{
 			Image:    kindImage,
 			Tty:      false,
@@ -347,7 +358,7 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		return resp, err
 	}
 
-	if err := d.Client.ContainerStart(d.ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	if err := d.Client.ContainerStart(d.Ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return resp, err
 	}
 
@@ -370,21 +381,41 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 // it is forcefully terminated (killed).
 func (d *Docker) StopKindNode(hostname string) error {
 	timeout := time.Minute * 1
-	err := d.Client.ContainerStop(d.ctx, hostname, &timeout)
+	err := d.Client.ContainerStop(d.Ctx, hostname, &timeout)
 	return err
 }
 
 // StartKindNode starts a kind node that was previously stopped.
 func (d *Docker) StartKindNode(hostname string) error {
-	err := d.Client.ContainerStart(d.ctx, hostname, types.ContainerStartOptions{})
+	err := d.Client.ContainerStart(d.Ctx, hostname, types.ContainerStartOptions{})
 	return err
 }
 
 // DeleteKindNode deletes a kind node.
 func (d *Docker) DeleteKindNode(hostname string) error {
-	err := d.Client.ContainerRemove(d.ctx, hostname, types.ContainerRemoveOptions{
+	err := d.Client.ContainerRemove(d.Ctx, hostname, types.ContainerRemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 	})
 	return err
+}
+
+// SetNamespace sets the Docker.Namespace field.
+func (d *Docker) SetNamespace(name string) {
+	d.Namespace = name
+}
+
+// GetKind return the Docker.Kind field.
+func (d *Docker) GetKind() KindSpec {
+	return d.Kind
+}
+
+// SetKind sets the Docker.Kind field.
+func (d *Docker) SetKind(kind KindSpec) {
+	d.Kind = kind
+}
+
+// SetProjectPath sets the Docker.ProjectPath field.
+func (d *Docker) SetProjectPath(path string) {
+	d.ProjectPath = path
 }

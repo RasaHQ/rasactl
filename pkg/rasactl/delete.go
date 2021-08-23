@@ -59,7 +59,7 @@ func (r *RasaCtl) Delete() error {
 		}
 	}
 
-	if (r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateProjectPath]) != "") || force {
+	if (r.DockerClient.GetKind().ControlPlaneHost != "" && string(state[types.StateProjectPath]) != "") || force {
 		r.Spinner.Message("Deleting persistent volume")
 		if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
 			return err
@@ -76,7 +76,7 @@ func (r *RasaCtl) Delete() error {
 		}
 	}
 
-	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
+	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaCtlLocalDomain)
 		err := utils.DeleteHostToEtcHosts(host)
 		if err != nil && !force {

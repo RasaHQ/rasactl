@@ -33,6 +33,42 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+type KubernetesInterface interface {
+	GetRasaXURL() (string, error)
+	GetRasaXToken() (string, error)
+	CreateNamespace() error
+	IsRasaXRunning() (bool, error)
+	GetPods() (*v1.PodList, error)
+	DeleteRasaXPods() error
+	GetPostgreSQLSvcNodePort() (int32, error)
+	GetRabbitMqSvcNodePort() (int32, error)
+	SaveSecretWithState(projectPath string) error
+	UpdateRasaXConfig(token string) error
+	ScaleDown() error
+	ScaleUp() error
+	UpdateSecretWithState(data ...interface{}) error
+	ReadSecretWithState() (map[string][]byte, error)
+	DeleteSecretWithState() error
+	GetPostgreSQLCreds() (string, string, error)
+	GetRabbitMqCreds() (string, string, error)
+	IsNamespaceExist(namespace string) (bool, error)
+	GetKindControlPlaneNode() (v1.Node, error)
+	IsNamespaceManageable() bool
+	AddNamespaceLabel() error
+	DeleteNamespaceLabel() error
+	DeleteNode(node string) error
+	DeleteNamespace() error
+	GetNamespaces() ([]string, error)
+	PodStatus(conditions []v1.PodCondition) string
+	CreateVolume(hostPath string) (string, error)
+	DeleteVolume() error
+	GetBackendType() types.KubernetesBackendType
+	SetNamespace(namespace string)
+	SetHelmValues(values map[string]interface{})
+	SetHelmReleaseName(release string)
+	GetCloudProvider() *cloud.Provider
+}
+
 // Kubernetes represents Kubernetes client.
 type Kubernetes struct {
 	kubeconfig string
@@ -68,24 +104,49 @@ type HelmSpec struct {
 }
 
 // New initializes a new Kubernetes client.
-func (k *Kubernetes) New() error {
-	k.Log.Info("Initializing Kubernetes client")
-	k.kubeconfig = viper.GetString("kubeconfig")
-	config, err := clientcmd.BuildConfigFromFlags("", k.kubeconfig)
+func New(client *Kubernetes) (KubernetesInterface, error) {
+	client.Log.Info("Initializing Kubernetes client")
+	client.kubeconfig = viper.GetString("kubeconfig")
+	config, err := clientcmd.BuildConfigFromFlags("", client.kubeconfig)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// Create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	k.clientset = clientset
+	client.clientset = clientset
 
-	k.BackendType = k.detectBackend()
+	client.BackendType = client.detectBackend()
 
-	return nil
+	return client, nil
+}
+
+// GetBackendType returns the backend type.
+func (k *Kubernetes) GetBackendType() types.KubernetesBackendType {
+	return k.BackendType
+}
+
+// SetNamespace sets Namespace field.
+func (k *Kubernetes) SetNamespace(namespace string) {
+	k.Namespace = namespace
+}
+
+// SetHelmValues sets helm values.
+func (k *Kubernetes) SetHelmValues(values map[string]interface{}) {
+	k.Helm.Values = values
+}
+
+// SetHelmReleaseName sets helm release name.
+func (k *Kubernetes) SetHelmReleaseName(release string) {
+	k.Helm.ReleaseName = release
+}
+
+// GetCloudProvider returns CloudProvider field.
+func (k *Kubernetes) GetCloudProvider() *cloud.Provider {
+	return k.CloudProvider
 }
 
 // GetRasaXURL returns URL for a given deployment.

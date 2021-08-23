@@ -29,6 +29,7 @@ import (
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 )
@@ -38,9 +39,28 @@ const (
 	repositoryConfigPath = "/tmp/.helmrepo"
 )
 
+type Interface interface {
+	SetNamespace(namespace string) error
+	GetNamespace() string
+	Install() error
+	Uninstall() error
+	Upgrade() error
+	ReadValuesFile() error
+	GetAllValues() (map[string]interface{}, error)
+	IsDeployed() (bool, error)
+	GetStatus() (*release.Release, error)
+	SetConfiguration(config *types.HelmConfigurationSpec)
+	GetConfiguration() *types.HelmConfigurationSpec
+	GetValues() map[string]interface{}
+	SetValues(values map[string]interface{})
+	SetKubernetesBackendType(backend types.KubernetesBackendType)
+	SetPersistanceVolumeClaimName(name string)
+}
+
 // Helm represents a helm client.
 type Helm struct {
-	settings *cli.EnvSettings
+	// Settings describes all of the environment settings.
+	Settings *cli.EnvSettings
 
 	// ActionConfig injects the dependencies that all actions share.
 	ActionConfig *action.Configuration
@@ -66,10 +86,13 @@ type Helm struct {
 	// Log defines logger.
 	Log logr.Logger
 
-	driver         string
-	debugLog       func(format string, v ...interface{})
-	rasaXChartName string
-	kubeConfig     string
+	driver   string
+	debugLog func(format string, v ...interface{})
+
+	// RasaXChartName defines a helm chart name to be used.
+	RasaXChartName string
+
+	kubeConfig string
 
 	// Values store helm values that are used by the client.
 	Values map[string]interface{}
@@ -82,43 +105,43 @@ type Helm struct {
 }
 
 // New initializes a new helm client.
-func (h *Helm) New() error {
+func New(client *Helm) (Interface, error) {
 	var driverIsSet bool
 
-	h.settings = cli.New()
-	h.settings.RepositoryCache = cachePath
-	h.settings.RepositoryConfig = repositoryConfigPath
-	h.rasaXChartName = "rasa-x"
-	h.kubeConfig = viper.GetString("kubeconfig")
+	client.Settings = cli.New()
+	client.Settings.RepositoryCache = cachePath
+	client.Settings.RepositoryConfig = repositoryConfigPath
+	client.RasaXChartName = "rasa-x"
+	client.kubeConfig = viper.GetString("kubeconfig")
 
-	h.Log.Info("Initializing Helm client")
-	if err := h.ReadValuesFile(); err != nil {
-		return err
+	client.Log.Info("Initializing Helm client")
+	if err := client.ReadValuesFile(); err != nil {
+		return nil, err
 	}
 
-	h.Repositories = append(h.Repositories, types.RepositorySpec{
+	client.Repositories = append(client.Repositories, types.RepositorySpec{
 		Name: "rasa-x",
 		URL:  "https://rasahq.github.io/rasa-x-helm",
 	})
 
-	h.ActionConfig = new(action.Configuration)
+	client.ActionConfig = new(action.Configuration)
 
-	h.driver, driverIsSet = os.LookupEnv("HELM_DRIVER")
+	client.driver, driverIsSet = os.LookupEnv("HELM_DRIVER")
 	if !driverIsSet {
-		h.driver = "secrets"
+		client.driver = "secrets"
 	}
 
-	h.debugLog = func(format string, v ...interface{}) {
-		h.Log.Info(fmt.Sprintf(format, v...))
+	client.debugLog = func(format string, v ...interface{}) {
+		client.Log.Info(fmt.Sprintf(format, v...))
 	}
 
 	genericcliopts := &genericclioptions.ConfigFlags{
-		Namespace:  &h.Namespace,
-		KubeConfig: &h.kubeConfig,
+		Namespace:  &client.Namespace,
+		KubeConfig: &client.kubeConfig,
 	}
 
-	err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
-	return err
+	err := client.ActionConfig.Init(genericcliopts, client.Namespace, client.driver, client.debugLog)
+	return client, err
 }
 
 // SetNamespace sets namespace for initialized client.
@@ -133,6 +156,11 @@ func (h *Helm) SetNamespace(namespace string) error {
 	return err
 }
 
+// GetNamespace returns namespace name.
+func (h *Helm) GetNamespace() string {
+	return h.Namespace
+}
+
 func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 	var repos []*repo.ChartRepository
 
@@ -141,8 +169,8 @@ func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 			Name: repEntry.Name,
 			URL:  repEntry.URL,
 		}
-		r, err := repo.NewChartRepository(&rep, getter.All(h.settings))
-		r.CachePath = h.settings.RepositoryCache
+		r, err := repo.NewChartRepository(&rep, getter.All(h.Settings))
+		r.CachePath = h.Settings.RepositoryCache
 		if err != nil {
 			return repos, err
 		}

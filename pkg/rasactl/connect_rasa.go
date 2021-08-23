@@ -88,10 +88,10 @@ func (r *RasaCtl) ConnectRasa() error {
 	}
 
 	r.Log.Info("Connecting Rasa Server to Rasa X")
-	if r.KubernetesClient.BackendType == types.KubernetesBackendLocal {
-		r.HelmClient.Values = utils.MergeMaps(helm.ValuesRabbitMQNodePort(),
-			helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX(), r.HelmClient.Values)
-		r.Log.V(1).Info("Merging values", "result", r.HelmClient.Values)
+	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal {
+		r.HelmClient.SetValues(utils.MergeMaps(helm.ValuesRabbitMQNodePort(),
+			helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX(), r.HelmClient.GetValues()))
+		r.Log.V(1).Info("Merging values", "result", r.HelmClient.GetValues())
 	} else {
 		return errors.Errorf(
 			"It looks like you're not using kind as a backend for Kubernetes cluster, the connect rasa command is available only if you use kind.",
@@ -278,7 +278,7 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 			Username: usernamePsql,
 			Password: passwordPsql,
 			Db:       "tracker",
-			LoginDb:  r.HelmClient.Values["global"].(map[string]interface{})["postgresql"].(map[string]interface{})["postgresqlDatabase"].(string),
+			LoginDb:  r.HelmClient.GetValues()["global"].(map[string]interface{})["postgresql"].(map[string]interface{})["postgresqlDatabase"].(string),
 		},
 		EventBroker: rtypes.EndpointEventBrokerSpec{
 			Type:     "pika",
@@ -286,7 +286,7 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 			Port:     rabbitNodePort,
 			Username: usernameRabbit,
 			Password: passwordRabbit,
-			Queues:   []string{r.HelmClient.Values["rasa"].(map[string]interface{})["rabbitQueue"].(string)},
+			Queues:   []string{r.HelmClient.GetValues()["rasa"].(map[string]interface{})["rabbitQueue"].(string)},
 		},
 	}
 

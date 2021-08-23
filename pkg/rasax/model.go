@@ -117,11 +117,12 @@ func (r *RasaX) ModelDownload() error {
 	}
 	r.Log.Info("Starting to download the model",
 		"storePath", file, "model", r.Flags.Model.Download.Name)
-	f, _ := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0644)
-	defer f.Close()
 
 	switch resp.StatusCode {
 	case 200:
+		f, _ := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0644)
+		defer f.Close()
+
 		bar := r.progressBarBytes(
 			resp.ContentLength,
 			fmt.Sprintf("Downloading %s", r.Flags.Model.Download.Name),

@@ -52,7 +52,7 @@ func modelTagCmd() *cobra.Command {
 		Example: templates.Examples(modelTagExample),
 		Args:    cobra.RangeArgs(2, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			args, err := parseArgs(args, 2, 3)
+			args, err := parseArgs(namespace, args, 2, 3, rasactlFlags)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
@@ -74,10 +74,12 @@ func modelTagCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateHelmReleaseName]),
-			}
-			rasaCtl.KubernetesClient.Helm.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.HelmClient.SetConfiguration(
+				&types.HelmConfigurationSpec{
+					ReleaseName: string(stateData[types.StateHelmReleaseName]),
+				},
+			)
+			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil
 		},
