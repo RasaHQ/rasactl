@@ -19,7 +19,7 @@ import "fmt"
 
 // Add adds an existing deployment.
 func (r *RasaCtl) Add() error {
-	r.Log.Info("Adding existing project", "namespace", r.Namespace, "releaseName", r.HelmClient.Configuration.ReleaseName)
+	r.Log.Info("Adding existing project", "namespace", r.Namespace, "releaseName", r.HelmClient.GetConfiguration().ReleaseName)
 
 	release, err := r.HelmClient.GetStatus()
 	if err != nil {

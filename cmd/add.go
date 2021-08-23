@@ -50,12 +50,12 @@ func addCmd() *cobra.Command {
 		Args:    cobra.ExactArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
-			rasaCtl.HelmClient.Configuration = helmConfiguration
+			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if _, err := parseArgs(args, 1, 1); err != nil {
+			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 

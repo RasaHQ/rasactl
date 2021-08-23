@@ -38,7 +38,7 @@ func (h *Helm) Install() error {
 		Version:               h.Configuration.Version,
 	}
 
-	chartPath, err := co.LocateChart(h.rasaXChartName, h.settings)
+	chartPath, err := co.LocateChart(h.RasaXChartName, h.Settings)
 	if err != nil {
 		return err
 	}

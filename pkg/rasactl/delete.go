@@ -59,7 +59,7 @@ func (r *RasaCtl) Delete() error {
 		}
 	}
 
-	if (r.DockerClient.Kind.ControlPlaneHost != "" && string(state[types.StateProjectPath]) != "") || force {
+	if (r.DockerClient.GetKind().ControlPlaneHost != "" && string(state[types.StateProjectPath]) != "") || force {
 		r.Spinner.Message("Deleting persistent volume")
 		if err := r.KubernetesClient.DeleteVolume(); err != nil && !force {
 			return err

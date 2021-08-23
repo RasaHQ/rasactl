@@ -48,7 +48,7 @@ func modelDownloadCmd() *cobra.Command {
 		Example: templates.Examples(modelDownloadExample),
 		Args:    cobra.RangeArgs(1, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			args, err := parseArgs(args, 1, 3)
+			args, err := parseArgs(namespace, args, 1, 3, rasactlFlags)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
@@ -64,9 +64,11 @@ func modelDownloadCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateHelmReleaseName]),
-			}
+			rasaCtl.HelmClient.SetConfiguration(
+				&types.HelmConfigurationSpec{
+					ReleaseName: string(stateData[types.StateHelmReleaseName]),
+				},
+			)
 			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil

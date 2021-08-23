@@ -5,6 +5,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
@@ -46,11 +47,11 @@ func checkIfNamespaceExists() error {
 }
 
 //nolint:golint,gocyclo
-func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
+func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, flags *types.RasaCtlFlags) ([]string, error) {
 	isInRange := true
 	isMaxArgs := false
+	nsExists := false
 	var ns string
-	var currentNamespace string
 
 	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 	if err != nil {
@@ -59,9 +60,7 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 
 	numNamespaces := len(namespaces)
 	// Check if namespace is defined by .rasactl or the configuration file
-	if namespace != "" {
-		currentNamespace = namespace
-	} else if namespace == "" && numNamespaces == 1 {
+	if currentNamespace == "" && numNamespaces == 1 {
 		currentNamespace = namespaces[0]
 	}
 
@@ -77,9 +76,17 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 
 	// Check if a new deployment is requested
 	newDeployment := false
-	if rasactlFlags.Start.Create || rasactlFlags.Start.Project ||
-		rasactlFlags.Start.ProjectPath != "" {
+	if flags.Start.Create || flags.Start.Project ||
+		flags.Start.ProjectPath != "" {
 		newDeployment = true
+	}
+
+	// Check if args[0] is a namespace
+	if len(args) != 0 {
+		nsExists, err = rasaCtl.KubernetesClient.IsNamespaceExist(args[0])
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	switch {
@@ -90,7 +97,6 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 	case numNamespaces >= 0 && len(args) == 0 && newDeployment:
 		ns = strings.Replace(namesgenerator.GetRandomName(0), "_", "-", -1)
 	case numNamespaces == 1 && len(args) == 0 && !newDeployment:
-		// use default namespace, example: rasactl command
 		ns = currentNamespace
 	case numNamespaces == 1 && isInRange && isMaxArgs && minArgs != len(args):
 		// use default namespace, example: rasactl command arg1
@@ -102,11 +108,17 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 		// the number of args is equal to maxArgs
 		ns = args[0]
 		args = []string{}
-	case numNamespaces == 1 && isInRange && !isMaxArgs:
-		// use default namespace, example: rasactl command arg1
-		// the number of args is not equal to maxArgs
+	case numNamespaces == 1 && isInRange && !isMaxArgs && currentNamespace != "" && nsExists:
+		ns = args[0]
+		args = args[1:]
+	case numNamespaces == 1 && isInRange && !isMaxArgs && currentNamespace != "" && !nsExists:
 		ns = currentNamespace
 	case numNamespaces >= 2 && len(args) == 0 && currentNamespace != "":
+		ns = currentNamespace
+	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "" && nsExists:
+		ns = args[0]
+		args = args[1:]
+	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "" && !nsExists:
 		ns = currentNamespace
 	case numNamespaces >= 2 && (minArgs+1 == len(args)) && currentNamespace == "":
 		ns = args[0]
@@ -115,14 +127,9 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 		ns = ""
 	case numNamespaces >= 2 && !isMaxArgs && currentNamespace == "":
 		ns = ""
-	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "":
-		ns = currentNamespace
 	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs != len(args):
 		ns = args[0]
 		args = args[1:]
-	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs == len(args):
-		ns = args[0]
-		args = []string{}
 	}
 	args = append([]string{ns}, args...)
 
@@ -132,7 +139,6 @@ func parseArgs(args []string, minArgs, maxArgs int) ([]string, error) {
 	}
 
 	// The valid namespace is returned as the first element in the args array
-	namespace = ns
 	rasaCtl.Namespace = ns
 	log.Info("Setting namespace", "namespace", ns)
 	if err := rasaCtl.SetNamespaceClients(ns); err != nil {

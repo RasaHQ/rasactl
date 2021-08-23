@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
@@ -49,8 +50,8 @@ func (h *Helm) ReadValuesFile() error {
 	return nil
 }
 
-// GetValues returns values for the active helm release.
-func (h *Helm) GetValues() (map[string]interface{}, error) {
+// GetAllValues returns all values for the active helm release.
+func (h *Helm) GetAllValues() (map[string]interface{}, error) {
 	client := action.NewGetValues(h.ActionConfig)
 	client.AllValues = true
 
@@ -73,6 +74,16 @@ func (h *Helm) GetValues() (map[string]interface{}, error) {
 		"values", values,
 	)
 	return values, err
+}
+
+// GetValues returns values used by the client.
+func (h *Helm) GetValues() map[string]interface{} {
+	return h.Values
+}
+
+// SetValues sets values for the client.
+func (h *Helm) SetValues(values map[string]interface{}) {
+	h.Values = values
 }
 
 // IsDeployed checks if a given helm release is deployed.
@@ -121,4 +132,24 @@ func (h *Helm) setCacheDirectory(path string) {
 		}
 		return err
 	})
+}
+
+// SetConfiguration sets the Helm.Configuration field.
+func (h *Helm) SetConfiguration(config *types.HelmConfigurationSpec) {
+	h.Configuration = config
+}
+
+// GetConfiguration returns the Helm.Configuration field.
+func (h *Helm) GetConfiguration() *types.HelmConfigurationSpec {
+	return h.Configuration
+}
+
+// SetKubernetesBackendType sets the Helm.KubernetesBackendType field.
+func (h *Helm) SetKubernetesBackendType(backend types.KubernetesBackendType) {
+	h.KubernetesBackendType = backend
+}
+
+// SetPersistanceVolumeClaimName sets the Helm.PVCName field.
+func (h *Helm) SetPersistanceVolumeClaimName(name string) {
+	h.PVCName = name
 }

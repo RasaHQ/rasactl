@@ -21,7 +21,7 @@ import "github.com/RasaHQ/rasactl/pkg/utils"
 func (r *RasaCtl) Start() error {
 
 	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)
-	if err := utils.ValidateName(r.HelmClient.Namespace); err != nil {
+	if err := utils.ValidateName(r.HelmClient.GetNamespace()); err != nil {
 		return err
 	}
 

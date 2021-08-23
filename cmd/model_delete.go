@@ -45,7 +45,7 @@ func modelDeleteCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			args, err := parseArgs(args, 1, 2)
+			args, err := parseArgs(namespace, args, 1, 2, rasactlFlags)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
@@ -60,9 +60,11 @@ func modelDeleteCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaCtl.HelmClient.Configuration = &types.HelmConfigurationSpec{
-				ReleaseName: string(stateData[types.StateHelmReleaseName]),
-			}
+			rasaCtl.HelmClient.SetConfiguration(
+				&types.HelmConfigurationSpec{
+					ReleaseName: string(stateData[types.StateHelmReleaseName]),
+				},
+			)
 			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil

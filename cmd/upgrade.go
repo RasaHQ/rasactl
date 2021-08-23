@@ -50,7 +50,7 @@ func upgradeCmd() *cobra.Command {
 		Example: templates.Examples(upgradeExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if _, err := parseArgs(args, 1, 1); err != nil {
+			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
@@ -62,8 +62,8 @@ func upgradeCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			rasaCtl.HelmClient.Configuration = helmConfiguration
-			rasaCtl.HelmClient.Configuration.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			helmConfiguration.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
 
 			return nil

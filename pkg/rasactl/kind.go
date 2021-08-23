@@ -17,6 +17,8 @@ package rasactl
 
 import (
 	"fmt"
+
+	"github.com/RasaHQ/rasactl/pkg/docker"
 )
 
 // CreateAndJoinKindNode creates and joins a kind node.
@@ -40,8 +42,12 @@ func (r *RasaCtl) GetKindControlPlaneNodeInfo() error {
 		r.Log.Info("Can't find kind control plane. Are you sure that the current Kubernetes context is kind?")
 	}
 
-	r.DockerClient.Kind.ControlPlaneHost = node.Name
-	r.DockerClient.Kind.Version = node.Status.NodeInfo.KubeletVersion
+	r.DockerClient.SetKind(
+		docker.KindSpec{
+			ControlPlaneHost: node.Name,
+			Version:          node.Status.NodeInfo.KubeletVersion,
+		},
+	)
 
 	return nil
 }
