@@ -264,6 +264,24 @@ func TestParseArgs(t *testing.T) {
 			false, // arg0IsNs
 		},
 		{
+			"two deployment, one arg, rasactl command deployment", // name
+			"",                     // namespace
+			"deployment",           // expectedNamespace
+			1,                      // minArgs
+			1,                      // maxArgs
+			[]string{"deployment"}, // args
+			[]string{"test-deployment1", "test-deployment2"}, // getNamespacesReturn
+			[]string{"deployment"},                           // expectedArgs
+			&types.RasaCtlFlags{
+				Start: types.RasaCtlStartFlags{
+					Create:      false,
+					ProjectPath: "",
+					Project:     false,
+				},
+			}, // flags
+			true, // arg0IsNs
+		},
+		{
 			"two deployment, one arg rasactl command [deployment]", // name
 			"",         // namespace
 			"",         // expectedNamespace

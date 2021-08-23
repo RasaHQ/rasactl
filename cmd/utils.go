@@ -127,9 +127,15 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 		ns = ""
 	case numNamespaces >= 2 && !isMaxArgs && currentNamespace == "":
 		ns = ""
+	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs == len(args):
+		ns = args[0]
+		args = []string{}
+	case numNamespaces >= 2 && isInRange && !isMaxArgs && currentNamespace != "":
+		ns = currentNamespace
 	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs != len(args):
 		ns = args[0]
 		args = args[1:]
+
 	}
 	args = append([]string{ns}, args...)
 
@@ -139,7 +145,8 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 	}
 
 	// The valid namespace is returned as the first element in the args array
-	rasaCtl.Namespace = ns
+
+	namespace = ns
 	log.Info("Setting namespace", "namespace", ns)
 	if err := rasaCtl.SetNamespaceClients(ns); err != nil {
 		return nil, err
