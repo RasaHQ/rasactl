@@ -20,11 +20,12 @@ import (
 	"encoding/json"
 	"net"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ktypes "k8s.io/apimachinery/pkg/types"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 func (k *Kubernetes) detectBackend() types.KubernetesBackendType {

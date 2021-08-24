@@ -25,8 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/RasaHQ/rasactl/pkg/status"
-	rtypes "github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -39,6 +37,9 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha4"
+
+	"github.com/RasaHQ/rasactl/pkg/status"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types"
 )
 
 type Interface interface {

@@ -23,12 +23,13 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
+
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/RasaHQ/rasactl/pkg/utils"
-	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
 )
 
 // RasaX defines Rasa X client.

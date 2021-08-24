@@ -7,9 +7,10 @@ package fake
 import (
 	reflect "reflect"
 
-	docker "github.com/RasaHQ/rasactl/pkg/docker"
 	container "github.com/docker/docker/api/types/container"
 	gomock "github.com/golang/mock/gomock"
+
+	docker "github.com/RasaHQ/rasactl/pkg/docker"
 )
 
 // MockInterface is a mock of Interface interface.

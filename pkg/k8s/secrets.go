@@ -19,11 +19,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
-	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
 const secretName string = "rasactl"

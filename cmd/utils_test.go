@@ -3,13 +3,14 @@ package cmd
 import (
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/require"
+
 	fd "github.com/RasaHQ/rasactl/pkg/docker/fake"
 	fh "github.com/RasaHQ/rasactl/pkg/helm/fake"
 	fk "github.com/RasaHQ/rasactl/pkg/k8s/fake"
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/require"
 )
 
 func TestParseArgs(t *testing.T) {
@@ -138,7 +139,7 @@ func TestParseArgs(t *testing.T) {
 			false, // arg0IsNs
 		},
 		{
-			"one deployment, defined deployment, two args, rasactl command deployment-name arg1 [arg2]", // name
+			"one deployment, two args, rasactl command deployment-name arg1 [arg2]", // name
 			"",                                     // namespace
 			"",                                     // expectedNamespace
 			1,                                      // minArgs

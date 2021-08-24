@@ -22,11 +22,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
 	"sigs.k8s.io/yaml"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 // ReadValuesFiles reads the value file and store values in the Helm.Values object.

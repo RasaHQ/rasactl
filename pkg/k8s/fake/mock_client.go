@@ -7,10 +7,11 @@ package fake
 import (
 	reflect "reflect"
 
-	types "github.com/RasaHQ/rasactl/pkg/types"
-	cloud "github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
+
+	types "github.com/RasaHQ/rasactl/pkg/types"
+	cloud "github.com/RasaHQ/rasactl/pkg/utils/cloud"
 )
 
 // MockKubernetesInterface is a mock of KubernetesInterface interface.

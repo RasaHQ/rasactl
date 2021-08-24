@@ -20,8 +20,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/briandowns/spinner"
+
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 // SpinnerMessage defines a spinner object.

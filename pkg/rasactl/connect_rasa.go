@@ -25,13 +25,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
+	"gopkg.in/yaml.v2"
+
 	"github.com/RasaHQ/rasactl/pkg/helm"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasa"
 	"github.com/RasaHQ/rasactl/pkg/utils"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 )
 
 // ConnectRasa connects a local rasa server to a given deployment.

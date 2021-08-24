@@ -16,10 +16,11 @@ limitations under the License.
 package logger
 
 import (
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/go-logr/logr"
 	"go.uber.org/zap/zapcore"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 // New initializes and return a new logger object.

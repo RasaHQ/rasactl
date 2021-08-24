@@ -16,9 +16,10 @@ limitations under the License.
 package cloud
 
 import (
+	"github.com/go-logr/logr"
+
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils/cloud/providers"
-	"github.com/go-logr/logr"
 )
 
 type Provider struct {

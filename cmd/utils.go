@@ -5,10 +5,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 // HandleSignals receives a signal from the channel and runs an action depends on the type of the signal.

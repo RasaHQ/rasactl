@@ -19,10 +19,11 @@ import (
 	"context"
 	"fmt"
 
-	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"gopkg.in/yaml.v2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
 // UpdateRasaXConfig generates configuration for Rasa X environments and update a Kubernetes secret which stores the configuration.

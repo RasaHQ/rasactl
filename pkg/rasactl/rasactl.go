@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
+
 	"github.com/RasaHQ/rasactl/pkg/docker"
 	"github.com/RasaHQ/rasactl/pkg/helm"
 	"github.com/RasaHQ/rasactl/pkg/k8s"
@@ -26,8 +29,6 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
-	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
 )
 
 // RasaCtl defines the rasactl client.
