@@ -27,9 +27,9 @@ import (
 
 const (
 	upgradeDesc = `
-This command upgrades a Rasa X / Enterprise deployment.
+This command upgrades Rasa X / Enterprise deployment.
 
-The upgrade command upgrades or change configuration for Rasa X / Enterprise deployment.
+The upgrade command upgrades or changes configuration for Rasa X / Enterprise deployment.
 
 You can specify a values file with you custom configuration. The values file has the same form as a values file for helm chart.
 Here you can find all available values that can be configured: https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml
