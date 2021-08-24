@@ -34,7 +34,6 @@ test: TESTFLAGS += -v
 else
 test: TESTFLAGS += -race -v
 endif
-test: test-style
 test: test-unit
 
 .PHONY: test-unit
