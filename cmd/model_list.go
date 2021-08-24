@@ -40,6 +40,10 @@ func modelListCmd() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		Aliases: []string{"ls"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkIfDeploymentsExist(); err != nil {
+				return err
+			}
+
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}

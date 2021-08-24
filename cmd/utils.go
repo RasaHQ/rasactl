@@ -47,6 +47,18 @@ func checkIfNamespaceExists() error {
 	return nil
 }
 
+func checkIfDeploymentsExist() error {
+	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
+	if err != nil {
+		return errors.Errorf(errorPrint.Sprint(err))
+	}
+
+	if len(namespaces) == 0 {
+		return errors.Errorf(errorPrint.Sprint("No deployments, use the 'rasactl start' command to create one."))
+	}
+	return nil
+}
+
 //nolint:golint,gocyclo
 func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, flags *types.RasaCtlFlags) ([]string, error) {
 	isInRange := true

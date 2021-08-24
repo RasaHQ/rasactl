@@ -46,6 +46,10 @@ func modelDeleteCmd() *cobra.Command {
 		Args:    cobra.RangeArgs(1, 2),
 		Aliases: []string{"del"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkIfDeploymentsExist(); err != nil {
+				return err
+			}
+
 			args, err := parseArgs(namespace, args, 1, 2, rasactlFlags)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

@@ -49,6 +49,10 @@ func modelDownloadCmd() *cobra.Command {
 		Example: templates.Examples(modelDownloadExample),
 		Args:    cobra.RangeArgs(1, 3),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkIfDeploymentsExist(); err != nil {
+				return err
+			}
+
 			args, err := parseArgs(namespace, args, 1, 3, rasactlFlags)
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))

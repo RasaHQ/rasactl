@@ -33,6 +33,10 @@ func stopCmd() *cobra.Command {
 		Long:  "Stop Rasa X deployment.",
 		Args:  cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if err := checkIfDeploymentsExist(); err != nil {
+				return err
+			}
+
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return err
 			}
