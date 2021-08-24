@@ -21,15 +21,16 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
+	"github.com/go-logr/logr"
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+
 	"github.com/RasaHQ/rasactl/pkg/logger"
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/RasaHQ/rasactl/pkg/version"
-	"github.com/fatih/color"
-	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"

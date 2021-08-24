@@ -5,6 +5,9 @@ on:
     types: [opened, synchronize, labeled]
 
 
+env:
+  GO_VERSION: 1.17
+
 jobs:
   golangci:
     name: lint
@@ -14,9 +17,23 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
 
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Run tests
+        run: make test
+
   build:
     runs-on: ubuntu-latest
-    needs: [golangci]
+    needs: [golangci, unit-tests]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -30,7 +47,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.17
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Build
         run: |
@@ -40,5 +57,5 @@ jobs:
             -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -v `pwd`:/go/src/rasactl \
             -w /go/src/rasactl \
-            ghcr.io/tczekajlo/golang-cross:v1.17.0 \
+            ghcr.io/tczekajlo/golang-cross:v${{ env.GO_VERSION }} \
             build --snapshot

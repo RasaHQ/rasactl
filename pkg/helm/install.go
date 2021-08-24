@@ -18,10 +18,11 @@ package helm
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 // Install prepares and executes the installation.

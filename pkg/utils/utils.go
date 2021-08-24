@@ -30,13 +30,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"github.com/txn2/txeh"
 	"golang.org/x/term"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 type NetworkError string

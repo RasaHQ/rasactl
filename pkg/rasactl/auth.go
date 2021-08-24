@@ -20,10 +20,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang-jwt/jwt"
+
 	"github.com/RasaHQ/rasactl/pkg/credentials"
 	"github.com/RasaHQ/rasactl/pkg/credentials/helpers"
 	"github.com/RasaHQ/rasactl/pkg/utils"
-	"github.com/golang-jwt/jwt"
 )
 
 func (r *RasaCtl) AuthLogin() error {

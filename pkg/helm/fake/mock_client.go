@@ -7,9 +7,10 @@ package fake
 import (
 	reflect "reflect"
 
-	types "github.com/RasaHQ/rasactl/pkg/types"
 	gomock "github.com/golang/mock/gomock"
 	release "helm.sh/helm/v3/pkg/release"
+
+	types "github.com/RasaHQ/rasactl/pkg/types"
 )
 
 // MockInterface is a mock of Interface interface.

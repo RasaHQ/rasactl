@@ -22,8 +22,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/pkg/errors"
+
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
 func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, error) {

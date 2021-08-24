@@ -26,8 +26,9 @@ import (
 	"os"
 	"path/filepath"
 
-	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/schollz/progressbar/v3"
+
+	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
 func (r *RasaX) ModelUpload() error {

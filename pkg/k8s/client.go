@@ -19,14 +19,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/spf13/viper"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"

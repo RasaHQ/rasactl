@@ -20,9 +20,6 @@ import (
 	"os"
 	"sync"
 
-	"github.com/RasaHQ/rasactl/pkg/status"
-	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
@@ -32,6 +29,10 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/repo"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
+
+	"github.com/RasaHQ/rasactl/pkg/status"
+	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 )
 
 const (

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/semver/v3"
+
 	"github.com/RasaHQ/rasactl/pkg/types"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )

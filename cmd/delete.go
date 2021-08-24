@@ -18,11 +18,12 @@ package cmd
 import (
 	"os"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"k8s.io/kubectl/pkg/util/templates"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 const (
