@@ -30,6 +30,7 @@ func stopCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "stop [DEPLOYMENT NAME]",
 		Short: "stop Rasa X deployment",
+		Long:  "Stop Rasa X deployment.",
 		Args:  cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {

@@ -29,6 +29,7 @@ func openCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "open [DEPLOYMENT NAME]",
 		Short: "open Rasa X in a web browser",
+		Long:  "Open Rasa X in a web browser.",
 		Args:  cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {

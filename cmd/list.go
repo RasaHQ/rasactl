@@ -24,13 +24,16 @@ const (
 	listDesc = `List all deployments.
 
 The '*' in the 'CURRENT' field indicates a deployment that is used as default.
-It means that every time when you execute 'rasactl' commandwithout defining
+It means that every time when you execute 'rasactl' command without defining
 the deployment name, the deployment marked with '*' is used.
 
-A deployment is marked as 'CURRENT' if in a current working directory is located
-the '.rasactl' file that includes a deployment name. The file is automatically created
-if you run the 'rasactl start' command with the '--project' or '--project-path' flag.
+A deployment is marked as 'CURRENT' if:
 
+  - in a current working directory is located.
+  - the '.rasactl' file that includes a deployment name. The file is automatically created
+    if you run the 'rasactl start' command with the '--project' or '--project-path' flag.
+  - there is only one deployment.
+  - a default deployment is defined, e.g. via the 'rasactl config use-deployment' command.
 `
 )
 
