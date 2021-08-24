@@ -52,7 +52,7 @@ func addAddFlags(cmd *cobra.Command) {
 
 func addConnectRasaFlags(cmd *cobra.Command) {
 	cmd.Flags().IntVarP(&rasactlFlags.ConnectRasa.Port, "port", "p", 5005, "port to run the Rasa server at")
-	cmd.Flags().BoolVar(&rasactlFlags.ConnectRasa.RunSeparateWorker, "run-saparate-worker", false,
+	cmd.Flags().BoolVar(&rasactlFlags.ConnectRasa.RunSeparateWorker, "run-separate-worker", false,
 		"runs a separate Rasa server for the worker environment")
 	cmd.Flags().StringSliceVar(&rasactlFlags.ConnectRasa.ExtraArgs, "extra-args", nil, "extra arguments for Rasa server")
 }

@@ -50,7 +50,7 @@ func deleteCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "delete DEPLOYMENT-NAME",
 		Short:   "delete Rasa X deployment",
-		Long:    templates.LongDesc(deleteDesc),
+		Long:    deleteDesc,
 		Example: templates.Examples(deleteExample),
 		Args:    cobra.ExactArgs(1),
 		Aliases: []string{"del"},

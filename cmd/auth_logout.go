@@ -27,7 +27,7 @@ import (
 
 const (
 	authLogoutDesc = `
-	It removes credentials from an external credentials store, such as the native keychain of the operating system.
+It removes credentials from an external credentials store, such as the native keychain of the operating system.
 `
 
 	authLogoutExample = `

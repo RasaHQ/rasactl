@@ -42,8 +42,8 @@ The command works only if Rasa X deployment uses a local rasa project.
 	# Connect Rasa Server to Rasa X deployment.
 	$ rasactl connect rasa
 
-	# Run a saparate rasa server for the Rasa X worker environment.
-	$ rasactl connect rasa --run-saparate-worker
+	# Run a separate rasa server for the Rasa X worker environment.
+	$ rasactl connect rasa --run-separate-worker
 
 	# Pass extra arguments to rasa server.
 	$ rasactl connect rasa --extra-args="--debug"
