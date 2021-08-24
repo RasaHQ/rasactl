@@ -45,7 +45,7 @@ Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
 )
 
 func modelTagCmd() *cobra.Command {
-	// cmd represents the status command
+	// cmd represents the model tag command
 	cmd := &cobra.Command{
 		Use:     "tag [DEPLOYMENT NAME] MODEL-NAME TAG",
 		Short:   "tag a model in Rasa X / Enterprise",

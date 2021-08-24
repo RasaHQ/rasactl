@@ -52,7 +52,7 @@ The command works only if Rasa X deployment uses a local rasa project.
 
 func connectRasaCmd() *cobra.Command {
 
-	// cmd represents the status command
+	// cmd represents the connect rasa command
 	cmd := &cobra.Command{
 		Use:     "rasa [DEPLOYMENT NAME]",
 		Short:   "run Rasa OSS server and connect it to the Rasa X deployment",

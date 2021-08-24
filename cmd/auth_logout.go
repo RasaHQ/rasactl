@@ -38,7 +38,7 @@ It removes credentials from an external credentials store, such as the native ke
 
 func authLogoutCmd() *cobra.Command {
 
-	// cmd represents the status command
+	// cmd represents the auth logout command
 	cmd := &cobra.Command{
 		Use:     "logout [DEPLOYMENT NAME]",
 		Short:   "remove access credentials for an account",

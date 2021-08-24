@@ -37,7 +37,7 @@ Delete a model from Rasa X / Enterprise.
 )
 
 func modelDeleteCmd() *cobra.Command {
-	// cmd represents the status command
+	// cmd represents the model delete command
 	cmd := &cobra.Command{
 		Use:     "delete [DEPLOYMENT NAME] MODEL-NAME",
 		Short:   "delete a model from Rasa X / Enterprise",

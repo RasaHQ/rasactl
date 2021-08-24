@@ -32,7 +32,7 @@ const (
 )
 
 func modelListCmd() *cobra.Command {
-	// cmd represents the status command
+	// cmd represents the model list command
 	cmd := &cobra.Command{
 		Use:     "list [DEPLOYMENT NAME]",
 		Short:   "list models stored in Rasa X / Enterprise",

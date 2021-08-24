@@ -48,7 +48,7 @@ const (
 
 func authLoginCmd() *cobra.Command {
 
-	// cmd represents the status command
+	// cmd represents the auth login command
 	cmd := &cobra.Command{
 		Use:     "login [DEPLOYMENT NAME]",
 		Short:   "authorize rasactl to access the Rasa X / Enterprise with user credentials",

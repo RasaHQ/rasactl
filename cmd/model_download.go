@@ -41,7 +41,7 @@ Download a model from Rasa X / Enterprise to your local machine.
 )
 
 func modelDownloadCmd() *cobra.Command {
-	// cmd represents the status command
+	// cmd represents the model download command
 	cmd := &cobra.Command{
 		Use:     "download [DEPLOYMENT NAME] MODEL-NAME [DESTINATION]",
 		Short:   "download a model from Rasa X / Enterprise",

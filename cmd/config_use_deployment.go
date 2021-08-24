@@ -32,7 +32,7 @@ const (
 
 func configUseDeploymentCmd() *cobra.Command {
 
-	// cmd represents the status command
+	// cmd represents the config use-deployment command
 	cmd := &cobra.Command{
 		Use:     "use-deployment DEPLOYMENT-NAME",
 		Short:   "set the current-deployment in the configuration file",
