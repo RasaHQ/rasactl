@@ -1,0 +1,6 @@
+rasa:
+  versions:
+    rasaProduction:
+      enabled: true
+    rasaWorker:
+      enabled: true
