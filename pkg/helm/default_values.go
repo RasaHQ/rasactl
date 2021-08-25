@@ -54,7 +54,6 @@ func valuesDisableRasaProduction() map[string]interface{} {
 	return values
 }
 
-/*
 func valuesEnableRasaProduction() map[string]interface{} {
 	values := map[string]interface{}{
 		"rasa": map[string]interface{}{
@@ -68,7 +67,6 @@ func valuesEnableRasaProduction() map[string]interface{} {
 
 	return values
 }
-*/
 
 func valuesUseDedicatedKindNode(namespace string) map[string]interface{} {
 	values := map[string]interface{}{
