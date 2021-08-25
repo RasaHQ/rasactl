@@ -116,9 +116,6 @@ func New(client *Helm) (Interface, error) {
 	client.kubeConfig = viper.GetString("kubeconfig")
 
 	client.Log.Info("Initializing Helm client")
-	if err := client.ReadValuesFile(); err != nil {
-		return nil, err
-	}
 
 	client.Repositories = append(client.Repositories, types.RepositorySpec{
 		Name: "rasa-x",

@@ -34,6 +34,9 @@ import (
 func (h *Helm) ReadValuesFile() error {
 	file := h.Flags.StartUpgrade.ValuesFile
 
+	// make sure that current values are empty
+	h.Values = nil
+
 	if file != "" {
 		h.Log.V(1).Info("Reading the values file", "file", file)
 		valuesFile, err := ioutil.ReadFile(file)
@@ -72,7 +75,6 @@ func (h *Helm) GetAllValues() (map[string]interface{}, error) {
 	h.Log.V(1).Info("Getting all values",
 		"releaseName", h.Configuration.ReleaseName,
 		"namespace", h.Namespace,
-		"values", values,
 	)
 	return values, err
 }

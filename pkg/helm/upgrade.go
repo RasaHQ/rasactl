@@ -59,6 +59,10 @@ func (h *Helm) Upgrade() error {
 
 	h.Log.V(1).Info("Helm client settings", "settings", client)
 
+	if err := h.ReadValuesFile(); err != nil {
+		return err
+	}
+
 	helmChart, err := loader.Load(chartPath)
 	if err != nil {
 		return err
