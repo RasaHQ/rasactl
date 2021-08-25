@@ -66,8 +66,8 @@ func (h *Helm) Install() error {
 		}
 	}
 
-	// Merge helm values - disable Rasa production deployment, set erlang cookie for rabbitmq.
-	h.Values = utils.MergeMaps(valuesDisableRasaProduction(), valuesRabbitMQErlangCookie(), h.Values)
+	// Merge helm values - set erlang cookie for rabbitmq.
+	h.Values = utils.MergeMaps(valuesRabbitMQErlangCookie(), h.Values)
 
 	// Use the latest edge release for Rasa X
 	if h.Flags.Start.UseEdgeRelease {
@@ -86,7 +86,12 @@ func (h *Helm) Install() error {
 	if h.KubernetesBackendType == types.KubernetesBackendLocal && h.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.%s", h.Namespace, types.RasaCtlLocalDomain)
 		ip := "127.0.0.1"
-		h.Values = utils.MergeMaps(valuesDisableNginx(), valuesSetupLocalIngress(host), h.Values)
+		h.Values = utils.MergeMaps(
+			valuesDisableRasaProduction(),
+			valuesDisableNginx(),
+			valuesSetupLocalIngress(host),
+			h.Values,
+		)
 		h.Log.V(1).Info("Merging values", "result", h.Values)
 
 		// Add host to /etc/hosts - required sudo
