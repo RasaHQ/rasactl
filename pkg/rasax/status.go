@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"time"
 
+	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -56,8 +57,9 @@ func (r *RasaX) WaitForDatabaseMigration(ctx context.Context) error {
 	}
 }
 
-// WaitForRasaXWorker waits for Rasa worker until it returns the 200 code.
-func (r *RasaX) WaitForRasaXWorker(ctx context.Context) error {
+// WaitForRasaServer waits for Rasa Server in a given environment until it returns the 200 code.
+func (r *RasaX) WaitForRasaServer(ctx context.Context, environment string) error {
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -73,14 +75,20 @@ func (r *RasaX) WaitForRasaXWorker(ctx context.Context) error {
 				continue
 			}
 
-			workerStatus := healthStatus.Worker
+			var serverStatus types.EnvironmentSpec
+			switch environment {
+			case "production":
+				serverStatus = healthStatus.Production
+			case "worker":
+				serverStatus = healthStatus.Worker
+			}
 
-			if workerStatus.Status != 200 {
-				msg := "Waiting for the Rasa worker to be ready"
+			if serverStatus.Status != 200 {
+				msg := fmt.Sprintf("Waiting for Rasa Server in the %s environment to be ready", environment)
 				r.Log.Info(msg, "health", healthStatus)
-				r.SpinnerMessage.Message(fmt.Sprintf("%s, status: %d", msg, workerStatus.Status))
+				r.SpinnerMessage.Message(fmt.Sprintf("%s, status: %d", msg, serverStatus.Status))
 			} else if healthStatus != nil {
-				msg := "The Rasa worker is ready"
+				msg := fmt.Sprintf("Rasa Server for the %s environment is ready", environment)
 				r.Log.Info(msg)
 				r.SpinnerMessage.Message(msg)
 				return nil
@@ -99,10 +107,6 @@ func (r *RasaX) WaitForRasaX() error {
 
 	eg.Go(func() error {
 		return r.WaitForDatabaseMigration(ctx)
-	})
-
-	eg.Go(func() error {
-		return r.WaitForRasaXWorker(ctx)
 	})
 
 	if err := eg.Wait(); err != nil {

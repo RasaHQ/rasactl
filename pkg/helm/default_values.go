@@ -54,12 +54,12 @@ func valuesDisableRasaProduction() map[string]interface{} {
 	return values
 }
 
-func valuesEnableRasaProduction() map[string]interface{} {
+func valuesDisableRasaWorker() map[string]interface{} {
 	values := map[string]interface{}{
 		"rasa": map[string]interface{}{
 			"versions": map[string]interface{}{
-				"rasaProduction": map[string]interface{}{
-					"enabled": true,
+				"rasaWorker": map[string]interface{}{
+					"enabled": false,
 				},
 			},
 		},

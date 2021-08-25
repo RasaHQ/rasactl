@@ -75,9 +75,19 @@ func (r *RasaCtl) List() error {
 				enterprise = "active"
 			}
 
+			rasaProductionVersion := versionEndpoint.Rasa.Production
+			if versionEndpoint.Rasa.Production == "" {
+				rasaProductionVersion = "0.0.0"
+			}
+
+			rasaWorkerVersion := versionEndpoint.Rasa.Worker
+			if versionEndpoint.Rasa.Worker == "" {
+				rasaWorkerVersion = "0.0.0"
+			}
+
 			data = append(data, []string{current, namespace, status,
-				versionEndpoint.Rasa.Production,
-				versionEndpoint.Rasa.Worker,
+				rasaProductionVersion,
+				rasaWorkerVersion,
 				enterprise,
 				versionEndpoint.RasaX,
 			},

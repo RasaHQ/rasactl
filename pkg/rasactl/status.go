@@ -66,10 +66,20 @@ func (r *RasaCtl) Status() error {
 		if versionEndpoint.Enterprise {
 			enterprise = "active"
 		}
+		rasaProductionVersion := versionEndpoint.Rasa.Production
+		if versionEndpoint.Rasa.Production == "" {
+			rasaProductionVersion = "0.0.0"
+		}
+
+		rasaWorkerVersion := versionEndpoint.Rasa.Worker
+		if versionEndpoint.Rasa.Worker == "" {
+			rasaWorkerVersion = "0.0.0"
+		}
+
 		d = append(d, []string{"Version:", versionEndpoint.RasaX})
 		d = append(d, []string{"Enterprise:", enterprise})
-		d = append(d, []string{"Rasa production version:", versionEndpoint.Rasa.Production})
-		d = append(d, []string{"Rasa worker version:", versionEndpoint.Rasa.Worker})
+		d = append(d, []string{"Rasa production version:", rasaProductionVersion})
+		d = append(d, []string{"Rasa worker version:", rasaWorkerVersion})
 	}
 
 	projectPath := "not defined"
