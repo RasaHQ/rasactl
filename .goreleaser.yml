@@ -88,8 +88,6 @@ brews:
 
     homepage: "https://github.com/RasaHQ/rasactl"
 
-    # Template of your app's description.
-    # Default is empty.
     description: "rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster and manages Rasa X / Enterprise deployments."
 
 signs:
