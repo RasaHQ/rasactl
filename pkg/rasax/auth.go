@@ -35,7 +35,8 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 
 	jsonValue, _ := json.Marshal(values)
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth", r.URL), bytes.NewBuffer(jsonValue))
+	urlAddress := r.getURL()
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/api/auth", urlAddress), bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,8 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 
 // ValidateToken validates token and returns true if a given token is valid.
 func (r *RasaX) ValidateToken(token string) bool {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/config", r.URL), nil)
+	urlAddress := r.getURL()
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/config", urlAddress), nil)
 	if err != nil {
 		r.Log.V(1).Info("Can't validate token", "error", err)
 		return false

@@ -58,7 +58,8 @@ func (r *RasaX) ModelUpload() error {
 
 	writer.Close()
 	//buffer
-	url := fmt.Sprintf("%s/api/projects/default/models", r.URL)
+	urlAddress := r.getURL()
+	url := fmt.Sprintf("%s/api/projects/default/models", urlAddress)
 	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("POST", url, &body)
 	if err != nil {
@@ -91,7 +92,8 @@ func (r *RasaX) ModelUpload() error {
 }
 
 func (r *RasaX) ModelDownload() error {
-	url := fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Download.Name)
+	urlAddress := r.getURL()
+	url := fmt.Sprintf("%s/api/projects/default/models/%s", urlAddress, r.Flags.Model.Download.Name)
 	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("GET",
 		url, nil)
@@ -146,8 +148,9 @@ func (r *RasaX) ModelDownload() error {
 }
 
 func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
+	urlAddress := r.getURL()
 	bodyData := &rtypes.ModelsListEndpointResponse{}
-	url := fmt.Sprintf("%s/api/projects/default/models", r.URL)
+	url := fmt.Sprintf("%s/api/projects/default/models", urlAddress)
 	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -182,7 +185,8 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 }
 
 func (r *RasaX) ModelTag() error {
-	url := fmt.Sprintf("%s/api/projects/default/models/%s/tags/%s", r.URL, r.Flags.Model.Tag.Model, r.Flags.Model.Tag.Name)
+	urlAddress := r.getURL()
+	url := fmt.Sprintf("%s/api/projects/default/models/%s/tags/%s", urlAddress, r.Flags.Model.Tag.Model, r.Flags.Model.Tag.Name)
 	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("PUT", url, nil)
 	if err != nil {
@@ -213,7 +217,8 @@ func (r *RasaX) ModelTag() error {
 }
 
 func (r *RasaX) ModelDelete() error {
-	url := fmt.Sprintf("%s/api/projects/default/models/%s", r.URL, r.Flags.Model.Delete.Name)
+	urlAddress := r.getURL()
+	url := fmt.Sprintf("%s/api/projects/default/models/%s", urlAddress, r.Flags.Model.Delete.Name)
 	r.Log.V(1).Info("Sending a request to Rasa X", "url", url)
 	request, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
