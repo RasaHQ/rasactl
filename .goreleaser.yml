@@ -71,9 +71,9 @@ brews:
 
     install: |-
       bin.install "rasactl"
-      bash_completion.install "completions/goreleaser.bash" => "rasactl"
-      zsh_completion.install "completions/goreleaser.zsh" => "_rasactl"
-      fish_completion.install "completions/goreleaser.fish"
+      bash_completion.install "completions/rasactl.bash" => "rasactl"
+      zsh_completion.install "completions/rasactl.zsh" => "_rasactl"
+      fish_completion.install "completions/rasactl.fish"
 
     test: |
       system "#{bin}/rasactl --version"
