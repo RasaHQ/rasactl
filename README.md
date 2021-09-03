@@ -48,7 +48,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
     - [Deploy Rasa X with mounted a local path and a custom Docker image](#deploy-rasa-x-with-mounted-a-local-path-and-a-custom-docker-image)
   - [License](#license)
 
-## Prequimentes
+## Prerequisites
 
 - Kubernetes cluster >= 1.14+
 - kind (for local mode)
