@@ -29,14 +29,23 @@ const (
 	modelListDesc = `
 	List all models stored in Rasa X / Enterprise.
 `
+
+	modelListExample = `
+	# List all models (use the currently active deployment).
+	$ rasactl model list
+
+	# List all models for the 'my-deployment' deployment.
+	$ rasactl model list my-deployment
+`
 )
 
 func modelListCmd() *cobra.Command {
 	// cmd represents the model list command
 	cmd := &cobra.Command{
-		Use:     "list [DEPLOYMENT NAME]",
+		Use:     "list [DEPLOYMENT-NAME]",
 		Short:   "list models stored in Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelListDesc),
+		Example: templates.Examples(modelListExample),
 		Args:    cobra.MaximumNArgs(1),
 		Aliases: []string{"ls"},
 		PreRunE: func(cmd *cobra.Command, args []string) error {

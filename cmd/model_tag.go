@@ -39,15 +39,18 @@ Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
 `
 
 	modelTagExample = `
-	# Tag a model as 'production'
+	# Tag the 'my-model' model as 'production' (use the currently active deployment)
 	$ rasactl model tag my-model production
+
+	# Tag the 'my-model' with the 'test' tag within the 'my-deployment' deployment.
+	$ rasactl model tag my-deployment my-model test
 `
 )
 
 func modelTagCmd() *cobra.Command {
 	// cmd represents the model tag command
 	cmd := &cobra.Command{
-		Use:     "tag [DEPLOYMENT NAME] MODEL-NAME TAG",
+		Use:     "tag [DEPLOYMENT-NAME] MODEL-NAME TAG",
 		Short:   "tag a model in Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelTagDesc),
 		Example: templates.Examples(modelTagExample),

@@ -31,19 +31,20 @@ Download a model from Rasa X / Enterprise to your local machine.
 `
 
 	modelDownloadExample = `
-	# Download the 'model' model.
+	# Download the 'example-model' model (use the currently active deployment).
 	# If the destination is not defined, the model will be stored in a current working directory.
-	$ rasactl model download deployment-name model
+	$ rasactl model download example-model
 
-	# Download the 'model' model and store it in the /tmp directory.
-	$ rasactl model download deployment-name model /tmp/model.tar.gz
+	# Download the 'example-model' model for the 'my-deployment' deployment
+	# and store it in the /tmp directory.
+	$ rasactl model download my-deployment example-model /tmp/example-model.tar.gz
 `
 )
 
 func modelDownloadCmd() *cobra.Command {
 	// cmd represents the model download command
 	cmd := &cobra.Command{
-		Use:     "download [DEPLOYMENT NAME] MODEL-NAME [DESTINATION]",
+		Use:     "download [DEPLOYMENT-NAME] MODEL-NAME [DESTINATION]",
 		Short:   "download a model from Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelDownloadDesc),
 		Example: templates.Examples(modelDownloadExample),

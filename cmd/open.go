@@ -27,7 +27,7 @@ func openCmd() *cobra.Command {
 
 	// cmd represents the open command
 	cmd := &cobra.Command{
-		Use:   "open [DEPLOYMENT NAME]",
+		Use:   "open [DEPLOYMENT-NAME]",
 		Short: "open Rasa X in a web browser",
 		Long:  "Open Rasa X in a web browser.",
 		Args:  cobra.MaximumNArgs(1),

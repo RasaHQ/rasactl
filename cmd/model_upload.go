@@ -31,15 +31,18 @@ Upload a model to Rasa X / Enterprise.
 `
 
 	modelUploadExample = `
-	# Upload the model.tar.gz model file to Rasa X / Enterprise.
+	# Upload the model.tar.gz model file to Rasa X / Enterprise (use the currently active deployment).
 	$ rasactl model upload model.tar.gz
+
+	# Upload the model.tar.gz model file to the 'my-deployment' deployment.
+	$ rasactl model upload my-deployment model.tag.gz
 `
 )
 
 func modelUploadCmd() *cobra.Command {
 	// cmd represents the model upload command
 	cmd := &cobra.Command{
-		Use:     "upload [DEPLOYMENT NAME] MODEL-FILE",
+		Use:     "upload [DEPLOYMENT-NAME] MODEL-FILE",
 		Short:   "upload model to Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelUploadDesc),
 		Example: templates.Examples(modelUploadExample),

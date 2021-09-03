@@ -45,7 +45,7 @@ func upgradeCmd() *cobra.Command {
 
 	// cmd represents the upgrade command
 	cmd := &cobra.Command{
-		Use:     "upgrade [DEPLOYMENT NAME]",
+		Use:     "upgrade [DEPLOYMENT-NAME]",
 		Short:   "upgrade Rasa X deployment",
 		Long:    upgradeDesc,
 		Example: templates.Examples(upgradeExample),

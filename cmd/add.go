@@ -27,7 +27,7 @@ const (
 	addDesc = `
 This command adds existing Rasa X deployment to rasactl.
 
-If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it via rasactl.
+If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it by rasactl.
 `
 
 	addExample = `
@@ -44,7 +44,7 @@ func addCmd() *cobra.Command {
 	// cmd represents the add command
 	cmd := &cobra.Command{
 		Use:     "add NAMESPACE",
-		Short:   "add existing Rasa X deployment",
+		Short:   "add existing Rasa X deployment to rasactl",
 		Long:    addDesc,
 		Example: templates.Examples(addExample),
 		Args:    cobra.ExactArgs(1),

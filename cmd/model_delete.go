@@ -31,15 +31,18 @@ Delete a model from Rasa X / Enterprise.
 `
 
 	modelDeleteExample = `
-	# Delete the 'model' model.
-	$ rasactl model delete deployment-name model
+	# Delete the 'example-model' model (use the currently active deployment).
+	$ rasactl model delete example-model
+
+	# Delete the 'example-model' model for the 'my-deployment' deployment.
+	$ rasactl model delete my-deployment example-model
 `
 )
 
 func modelDeleteCmd() *cobra.Command {
 	// cmd represents the model delete command
 	cmd := &cobra.Command{
-		Use:     "delete [DEPLOYMENT NAME] MODEL-NAME",
+		Use:     "delete [DEPLOYMENT-NAME] MODEL-NAME",
 		Short:   "delete a model from Rasa X / Enterprise",
 		Long:    templates.LongDesc(modelDeleteDesc),
 		Example: templates.Examples(modelDeleteExample),

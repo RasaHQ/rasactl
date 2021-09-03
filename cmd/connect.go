@@ -24,7 +24,7 @@ func connectCmd() *cobra.Command {
 	// cmd represents the connect command
 	cmd := &cobra.Command{
 		Use:   "connect",
-		Short: "connect a component to Rasa X",
+		Short: "connect a component (e.g. a Rasa OSS server) to Rasa X",
 		Args:  cobra.NoArgs,
 	}
 

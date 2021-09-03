@@ -29,11 +29,12 @@ the deployment name, the deployment marked with '*' is used.
 
 A deployment is marked as 'CURRENT' if:
 
-  - in a current working directory is located.
-  - the '.rasactl' file that includes a deployment name. The file is automatically created
-    if you run the 'rasactl start' command with the '--project' or '--project-path' flag.
+	- there is a '.rasactl' file that includes a deployment name in your current working directory.
+	  The file is automatically created if you run the 'rasactl start' command with
+		the '--project' or '--project-path' flag.
+	- a default deployment is defined, e.g. via the 'rasactl config use-deployment' command.
   - there is only one deployment.
-  - a default deployment is defined, e.g. via the 'rasactl config use-deployment' command.
+
 `
 )
 

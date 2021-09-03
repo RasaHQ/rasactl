@@ -40,7 +40,7 @@ func authLogoutCmd() *cobra.Command {
 
 	// cmd represents the auth logout command
 	cmd := &cobra.Command{
-		Use:     "logout [DEPLOYMENT NAME]",
+		Use:     "logout [DEPLOYMENT-NAME]",
 		Short:   "remove access credentials for an account",
 		Long:    authLogoutDesc,
 		Args:    cobra.MaximumNArgs(1),

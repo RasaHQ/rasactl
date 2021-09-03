@@ -20,18 +20,36 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+)
+
+const (
+	stopDesc = `
+Stop a given running Rasa X deployment.
+`
+
+	stopExample = `
+	# Stop a Rasa X deployment with the 'my-deployment' name.
+	$ rasactl stop my-deployment
+
+	# Stop a currently active Rasa X deployment.
+	# The command stops the currently active deployment.
+	# You can use the 'rasactl list' command to check which deployment is currently used.
+	$ rasactl stop
+`
 )
 
 func stopCmd() *cobra.Command {
 
 	// cmd represents the stop command
 	cmd := &cobra.Command{
-		Use:   "stop [DEPLOYMENT NAME]",
-		Short: "stop Rasa X deployment",
-		Long:  "Stop Rasa X deployment.",
-		Args:  cobra.MaximumNArgs(1),
+		Use:     "stop [DEPLOYMENT-NAME]",
+		Short:   "stop Rasa X deployment",
+		Long:    stopDesc,
+		Example: templates.Examples(stopExample),
+		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := checkIfDeploymentsExist(); err != nil {
 				return err

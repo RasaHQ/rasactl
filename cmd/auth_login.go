@@ -28,15 +28,21 @@ import (
 const (
 	authLoginDesc = `
 	Log in to Rasa X / Enterprise.
+
 	It stores credentials in an external credentials store, such as the native keychain of the operating system.
 
-	- Apple macOS Keychain Access for macOS
-	- pass for Linux
-	- Microsoft Windows Credential Manager for Windows
+	The following external credential stores will be used:
+
+	-	On macOS: Apple macOS Keychain Access
+	- On Linux: pass
+	- On Windows: Microsoft Windows Credential Manager
 `
 
 	authLoginExample = `
-	# Login to Rasa X / Enterprise.
+	# Login to the 'my-deployment' Rasa X / Enterprise deployment.
+	$ rasactl auth login my-deployment
+
+	# Login to Rasa X / Enterprise (login to the currently active deployment).
 	$ rasactl auth login
 
 	# Provide a password using STDIN.
@@ -50,7 +56,7 @@ func authLoginCmd() *cobra.Command {
 
 	// cmd represents the auth login command
 	cmd := &cobra.Command{
-		Use:     "login [DEPLOYMENT NAME]",
+		Use:     "login [DEPLOYMENT-NAME]",
 		Short:   "authorize rasactl to access the Rasa X / Enterprise with user credentials",
 		Long:    templates.LongDesc(authLoginDesc),
 		Example: templates.Examples(authLoginExample),

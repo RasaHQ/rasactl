@@ -35,7 +35,7 @@ The command prepares a configuration that's required to connect Rasa X deploymen
 
 It's required to have the 'rasa' command accessible by rasactl.
 
-The command works only if Rasa X deployment uses a local rasa project.
+The command works only if Rasa X deployment runs on a local Kubernetes cluster runs on kind.
 `
 
 	connectRasaExample = `
@@ -54,7 +54,7 @@ func connectRasaCmd() *cobra.Command {
 
 	// cmd represents the connect rasa command
 	cmd := &cobra.Command{
-		Use:     "rasa [DEPLOYMENT NAME]",
+		Use:     "rasa [DEPLOYMENT-NAME]",
 		Short:   "run Rasa OSS server and connect it to the Rasa X deployment",
 		Long:    connectRasaDesc,
 		Args:    cobra.MaximumNArgs(1),

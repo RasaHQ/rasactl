@@ -23,7 +23,7 @@ import (
 
 const (
 	statusDesc = `
-Show status of the deployment.
+Show the status of a deployment.
 `
 
 	statusExample = `
@@ -40,7 +40,7 @@ func statusCmd() *cobra.Command {
 
 	// cmd represents the status command
 	cmd := &cobra.Command{
-		Use:     "status [DEPLOYMENT NAME]",
+		Use:     "status [DEPLOYMENT-NAME]",
 		Short:   "show deployment status",
 		Long:    templates.LongDesc(statusDesc),
 		Example: templates.Examples(statusExample),
