@@ -15,7 +15,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 - [rasactl](#rasactl)
   - [Features](#features)
   - [Table of Contents](#table-of-contents)
-  - [Prequimentes](#prequimentes)
+  - [Prerequisites](#prerequisites)
   - [Installation](#installation)
     - [Linux / macOS](#linux--macos)
   - [Commands](#commands)
@@ -240,7 +240,7 @@ Log in to Rasa X / Enterprise. It stores credentials in an external credentials 
 *  pass for Linux
 *  Microsoft Windows Credential Manager for Windows
 
-***Notice*** For Linux, pass` is used as credential storage. `pass` must be installed and configured before you use the `rasactl auth` command. Below you can find an example of `pass` installation and configuration.
+***Notice*** For Linux, `pass` is used as credential storage. `pass` must be installed and configured before you use the `rasactl auth` command. Below you can find an example of `pass` installation and configuration.
 
 `pass` installation and configuration for Linux Ubuntu.
 
