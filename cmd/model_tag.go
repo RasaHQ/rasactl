@@ -39,7 +39,7 @@ Learn more: https://rasa.com/docs/rasa-x/enterprise/deployment-environments/
 `
 
 	modelTagExample = `
-	# Tag the 'my-model' model as 'production' (use the currently active deployment)
+	# Tag the 'my-model' model as 'production' (use the currently active deployment).
 	$ rasactl model tag my-model production
 
 	# Tag the 'my-model' with the 'test' tag within the 'my-deployment' deployment.

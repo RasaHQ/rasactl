@@ -15,14 +15,23 @@ limitations under the License.
 */
 package rasactl
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/RasaHQ/rasactl/pkg/utils"
+)
 
 // Add adds an existing deployment.
 func (r *RasaCtl) Add() error {
-	r.Log.Info("Adding existing project", "namespace", r.Namespace, "releaseName", r.HelmClient.GetConfiguration().ReleaseName)
+	r.Log.Info("Adding existing deployment",
+		"namespace", r.Namespace, "releaseName", r.HelmClient.GetConfiguration().ReleaseName)
 
 	release, err := r.HelmClient.GetStatus()
 	if err != nil {
+		return err
+	}
+
+	if err := utils.HelmChartVersionConstrains(release.Chart.Metadata.Version); err != nil {
 		return err
 	}
 

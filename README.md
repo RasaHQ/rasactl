@@ -43,6 +43,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
   - [Before you start](#before-you-start)
   - [Global flags](#global-flags)
   - [Commands](#commands)
+    - [The `add` command](#the-add-command)
     - [The `start` command](#the-start-command)
     - [The `stop` command](#the-stop-command)
     - [The `delete` command](#the-delete-command)
@@ -148,6 +149,33 @@ Available Commands:
   status      show deployment status
   stop        stop Rasa X deployment
   upgrade     upgrade Rasa X deployment
+```
+
+### The `add` command
+
+Adds existing Rasa X deployment to rasactl.
+
+If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and manage it by rasactl.
+
+```text
+Usage:
+  rasactl add NAMESPACE [flags]
+```
+
+```text
+Examples:
+  # Add a Rasa X deployment that is deployed in the 'my-test' namespace.
+  $ rasactl add my-test
+
+  # Add a Rasa X deployment that is deployed in the 'my-test' namespace and
+  # a helm release name for the deployment is 'rasa-x-example'.
+  $ rasactl add my-test --rasa-x-release-name rasa-x-example
+```
+
+```text
+Flags:
+  -h, --help                         help for add
+      --rasa-x-release-name string   a helm release name to manage (default "rasa-x")
 ```
 
 ### The `start` command

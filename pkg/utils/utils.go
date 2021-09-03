@@ -30,6 +30,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
@@ -227,6 +228,7 @@ func CommandExists(cmd string) bool {
 	return err == nil
 }
 
+// ReadCredentials reads a username and a password from input.
 func ReadCredentials(flags *types.RasaCtlFlags) (string, string, error) {
 	var username, password string
 
@@ -264,6 +266,7 @@ func ReadCredentials(flags *types.RasaCtlFlags) (string, string, error) {
 	return strings.TrimSpace(username), strings.TrimSpace(password), nil
 }
 
+// GetPasswordStdin reads a password from STDIN.
 func GetPasswordStdin() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	line, err := reader.ReadString('\n')
@@ -271,4 +274,32 @@ func GetPasswordStdin() (string, error) {
 		return line, err
 	}
 	return strings.TrimSuffix(line, "\n"), nil
+}
+
+// HelmChartVersionConstrains checks if the rasa-x-helm chart version
+// is within constraints boundaries.
+func HelmChartVersionConstrains(helmChartVersion string) error {
+	constraint := ">= 2.4.0"
+
+	if helmChartVersion == "" {
+		return nil
+	}
+
+	c, err := semver.NewConstraint(constraint)
+	if err != nil {
+		return err
+	}
+
+	v, err := semver.NewVersion(helmChartVersion)
+	if err != nil {
+		return err
+	}
+
+	if !c.Check(v) {
+		return fmt.Errorf(
+			"the helm chart version is incorrect, the version that you want to use is %s"+
+				", use the helm chart in version %s", helmChartVersion, constraint)
+	}
+
+	return nil
 }

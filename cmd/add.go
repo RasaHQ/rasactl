@@ -27,7 +27,8 @@ const (
 	addDesc = `
 This command adds existing Rasa X deployment to rasactl.
 
-If you already have a Rasa X deployment that uses the rasa-x-helm chart you can add the deployment and control it by rasactl.
+If you already have a Rasa X deployment that uses the rasa-x-helm chart,
+you can add the deployment and manage it by rasactl.
 `
 
 	addExample = `

@@ -32,7 +32,7 @@ func (r *RasaCtl) List() error {
 	}
 
 	if len(namespaces) == 0 {
-		fmt.Println("Nothing to show, use the start command to create a new project")
+		fmt.Println("Nothing to show, use the start command to create a new deployment.")
 		return nil
 	}
 

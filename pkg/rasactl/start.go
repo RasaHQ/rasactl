@@ -20,6 +20,12 @@ import "github.com/RasaHQ/rasactl/pkg/utils"
 // Start starts a Rasa X / Enterprise deployment.
 func (r *RasaCtl) Start() error {
 
+	if err := utils.HelmChartVersionConstrains(
+		r.HelmClient.GetConfiguration().Version,
+	); err != nil {
+		return err
+	}
+
 	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)
 	if err := utils.ValidateName(r.HelmClient.GetNamespace()); err != nil {
 		return err
