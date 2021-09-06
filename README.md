@@ -16,11 +16,11 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 
 - stop/delete/start a running Rasa X / Enterprise deployment
 
-  Manage the lifecycle of your deployment, you can stop, delete or start one of the Rasa X deployments managed by `rasactl`.
+  Manage the lifecycle of your deployment: you can stop, delete or start one of the Rasa X deployments managed by `rasactl`.
 
 - connect a local Rasa Server to Rasa X / Enterprise
 
-  You can use your local Rasa Open Source Server along with Rasa X / Enterprise. The `rasactl` will prepare configuration for Rasa OSS and Rasa X and run Rasa Server on your local machine.
+  You can use your local Rasa Open Source server along with Rasa X / Enterprise. `rasactl` will prepare configuration for Rasa OSS and Rasa X and run the Rasa Open Source server on your local machine.
 
   (requires `kind` and Rasa OSS installed locally)
 
@@ -28,7 +28,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 
   Use your local Rasa project along with Rasa X / Enterprise deployment. The `rasaxctl` provides an easy way to use your local Rasa project along with Rasa X / Enterprise.
 
-  It's something that might be known as "local mode" in the older Rasa X version.
+  This setup was previously referred to as "local mode" in older Rasa X versions.
 
   (requires `kind` and Rasa X >= 1.0.0)
 
@@ -85,7 +85,7 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
 
 ### Linux / macOS
 
-- Binary downloads of `rasactl` can be found on [the Releases page](https://github.com/rasahq/rasactl/releases/latest).
+- Binary downloads of `rasactl` can be found on [the Releases page](https://github.com/rasahq/rasactl/releases/latest). You can manually install rasactl by coping the binary into your `bin`:
 
 ```text
 $ curl -L https://github.com/RasaHQ/rasactl/releases/download/0.0.7/rasactl_0.0.7_darwin_amd64.tar.gz
@@ -93,7 +93,7 @@ $ tar -zxvf rasactl_0.0.7_darwin_amd64.tar.gz
 $ cp rasactl_0.0.7_darwin_amd64/rasactl /usr/local/bin/
 ```
 
-- Using `brew`
+- You can also install via `brew`:
 
 ```text
 $ brew tap rasahq/rasactl
@@ -104,19 +104,19 @@ $ brew install rasactl
 
 Below you can find several things that are good to know and keep in mind when you use `rasactl`.
 
-- `rasactl` executes an operation always only for a given deployment. The order in which `rasactl` determine a deployment to use:
+- It is possible to configure multiple deployments with `rasactl`. A `rasactl` command will always execute an operation on a single deployment. Here is the order in which `rasactl` determines which deployment to use:
 
   1. A deployment name passed as an argument in CLI, e.g. `rasactl status deployment-name`, you can use `rasactl help command` to see usage example for a given command.
-  2. The `rasactl` checks if a `.rasactl` file exists in a current working directory, if yes, then a deployment defined in the file is used. The `.rasactl` file is created automatically when the `rasactl start --project` command is executed.
-  3. The `rasactl` checks if a default deployment is configured in the `rasactl.yaml` configuration file, if yes, then the default deployment is used. The default deployment can be set by using the `rasactl config use-deployment` command.
+  2. `rasactl` checks if a `.rasactl` file exists in a current working directory. If so, the deployment defined in the file is used. This `.rasactl` file is created automatically when the `rasactl start --project` command is executed.
+  3. `rasactl` checks if a default deployment is configured in the `rasactl.yaml` configuration file, if yes, then the default deployment is used. The default deployment can be set by using the `rasactl config use-deployment` command.
   4. If there is only one deployment, then it's used.
 
   You can use the [`rasactl list`](#the-list-command) command to check which deployment is used as the current one.
 
-  The `rasactl delete` command always requires explicitly pass a deployment name as an argument.
+  The `rasactl delete` command requires explicitly passing a deployment name as an argument.
 
 - `rasactl` uses the [`rasa-x-helm`](https://github.com/RasaHQ/rasa-x-helm) chart to deploy Rasa X / Enterprise.
-- `rasactl` deploys Rasa X / Enterprise without Rasa Open Source Server. It's up to you to connect Rasa OSS with Rasa X / Enterprise deployment.
+- `rasactl` deploys Rasa X / Enterprise without a Rasa Open Source server. It's up to you to connect Rasa OSS with Rasa X / Enterprise deployment.
 - `rasactl` uses a Kubernetes context from the kubeconfig file, if you want to switch Kubernetes cluster you have to use `kubectl` or other tools that change the active context for the kubeconfig.
 
 ## Global flags
@@ -369,7 +369,7 @@ Flags:
 
 ### The `connect rasa` command
 
-Connect Rasa OSS (Open Source Server) to Rasa X deployment.
+Run a local Rasa Open Source server and connect it to a Rasa X deployment.
 
 The command prepares a configuration that's required to connect Rasa X deployment and run a local Rasa server.
 
