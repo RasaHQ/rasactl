@@ -32,7 +32,7 @@ func (r *RasaCtl) checkIfRasaOSSProductionIsConnected() error {
 		return err
 	}
 
-	if resp.Rasa.Production == "0.0.0" {
+	if resp.Rasa.Production == "0.0.0" || resp.Rasa.Production == "" {
 		return fmt.Errorf("rasa server is not connected to the production environment")
 	}
 

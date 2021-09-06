@@ -16,11 +16,7 @@ limitations under the License.
 package rasactl
 
 import (
-	"encoding/json"
 	"fmt"
-	"time"
-
-	"github.com/golang-jwt/jwt"
 
 	"github.com/RasaHQ/rasactl/pkg/credentials"
 	"github.com/RasaHQ/rasactl/pkg/credentials/helpers"
@@ -86,32 +82,6 @@ func (r *RasaCtl) AuthLogout() error {
 	return err
 }
 
-func (r *RasaCtl) isJWTExpired(token string) bool {
-	t, _, err := new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
-	if err != nil {
-		r.Log.Error(err, "Can't parse a JWT token")
-	}
-
-	if claims, ok := t.Claims.(jwt.MapClaims); ok {
-		var tm time.Time
-		switch exp := claims["exp"].(type) {
-		case float64:
-			tm = time.Unix(int64(exp), 0)
-		case json.Number:
-			v, _ := exp.Int64()
-			tm = time.Unix(v, 0)
-		}
-
-		now := time.Now()
-
-		return now.Before(tm)
-	}
-
-	r.Log.Error(err, "Can't parse a JWT token")
-
-	return false
-}
-
 func (r *RasaCtl) getAuthToken() (string, error) {
 	var token string
 
@@ -126,7 +96,7 @@ func (r *RasaCtl) getAuthToken() (string, error) {
 		return token, fmt.Errorf("%s, use the 'rasa auth login' command", err)
 	}
 
-	if !r.isJWTExpired(token) || !r.RasaXClient.ValidateToken(token) {
+	if !r.RasaXClient.ValidateToken(token) {
 		r.initRasaXClient()
 		r.Log.V(1).Info("Getting credentials from the store", "name", "rasactl-login", "namespace", r.Namespace)
 		username, password, err := credsStore.Get("rasactl-login")
