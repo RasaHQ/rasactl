@@ -34,10 +34,10 @@ import (
 func (h *Helm) ReadValuesFile() error {
 	file := h.Flags.StartUpgrade.ValuesFile
 
-	// make sure that current values are empty
-	h.Values = nil
-
 	if file != "" {
+		// make sure that current values are empty
+		h.Values = nil
+
 		h.Log.V(1).Info("Reading the values file", "file", file)
 		valuesFile, err := ioutil.ReadFile(file)
 		if err != nil {
