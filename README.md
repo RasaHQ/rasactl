@@ -59,12 +59,12 @@ rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster a
     - [The `model list` command](#the-model-list-command)
     - [The `model tag` command](#the-model-tag-command)
     - [The `model upload` command](#the-model-upload-command)
+    - [Upload a model to Rasa X](#upload-a-model-to-rasa-x)
   - [Examples of usage](#examples-of-usage)
     - [Run Rasa X / Enterprise with a local Rasa Server](#run-rasa-x--enterprise-with-a-local-rasa-server)
     - [Run Rasa X / Enterprise with mounted a local Rasa project](#run-rasa-x--enterprise-with-mounted-a-local-rasa-project)
     - [Upgrade Rasa X / Enterprise version](#upgrade-rasa-x--enterprise-version)
     - [Deploy Rasa X in one of the public cloud providers](#deploy-rasa-x-in-one-of-the-public-cloud-providers)
-    - [Upload a model to Rasa X](#upload-a-model-to-rasa-x)
   - [Development](#development)
     - [How to run it?](#how-to-run-it)
     - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
@@ -674,6 +674,33 @@ Flags:
   -h, --help   help for upload
 ```
 
+### Upload a model to Rasa X
+
+The following example shows how to download an existing model and upload it via `rasactl`.
+
+1. Download a model.
+
+```text
+$ curl -L https://github.com/RasaHQ/rasa-x-demo/blob/master/models/model.tar.gz?raw=true --output model.tar.gz
+[...]
+```
+
+2. Upload the download model to Rasa X.
+
+```text
+$ rasactl model upload [deployment name] model.tar.gz
+
+Successfully uploaded.
+```
+
+You can use the `rasa model list` command to list all available models, e.g
+
+```text
+$ rasactl model list [deployment name]
+NAME 	VERSION	COMPATIBLE	TAGS	HASH                            	TRAINED AT
+model	2.8.2  	true      	none	093dfaad610d330e5f36e6d7dc104d86	05 Aug 21 13:16 UTC
+```
+
 ## Examples of usage
 
 ### Run Rasa X / Enterprise with a local Rasa Server
@@ -793,33 +820,6 @@ $ rasactl start
 ```
 
 ***Important!*** The Rasa X / Enterprise deployment will be exposed to the public on one of the service node ports (`30000-30100`). Remember to add a rule to firewall configuration that allows for access to the Rasa X deployment.
-
-### Upload a model to Rasa X
-
-The following example shows how to download an existing model and upload it via `rasactl`.
-
-1. Download a model.
-
-```text
-$ curl -L https://github.com/RasaHQ/rasa-x-demo/blob/master/models/model.tar.gz?raw=true --output model.tar.gz
-[...]
-```
-
-2. Upload the download model to Rasa X.
-
-```text
-$ rasactl model upload [deployment name] model.tar.gz
-
-Successfully uploaded.
-```
-
-You can use the `rasa model list` command to list all available models, e.g
-
-```text
-$ rasactl model list [deployment name]
-NAME 	VERSION	COMPATIBLE	TAGS	HASH                            	TRAINED AT
-model	2.8.2  	true      	none	093dfaad610d330e5f36e6d7dc104d86	05 Aug 21 13:16 UTC
-```
 
 ## Development
 
