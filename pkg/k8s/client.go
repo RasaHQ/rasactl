@@ -20,18 +20,17 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	"github.com/spf13/viper"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 type KubernetesInterface interface {
@@ -68,6 +67,7 @@ type KubernetesInterface interface {
 	SetHelmValues(values map[string]interface{})
 	SetHelmReleaseName(release string)
 	GetCloudProvider() *cloud.Provider
+	LoadConfig() (*rest.Config, error)
 }
 
 // Kubernetes represents Kubernetes client.
@@ -107,8 +107,8 @@ type HelmSpec struct {
 // New initializes a new Kubernetes client.
 func New(client *Kubernetes) (KubernetesInterface, error) {
 	client.Log.Info("Initializing Kubernetes client")
-	client.kubeconfig = viper.GetString("kubeconfig")
-	config, err := clientcmd.BuildConfigFromFlags("", client.kubeconfig)
+
+	config, err := client.LoadConfig()
 	if err != nil {
 		return nil, err
 	}

@@ -106,7 +106,7 @@ Below you can find several things that are good to know and keep in mind when yo
 
 - `rasactl` executes an operation always only for a given deployment. The order in which `rasactl` determine a deployment to use:
 
-  1. A deployment name passed as an argument.
+  1. A deployment name passed as an argument in CLI, e.g. `rasactl status deployment-name`, you can use `rasactl help command` to see usage example for a given command.
   2. The `rasactl` checks if a `.rasactl` file exists in a current working directory, if yes, then a deployment defined in the file is used. The `.rasactl` file is created automatically when the `rasactl start --project` command is executed.
   3. The `rasactl` checks if a default deployment is configured in the `rasactl.yaml` configuration file, if yes, then the default deployment is used. The default deployment can be set by using the `rasactl config use-deployment` command.
   4. If there is only one deployment, then it's used.
@@ -127,7 +127,8 @@ Below you can find global flags that can be used with every command.
 Global Flags:
       --config string       config file (default is $HOME/.rasactl.yaml)
       --debug               enable debug output
-      --kubeconfig string   absolute path to the kubeconfig file (default "/Users/tczekajlo/.kube/config")
+      --kube-context string   name of the kubeconfig context to use
+      --kubeconfig string   absolute path to the kubeconfig file (default "$HOME/.kube/config")
       --verbose             enable verbose output
 ```
 
@@ -374,7 +375,7 @@ The command prepares a configuration that's required to connect Rasa X deploymen
 
 It's required to have the 'rasa' command accessible by rasactl.
 
-The command works only if Rasa X deployment runs on a local Kubernetes cluster runs on kind.
+The command works only if Rasa X deployment runs on a local Kubernetes cluster managed with 'kind'.
 
 ```text
 Usage:
@@ -498,7 +499,26 @@ Successfully logged.
 
 ### The `auth logout` command
 
-Removes access credentials for an account.
+Removes credentials from an external credentials store, such as the native keychain of the operating system.
+
+```text
+Usage:
+  rasactl auth logout [DEPLOYMENT-NAME] [flags]
+```
+
+```text
+Examples:
+  # Remove access credentials (use the currently active deployment).
+  $ rasactl auth logout
+
+  # Remove access credentials for the 'my-deployment' deployment.
+  $ rasactl auth logout my-deployment
+```
+
+```text
+Flags:
+  -h, --help   help for logout
+```
 
 ## Model Management Commands
 

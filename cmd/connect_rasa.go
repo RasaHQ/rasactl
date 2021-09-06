@@ -35,7 +35,7 @@ The command prepares a configuration that's required to connect Rasa X deploymen
 
 It's required to have the 'rasa' command accessible by rasactl.
 
-The command works only if Rasa X deployment runs on a local Kubernetes cluster runs on kind.
+The command works only if Rasa X deployment runs on a local Kubernetes cluster managed with 'kind'.
 `
 
 	connectRasaExample = `

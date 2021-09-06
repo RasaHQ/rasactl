@@ -88,6 +88,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&rasactlFlags.Global.Verbose, "verbose", false, "enable verbose output")
 	rootCmd.PersistentFlags().BoolVar(&rasactlFlags.Global.Debug, "debug", false, "enable debug output")
 	rootCmd.PersistentFlags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "absolute path to the kubeconfig file")
+	rootCmd.PersistentFlags().String("kube-context", "", "name of the kubeconfig context to use")
 
 	//nolint:golint,errcheck
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
@@ -95,6 +96,8 @@ func init() {
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	//nolint:golint,errcheck
 	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
+	//nolint:golint,errcheck
+	viper.BindPFlag("kube-context", rootCmd.PersistentFlags().Lookup("kube-context"))
 }
 
 func initLog() {

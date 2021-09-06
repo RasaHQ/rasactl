@@ -31,8 +31,11 @@ It removes credentials from an external credentials store, such as the native ke
 `
 
 	authLogoutExample = `
-	# Remove access credentials
+	# Remove access credentials (use the currently active deployment).
 	$ rasactl auth logout
+
+	# Remove access credentials for the 'my-deployment' deployment.
+	$ rasactl auth logout my-deployment
 `
 )
 

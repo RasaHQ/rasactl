@@ -18,14 +18,18 @@ package k8s
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	ktypes "k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/spf13/viper"
 )
 
 func (k *Kubernetes) detectBackend() types.KubernetesBackendType {
@@ -178,4 +182,30 @@ func (k *Kubernetes) PodStatus(conditions []v1.PodCondition) string {
 	}
 
 	return "Ready"
+}
+
+// LoadConfig loads the kubeconfig file and returns a complete client config.
+func (k *Kubernetes) LoadConfig() (*rest.Config, error) {
+	context := viper.GetString("kube-context")
+	k.kubeconfig = viper.GetString("kubeconfig")
+
+	rawConfig, err := clientcmd.LoadFromFile(k.kubeconfig)
+	if err != nil {
+		return nil, err
+	}
+
+	if rawConfig.CurrentContext == "" {
+		return nil, fmt.Errorf("kubeconfig: the current context is empty, use the --kube-context flag or kubectl to set a context")
+	}
+
+	if _, ok := rawConfig.Contexts[context]; !ok && context != "" {
+		return nil, fmt.Errorf("kubeconfig: the %s context doesn't exist", context)
+	}
+
+	if context != "" {
+		rawConfig.CurrentContext = context
+	}
+
+	client, err := clientcmd.NewDefaultClientConfig(*rawConfig, nil).ClientConfig()
+	return client, err
 }

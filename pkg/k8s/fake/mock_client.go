@@ -7,11 +7,11 @@ package fake
 import (
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
-	v1 "k8s.io/api/core/v1"
-
 	types "github.com/RasaHQ/rasactl/pkg/types"
 	cloud "github.com/RasaHQ/rasactl/pkg/utils/cloud"
+	gomock "github.com/golang/mock/gomock"
+	v1 "k8s.io/api/core/v1"
+	rest "k8s.io/client-go/rest"
 )
 
 // MockKubernetesInterface is a mock of KubernetesInterface interface.
@@ -371,6 +371,21 @@ func (m *MockKubernetesInterface) IsRasaXRunning() (bool, error) {
 func (mr *MockKubernetesInterfaceMockRecorder) IsRasaXRunning() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsRasaXRunning", reflect.TypeOf((*MockKubernetesInterface)(nil).IsRasaXRunning))
+}
+
+// LoadConfig mocks base method.
+func (m *MockKubernetesInterface) LoadConfig() (*rest.Config, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LoadConfig")
+	ret0, _ := ret[0].(*rest.Config)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// LoadConfig indicates an expected call of LoadConfig.
+func (mr *MockKubernetesInterfaceMockRecorder) LoadConfig() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LoadConfig", reflect.TypeOf((*MockKubernetesInterface)(nil).LoadConfig))
 }
 
 // PodStatus mocks base method.
