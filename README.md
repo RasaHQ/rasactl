@@ -125,11 +125,12 @@ Below you can find global flags that can be used with every command.
 
 ```text
 Global Flags:
-      --config string       config file (default is $HOME/.rasactl.yaml)
-      --debug               enable debug output
+      --config string         config file (default is $HOME/.rasactl.yaml)
+      --debug                 enable debug output
+  -h, --help                  help for rasactl
       --kube-context string   name of the kubeconfig context to use
-      --kubeconfig string   absolute path to the kubeconfig file (default "$HOME/.kube/config")
-      --verbose             enable verbose output
+      --kubeconfig string     absolute path to the kubeconfig file (default "$HOME/.kube/config")
+      --verbose               enable verbose outpu
 ```
 
 ## Commands
