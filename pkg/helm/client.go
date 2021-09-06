@@ -93,7 +93,8 @@ type Helm struct {
 	// RasaXChartName defines a helm chart name to be used.
 	RasaXChartName string
 
-	kubeConfig string
+	kubeConfig  string
+	kubeContext string
 
 	// Values store helm values that are used by the client.
 	Values map[string]interface{}
@@ -114,6 +115,11 @@ func New(client *Helm) (Interface, error) {
 	client.Settings.RepositoryConfig = repositoryConfigPath
 	client.RasaXChartName = "rasa-x"
 	client.kubeConfig = viper.GetString("kubeconfig")
+
+	client.kubeContext = viper.GetString("kube-context")
+	if client.kubeContext != "" {
+		client.Settings.KubeContext = client.kubeContext
+	}
 
 	client.Log.Info("Initializing Helm client")
 
@@ -136,6 +142,7 @@ func New(client *Helm) (Interface, error) {
 	genericcliopts := &genericclioptions.ConfigFlags{
 		Namespace:  &client.Namespace,
 		KubeConfig: &client.kubeConfig,
+		Context:    &client.kubeContext,
 	}
 
 	err := client.ActionConfig.Init(genericcliopts, client.Namespace, client.driver, client.debugLog)
@@ -148,6 +155,7 @@ func (h *Helm) SetNamespace(namespace string) error {
 	genericcliopts := &genericclioptions.ConfigFlags{
 		Namespace:  &h.Namespace,
 		KubeConfig: &h.kubeConfig,
+		Context:    &h.kubeContext,
 	}
 
 	err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
