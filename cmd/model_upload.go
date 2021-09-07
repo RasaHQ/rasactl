@@ -62,12 +62,7 @@ func modelUploadCmd() *cobra.Command {
 				return err
 			}
 
-			modelFile := args[1]
-			if err != nil {
-				return err
-			}
-
-			rasactlFlags.Model.Upload.File = modelFile
+			rasactlFlags.Model.Upload.File = args[1]
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
