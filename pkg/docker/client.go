@@ -272,16 +272,6 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 	return nil
 }
 
-func (d *Docker) getKindNetwork() (string, error) {
-
-	inspect, err := d.Client.ContainerInspect(d.Ctx, d.Kind.ControlPlaneHost)
-	if err != nil {
-		return "", err
-	}
-
-	return inspect.HostConfig.NetworkMode.NetworkName(), nil
-}
-
 // CreateKindNode creates a new container that is used as a kind node.
 func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreatedBody, error) {
 	kindImage := fmt.Sprintf("%s%s", kindImagePrefix, d.Kind.Version)
@@ -336,7 +326,7 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 
 	}
 
-	kindNetwork, err := d.getKindNetwork()
+	kindControlPlaneContainer, err := d.getKindControlPlaneInfo()
 	if err != nil {
 		return container.ContainerCreateCreatedBody{}, err
 	}
@@ -348,9 +338,15 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 			Hostname: hostname,
 			Volumes:  map[string]struct{}{"/var": {}},
 			Env:      []string{"container=docker"},
+			Labels: map[string]string{
+				"io.x-k8s.kind.cluster": kindControlPlaneContainer.Config.Labels["io.x-k8s.kind.cluster"],
+				"io.x-k8s.kind.role":    "worker",
+			},
 		},
 		hostConfig, &network.NetworkingConfig{
-			EndpointsConfig: map[string]*network.EndpointSettings{kindNetwork: {}},
+			EndpointsConfig: map[string]*network.EndpointSettings{
+				kindControlPlaneContainer.HostConfig.NetworkMode.NetworkName(): {},
+			},
 		},
 		nil,
 		hostname,
@@ -419,4 +415,14 @@ func (d *Docker) SetKind(kind KindSpec) {
 // SetProjectPath sets the Docker.ProjectPath field.
 func (d *Docker) SetProjectPath(path string) {
 	d.ProjectPath = path
+}
+
+func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
+
+	inspect, err := d.Client.ContainerInspect(d.Ctx, d.Kind.ControlPlaneHost)
+	if err != nil {
+		return inspect, err
+	}
+
+	return inspect, nil
 }
