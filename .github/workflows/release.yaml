@@ -45,7 +45,7 @@ jobs:
           docker run \
             --rm \
             -e CGO_ENABLED=1 -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -e VERSION=${{ env.VERSION }} \
-            -e RASACTL_GITHUB_TOKEN=${{ secrets.RASACTL_GITHUB_TOKEN }} \
+            -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -e GPG_FINGERPRINT=${{ steps.import_gpg.outputs.fingerprint }} \
             -v `pwd`:/go/src/rasactl \
             -v /home/runner/.gnupg:/root/.gnupg \

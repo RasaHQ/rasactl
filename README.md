@@ -96,6 +96,7 @@ $ cp rasactl_0.0.7_darwin_amd64/rasactl /usr/local/bin/
 - You can also install via `brew`:
 
 ```text
+$ brew tap rasahq/rasactl
 $ brew install rasactl
 ```
 

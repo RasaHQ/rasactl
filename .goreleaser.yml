@@ -65,9 +65,9 @@ before:
 brews:
   - name: rasactl
     tap:
-      owner: rasactl
-      name: homebrew-tap
-      token: "{{ .Env.RASACTL_GITHUB_TOKEN }}"
+      owner: RasaHQ
+      name: homebrew-rasactl
+      token: "{{ .Env.RASABOT_GITHUB_TOKEN }}"
 
     install: |-
       bin.install "rasactl"
@@ -81,8 +81,8 @@ brews:
     # Git author used to commit to the repository.
     # Defaults are shown.
     commit_author:
-      name: rasactl
-      email: 90342937+rasactl@users.noreply.github.com
+      name: rasabot
+      email: rasabot@rasa.com
 
     folder: Formula
 
