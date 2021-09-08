@@ -81,8 +81,8 @@ brews:
     # Git author used to commit to the repository.
     # Defaults are shown.
     commit_author:
-      name: rasabot
-      email: rasabot@rasa.com
+      name: rasactl
+      email: 90342937+rasactl@users.noreply.github.com
 
     folder: Formula
 
