@@ -2,6 +2,8 @@
 
 rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster and manages Rasa X / Enterprise deployments.
 
+<p align="center"><img src="img/render1631526529716.gif?raw=true"/></p>
+
 ## Features
 
 - deploy Rasa X / Enterprise
