@@ -31,7 +31,7 @@ func valuesMountHostPath(pvcName string) map[string]interface{} {
 			"extraVolumeMounts": []map[string]interface{}{
 				{
 					"name":      "rasa-x-local-path",
-					"mountPath": "/project",
+					"mountPath": "/app/local_project",
 				},
 			},
 		},
