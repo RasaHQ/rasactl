@@ -1,0 +1,41 @@
+# Settings to connect Rasa OSS to Rasa X
+  applicationSettings:
+    rasaX:
+      enabled: true
+      # here you have to put the URL to your Rasa Enterprise instance
+      url: "http://rasa-x-rasa-x:5005"
+    endpoints:
+      # In order to send messages to the same
+      # event broker as Rasa X/Enterprise does we can pass
+      # a custom configuration.
+      eventBroker:
+        type: "pika"
+        url: "rasa-x-rabbit"
+        username: "user"
+        password: ${RABBITMQ_PASSWORD}
+        port: "5672"
+        queues:
+          - "rasa_production_events"
+
+      # Use Rasa X as a model server
+      models:
+        enabled: true
+        # User Rasa X/Enterprise token
+        # If you use the rasa-x-helm chart you can set a token by using the `rasax.token` parameter
+        # See: https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml#L22
+        token: "rasaXToken"
+        waitTimeBetweenPulls: 20
+        useRasaXasModelServer:
+          enabled: true
+          # -- The tag of the model that should be pulled from Rasa X/Enterprise
+          tag: "production"
+
+  extraEnv:
+    # The configuration for an event broker uses environment variables, thus
+    # you have to pass extra environment variables that read values from
+    # the rasa-x-rabbit secret.
+    - name: "RABBITMQ_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: rasa-x-rabbit
+          key: rabbitmq-password

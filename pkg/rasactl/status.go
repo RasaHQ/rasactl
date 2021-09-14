@@ -96,7 +96,7 @@ func (r *RasaCtl) Status() error {
 		}
 		d = append(d, []string{"Helm chart:", fmt.Sprintf("%s-%s", release.Chart.Name(), release.Chart.Metadata.Version)})
 		d = append(d, []string{"Helm release:", release.Name})
-		d = append(d, []string{"Helm release status", release.Info.Status.String()})
+		d = append(d, []string{"Helm release status:", release.Info.Status.String()})
 
 		pods, err := r.KubernetesClient.GetPods()
 		if err != nil {
