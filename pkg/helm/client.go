@@ -16,13 +16,14 @@ limitations under the License.
 package helm
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"sync"
 
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"golang.org/x/sync/errgroup"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
@@ -196,19 +197,18 @@ func (h *Helm) updateRepository() error {
 		return err
 	}
 
-	var wg sync.WaitGroup
-	var errResult error
+	g, _ := errgroup.WithContext(context.Background())
+
 	for _, re := range repos {
-		wg.Add(1)
-		go func(re *repo.ChartRepository) {
-			defer wg.Done()
+		re := re // create a new 're', https://golang.org/doc/faq#closures_and_goroutines
+		g.Go(func() error {
 			if _, err := re.DownloadIndexFile(); err != nil {
-				errResult = errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s\n",
+				return errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s\n",
 					re.Config.Name, re.Config.URL, err)
 			}
-		}(re)
+			return nil
+		})
 	}
-	wg.Wait()
 
-	return errResult
+	return g.Wait()
 }

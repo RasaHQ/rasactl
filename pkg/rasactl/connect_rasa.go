@@ -140,6 +140,7 @@ func (r *RasaCtl) ConnectRasa() error {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	ready := make(chan bool, 1)
+
 	go func() {
 		sig := <-sigs
 		fmt.Println()

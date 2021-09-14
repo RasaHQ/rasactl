@@ -340,5 +340,5 @@ func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
 		}
 	}
 
-	return 0, nil
+	return 0, fmt.Errorf("can't determine a node port for the rabbitmq service")
 }
