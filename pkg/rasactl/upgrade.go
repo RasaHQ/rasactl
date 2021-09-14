@@ -52,6 +52,5 @@ func (r *RasaCtl) Upgrade() error {
 		return err
 	}
 
-	err = r.KubernetesClient.UpdateSecretWithState(rasaXVersion, helmRelease)
-	return err
+	return r.KubernetesClient.UpdateSecretWithState(rasaXVersion, helmRelease)
 }

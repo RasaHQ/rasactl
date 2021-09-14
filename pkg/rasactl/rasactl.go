@@ -113,8 +113,7 @@ func (r *RasaCtl) InitClients() error {
 	}
 	r.DockerClient = dockerClient
 
-	err = r.GetKindControlPlaneNodeInfo()
-	return err
+	return r.GetKindControlPlaneNodeInfo()
 }
 
 // SetNamespaceClients sets namespace for initialized clients.
@@ -149,50 +148,87 @@ func (r *RasaCtl) CheckDeploymentStatus() (bool, bool, error) {
 	return isRasaXDeployed, isRasaXRunning, nil
 }
 
+func (r *RasaCtl) useProject(projectPath string) error {
+	if projectPath != "" || r.Flags.Start.Project {
+		if r.DockerClient.GetKind().ControlPlaneHost != "" {
+			if !r.Flags.Start.Project {
+				// check if the project path exists
+				if path, err := os.Stat(projectPath); err != nil {
+					if os.IsNotExist(err) {
+						return err
+					} else if !path.IsDir() {
+						return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
+					}
+					return err
+				}
+				r.DockerClient.SetProjectPath(projectPath)
+			} else {
+				// use a current working directory
+				wd, err := os.Getwd()
+				if err != nil {
+					return err
+				}
+				r.DockerClient.SetProjectPath(wd)
+				projectPath = wd
+			}
+
+			r.Spinner.Message("Creating and joining a kind node")
+			if err := r.CreateAndJoinKindNode(); err != nil {
+				return err
+			}
+			volume, err := r.KubernetesClient.CreateVolume(projectPath)
+			if err != nil {
+				return err
+			}
+			r.HelmClient.SetPersistanceVolumeClaimName(volume)
+
+		} else {
+			return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
+		}
+
+		if err := r.writeStatusFile(projectPath); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *RasaCtl) start() error {
+	state, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+	// Start Rasa X if deployments are scaled down to 0
+	msg := "Starting Rasa X"
+	r.Spinner.Message(msg)
+	r.Log.Info(msg)
+
+	if string(state[types.StateProjectPath]) != "" && r.DockerClient.GetKind().ControlPlaneHost != "" {
+		nodeName := fmt.Sprintf("kind-%s", r.Namespace)
+		if err := r.DockerClient.StartKindNode(nodeName); err != nil {
+			return err
+		}
+	}
+	// Set configuration used for starting a stopped project.
+	helmConfig := r.HelmClient.GetConfiguration()
+	helmConfig.StartProject = true
+	r.HelmClient.SetConfiguration(helmConfig)
+
+	if err := r.HelmClient.Upgrade(); err != nil {
+		return err
+	}
+
+	return r.KubernetesClient.ScaleUp()
+}
+
 func (r *RasaCtl) startOrInstall() error {
 	projectPath := r.Flags.Start.ProjectPath
 	// Install Rasa X
 	if !r.isRasaXDeployed && !r.isRasaXRunning {
-		if projectPath != "" || r.Flags.Start.Project {
-			if r.DockerClient.GetKind().ControlPlaneHost != "" {
-				if !r.Flags.Start.Project {
-					// check if the project path exists
-					if path, err := os.Stat(projectPath); err != nil {
-						if os.IsNotExist(err) {
-							return err
-						} else if !path.IsDir() {
-							return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
-						}
-						return err
-					}
-					r.DockerClient.SetProjectPath(projectPath)
-				} else {
-					// use a current working directory
-					wd, err := os.Getwd()
-					if err != nil {
-						return err
-					}
-					r.DockerClient.SetProjectPath(wd)
-					projectPath = wd
-				}
 
-				r.Spinner.Message("Creating and joining a kind node")
-				if err := r.CreateAndJoinKindNode(); err != nil {
-					return err
-				}
-				volume, err := r.KubernetesClient.CreateVolume(projectPath)
-				if err != nil {
-					return err
-				}
-				r.HelmClient.SetPersistanceVolumeClaimName(volume)
-
-			} else {
-				return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
-			}
-
-			if err := r.writeStatusFile(projectPath); err != nil {
-				return err
-			}
+		// executes additional operations if a deployment uses a local Rasa project
+		if err := r.useProject(projectPath); err != nil {
+			return err
 		}
 
 		if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
@@ -204,33 +240,8 @@ func (r *RasaCtl) startOrInstall() error {
 			return err
 		}
 	} else if !r.isRasaXRunning {
-		state, err := r.KubernetesClient.ReadSecretWithState()
-		if err != nil {
-			return err
-		}
-		// Start Rasa X if deployments are scaled down to 0
-		msg := "Starting Rasa X"
-		r.Spinner.Message(msg)
-		r.Log.Info(msg)
-
-		if string(state[types.StateProjectPath]) != "" {
-			if r.DockerClient.GetKind().ControlPlaneHost != "" {
-				nodeName := fmt.Sprintf("kind-%s", r.Namespace)
-				if err := r.DockerClient.StartKindNode(nodeName); err != nil {
-					return err
-				}
-			}
-		}
-		// Set configuration used for starting a stopped project.
-		helmConfig := r.HelmClient.GetConfiguration()
-		helmConfig.StartProject = true
-		r.HelmClient.SetConfiguration(helmConfig)
-
-		if err := r.HelmClient.Upgrade(); err != nil {
-			return err
-		}
-
-		if err := r.KubernetesClient.ScaleUp(); err != nil {
+		// starts a stopped deployment
+		if err := r.start(); err != nil {
 			return err
 		}
 	}
@@ -258,20 +269,15 @@ func (r *RasaCtl) GetRasaXURL() (string, error) {
 
 	url, err := r.KubernetesClient.GetRasaXURL()
 	if err != nil {
-		return url, err
+		return "", err
 	}
 
-	r.Log.V(1).Info("Get Rasa X URL", "url", url)
+	r.Log.V(1).Info("Getting Rasa X URL", "url", url)
 	return url, nil
 }
 
 func (r *RasaCtl) GetRasaXToken() (string, error) {
-	token, err := r.KubernetesClient.GetRasaXToken()
-	if err != nil {
-		return token, err
-	}
-
-	return token, nil
+	return r.KubernetesClient.GetRasaXToken()
 }
 
 func (r *RasaCtl) initRasaXClient() {

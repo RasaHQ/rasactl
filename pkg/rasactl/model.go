@@ -88,8 +88,7 @@ func (r *RasaCtl) ModelDownload() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	err = r.RasaXClient.ModelDownload()
-	return err
+	return r.RasaXClient.ModelDownload()
 }
 
 func (r *RasaCtl) ModelTag() error {

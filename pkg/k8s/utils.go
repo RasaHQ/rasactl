@@ -58,15 +58,15 @@ func (k *Kubernetes) detectBackend() types.KubernetesBackendType {
 func (k *Kubernetes) IsNamespaceExist(namespace string) (bool, error) {
 
 	_, err := k.clientset.CoreV1().Namespaces().Get(context.TODO(), namespace, metav1.GetOptions{})
-	switch t := err; true {
-	case errors.IsNotFound(t):
-		k.Log.V(1).Info("Namespace not found", "namespace", namespace)
-		return false, nil
-	case t != nil:
+
+	if err != nil {
 		k.Log.V(1).Info("Namespace is invalid", "namespace", namespace, "error", err)
 		return false, nil
-
+	} else if errors.IsNotFound(err) {
+		k.Log.V(1).Info("Namespace not found", "namespace", namespace)
+		return false, nil
 	}
+
 	return true, nil
 
 }
@@ -79,8 +79,8 @@ func (k *Kubernetes) GetKindControlPlaneNode() (v1.Node, error) {
 		return v1.Node{}, err
 	}
 
-	for _, node := range nodes.Items {
-		return node, nil
+	if len(nodes.Items) != 0 {
+		return nodes.Items[0], nil
 	}
 
 	return v1.Node{}, nil

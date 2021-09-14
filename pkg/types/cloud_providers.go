@@ -18,11 +18,11 @@ package types
 type CloudProvider string
 
 const (
-	CloudProviderUnknown      CloudProvider = "Unknown"
-	CloudProviderGoogle       CloudProvider = "GCP"
-	CloudProviderAmazon       CloudProvider = "AWS"
-	CloudProviderAlibaba      CloudProvider = "Alibaba Cloud"
-	CloudProviderAzure        CloudProvider = "Azure"
-	CloudProviderDigitalOcean CloudProvider = "Digital Ocean"
-	CloudProviderOracle       CloudProvider = "Oracle Cloud"
+	CloudProviderUnknown      = "Unknown"
+	CloudProviderGoogle       = "GCP"
+	CloudProviderAmazon       = "AWS"
+	CloudProviderAlibaba      = "Alibaba Cloud"
+	CloudProviderAzure        = "Azure"
+	CloudProviderDigitalOcean = "Digital Ocean"
+	CloudProviderOracle       = "Oracle Cloud"
 )

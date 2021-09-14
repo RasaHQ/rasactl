@@ -263,6 +263,8 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 
 // CreateNamespace creates a namespace.
 func (k *Kubernetes) CreateNamespace() error {
+	k.Log.V(1).Info("Creating namespace", "namespace", k.Namespace)
+
 	namespace := &v1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: k.Namespace,
@@ -279,10 +281,9 @@ func (k *Kubernetes) CreateNamespace() error {
 			return nil
 		}
 		return err
+	default:
+		return err
 	}
-
-	k.Log.V(1).Info("Create namespace", "namespace", k.Namespace)
-	return nil
 }
 
 // GetPods returns a list of pods for the active namespace.

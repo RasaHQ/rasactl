@@ -71,6 +71,9 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 			secret.Data[types.StateHelmChartVersion] = []byte(t.Chart.Metadata.Version)
 			secret.Data[types.StateHelmReleaseName] = []byte(t.Name)
 			secret.Data[types.StateHelmReleaseStatus] = []byte(t.Info.Status)
+
+		default:
+			return fmt.Errorf("can't update a secret with state, unknown data type: %T", d)
 		}
 	}
 	k.Log.Info("Updating secret with the deployment state", "secret", secret.Name, "namespace", k.Namespace, "data", secret.Data)

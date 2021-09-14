@@ -52,11 +52,7 @@ const (
 )
 
 func IsDebugOrVerboseEnabled() bool {
-	if viper.GetBool("debug") || viper.GetBool("verbose") {
-		return true
-	}
-
-	return false
+	return viper.GetBool("debug") || viper.GetBool("verbose")
 }
 
 func CheckNetworkError(err error) (NetworkError, error) {
@@ -73,9 +69,7 @@ func CheckNetworkError(err error) (NetworkError, error) {
 func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
 	for _, m := range maps {
-		if err := mergo.Map(&result, m, mergo.WithOverride); err != nil {
-			continue
-		}
+		mergo.Map(&result, m, mergo.WithOverride) //nolint:errcheck
 	}
 	return result
 }
