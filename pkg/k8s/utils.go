@@ -92,10 +92,7 @@ func (k *Kubernetes) IsNamespaceManageable() bool {
 	if err != nil {
 		return false
 	}
-	if namespace.Labels["rasactl"] == "true" {
-		return true
-	}
-	return false
+	return namespace.Labels["rasactl"] == "true"
 }
 
 // AddNamespaceLabels adds an extra label to a given namespace that indicates that the namespace
@@ -145,14 +142,12 @@ func (k *Kubernetes) DeleteNamespaceLabel() error {
 
 // DeleteNode deletes a given Kubernetes node.
 func (k *Kubernetes) DeleteNode(node string) error {
-	err := k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{})
-	return err
+	return k.clientset.CoreV1().Nodes().Delete(context.TODO(), node, metav1.DeleteOptions{})
 }
 
 // DeleteNamespace deletes the active namespace.
 func (k *Kubernetes) DeleteNamespace() error {
-	err := k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{})
-	return err
+	return k.clientset.CoreV1().Namespaces().Delete(context.TODO(), k.Namespace, metav1.DeleteOptions{})
 }
 
 // GetNamespaces returns namespaces that are managed by rasactl.
@@ -207,6 +202,5 @@ func (k *Kubernetes) LoadConfig() (*rest.Config, error) {
 		rawConfig.CurrentContext = context
 	}
 
-	client, err := clientcmd.NewDefaultClientConfig(*rawConfig, nil).ClientConfig()
-	return client, err
+	return clientcmd.NewDefaultClientConfig(*rawConfig, nil).ClientConfig()
 }

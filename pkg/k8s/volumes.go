@@ -79,7 +79,7 @@ func (k *Kubernetes) createPV(hostPath string) (*apiv1.PersistentVolume, error) 
 
 	pv, err := k.clientset.CoreV1().PersistentVolumes().Create(context.TODO(), pvSpec, metav1.CreateOptions{})
 	if err != nil {
-		return pv, err
+		return nil, err
 	}
 
 	k.Log.V(1).Info("Persistent Volume has been created",
@@ -111,7 +111,7 @@ func (k *Kubernetes) createPVC(pv *apiv1.PersistentVolume) (*apiv1.PersistentVol
 
 	pvc, err := k.clientset.CoreV1().PersistentVolumeClaims(k.Namespace).Create(context.TODO(), pvcSpec, metav1.CreateOptions{})
 	if err != nil {
-		return pvc, err
+		return nil, err
 	}
 	k.Log.V(1).Info("Persistent Volume Claim has been created", "name", pvc.Name, "namespace", pvc.Namespace)
 	return pvc, nil

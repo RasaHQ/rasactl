@@ -70,7 +70,7 @@ func (h *Helm) GetAllValues() (map[string]interface{}, error) {
 			"namespace", h.Namespace,
 			"helmClient", fmt.Sprintf("%#v", h),
 		)
-		return values, err
+		return nil, err
 	}
 	h.Log.V(1).Info("Getting all values",
 		"releaseName", h.Configuration.ReleaseName,

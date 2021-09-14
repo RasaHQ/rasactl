@@ -78,8 +78,7 @@ func (r *RasaCtl) AuthLogout() error {
 		return err
 	}
 	r.Log.Info("Deleting credentials from the store", "name", "rasactl-token", "namespace", r.Namespace)
-	err := credsStore.Delete("rasactl-token")
-	return err
+	return credsStore.Delete("rasactl-token")
 }
 
 func (r *RasaCtl) getAuthToken() (string, error) {
@@ -101,16 +100,16 @@ func (r *RasaCtl) getAuthToken() (string, error) {
 		r.Log.V(1).Info("Getting credentials from the store", "name", "rasactl-login", "namespace", r.Namespace)
 		username, password, err := credsStore.Get("rasactl-login")
 		if err != nil {
-			return token, fmt.Errorf("%s, use the 'rasa auth login' command", err)
+			return "", fmt.Errorf("%s, use the 'rasa auth login' command", err)
 		}
 
 		authRes, err := r.RasaXClient.Auth(username, password)
 		if err != nil {
-			return token, err
+			return "", err
 		}
 		r.Log.V(1).Info("Storing credentials in the store", "name", "rasactl-token", "namespace", r.Namespace)
 		if err := credsStore.Set("rasactl-token", r.Namespace, authRes.AccessToken); err != nil {
-			return token, err
+			return "", err
 		}
 		return authRes.AccessToken, nil
 	}
@@ -131,8 +130,5 @@ func (r *RasaCtl) isLogged() bool {
 		return false
 	}
 
-	if user != "" && password != "" {
-		return true
-	}
-	return false
+	return user != "" && password != ""
 }

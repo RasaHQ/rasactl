@@ -128,11 +128,10 @@ func startCmd() *cobra.Command {
 				fmt.Printf("Rasa X for the %s namespace is running.\n", rasaCtl.HelmClient.GetNamespace())
 				return nil
 			}
-
+			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Start(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			defer rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

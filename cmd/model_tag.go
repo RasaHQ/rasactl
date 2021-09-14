@@ -67,9 +67,6 @@ func modelTagCmd() *cobra.Command {
 
 			modelName := args[1]
 			modelTag := args[2]
-			if err != nil {
-				return err
-			}
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err

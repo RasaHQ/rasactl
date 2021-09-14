@@ -45,11 +45,7 @@ func (k *Kubernetes) SaveSecretWithState(projectPath string) error {
 	k.Log.Info("Saving secret with the deployment state", "secret", secret.Name, "namespace", k.Namespace)
 
 	_, err := k.clientset.CoreV1().Secrets(k.Namespace).Create(context.TODO(), secret, metav1.CreateOptions{})
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // UpdateSecretWithState updates the rasactl secret.
@@ -91,7 +87,7 @@ func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
-		return secret.Data, err
+		return nil, err
 	}
 
 	return secret.Data, nil
