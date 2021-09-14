@@ -94,10 +94,10 @@ func deleteCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
+			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Delete(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			defer rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

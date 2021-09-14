@@ -30,11 +30,14 @@ type SpinnerMessage struct {
 	spinner *spinner.Spinner
 }
 
-// New create a new spinner object.
-func (s *SpinnerMessage) New() {
+// NewSpinner creates a new spinner object.
+func NewSpinner() *SpinnerMessage {
+	s := &SpinnerMessage{}
 	s.spinner = spinner.New(spinner.CharSets[69], 200*time.Millisecond, spinner.WithWriter(os.Stderr))
+	return s
 }
 
+// Message adds a message to the Spinner object.
 func (s *SpinnerMessage) Message(msg string) {
 	if !utils.IsDebugOrVerboseEnabled() {
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)

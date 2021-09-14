@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -148,6 +149,8 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 	case numNamespaces >= 2 && isInRange && isMaxArgs && minArgs != len(args):
 		ns = args[0]
 		args = args[1:]
+	default:
+		return nil, fmt.Errorf("can't parse arguments")
 
 	}
 	args = append([]string{ns}, args...)
@@ -158,7 +161,6 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 	}
 
 	// The valid namespace is returned as the first element in the args array
-
 	namespace = ns
 	rasaCtl.Namespace = namespace
 	log.Info("Setting namespace", "namespace", ns)

@@ -66,8 +66,7 @@ type RasaCtl struct {
 
 // InitClients initializes clients.
 func (r *RasaCtl) InitClients() error {
-	r.Spinner = &status.SpinnerMessage{}
-	r.Spinner.New()
+	r.Spinner = status.NewSpinner()
 
 	cloudProvider := &cloud.Provider{Log: r.Log}
 	cloudProvider.New()

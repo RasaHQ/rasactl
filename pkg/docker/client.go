@@ -421,7 +421,7 @@ func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
 
 	inspect, err := d.Client.ContainerInspect(d.Ctx, d.Kind.ControlPlaneHost)
 	if err != nil {
-		return inspect, err
+		return types.ContainerJSON{}, err
 	}
 
 	return inspect, nil

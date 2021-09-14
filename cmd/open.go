@@ -70,7 +70,6 @@ func openCmd() *cobra.Command {
 			}
 
 			fmt.Printf("The %s URL has been opened in your web browser\n", url)
-			rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}
