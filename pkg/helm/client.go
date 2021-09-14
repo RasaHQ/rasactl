@@ -158,8 +158,7 @@ func (h *Helm) SetNamespace(namespace string) error {
 		Context:    &h.kubeContext,
 	}
 
-	err := h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
-	return err
+	return h.ActionConfig.Init(genericcliopts, h.Namespace, h.driver, h.debugLog)
 }
 
 // GetNamespace returns namespace name.
@@ -178,12 +177,12 @@ func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 		r, err := repo.NewChartRepository(&rep, getter.All(h.Settings))
 		r.CachePath = h.Settings.RepositoryCache
 		if err != nil {
-			return repos, err
+			return nil, err
 		}
 
 		if _, err := r.DownloadIndexFile(); err != nil {
 			err := errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", rep.URL)
-			return repos, err
+			return nil, err
 		}
 		repos = append(repos, r)
 	}

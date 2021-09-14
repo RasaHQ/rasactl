@@ -33,7 +33,7 @@ func (k *Kubernetes) UpdateRasaXConfig(token string) error {
 	var workerPort int = k.Flags.ConnectRasa.Port
 
 	if k.Flags.ConnectRasa.RunSeparateWorker {
-		workerPort = workerPort + 1
+		workerPort++
 	}
 	urlProduction := fmt.Sprintf("http://gateway.docker.internal:%d", productionPort)
 	urlWorker := fmt.Sprintf("http://gateway.docker.internal:%d", workerPort)
@@ -69,8 +69,5 @@ func (k *Kubernetes) UpdateRasaXConfig(token string) error {
 	}
 
 	_, err = k.clientset.CoreV1().ConfigMaps(k.Namespace).Update(context.TODO(), config, metav1.UpdateOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

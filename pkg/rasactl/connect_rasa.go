@@ -80,7 +80,7 @@ func (r *RasaCtl) ConnectRasa() error {
 	var workerPort int = r.Flags.ConnectRasa.Port
 
 	if r.Flags.ConnectRasa.RunSeparateWorker {
-		workerPort = workerPort + 1
+		workerPort++
 		environmentName = "production"
 	}
 
@@ -226,8 +226,7 @@ func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(file, data, 0644)
-	return err
+	return ioutil.WriteFile(file, data, 0644)
 }
 
 func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
@@ -297,6 +296,5 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(file, data, 0644)
-	return err
+	return ioutil.WriteFile(file, data, 0644)
 }

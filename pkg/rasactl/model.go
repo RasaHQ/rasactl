@@ -51,8 +51,7 @@ func (r *RasaCtl) ModelUpload() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	err = r.RasaXClient.ModelUpload()
-	return err
+	return r.RasaXClient.ModelUpload()
 }
 
 func (r *RasaCtl) ModelDelete() error {
@@ -75,8 +74,7 @@ func (r *RasaCtl) ModelDelete() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	err = r.RasaXClient.ModelDelete()
-	return err
+	return r.RasaXClient.ModelDelete()
 }
 
 func (r *RasaCtl) ModelDownload() error {
@@ -105,8 +103,7 @@ func (r *RasaCtl) ModelTag() error {
 	}
 	r.RasaXClient.BearerToken = token
 
-	err = r.RasaXClient.ModelTag()
-	return err
+	return r.RasaXClient.ModelTag()
 }
 
 func (r *RasaCtl) ModelList() error {

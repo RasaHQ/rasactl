@@ -87,11 +87,10 @@ func stopCmd() *cobra.Command {
 				fmt.Printf("The %s deployment is not running.\n", rasaCtl.Namespace)
 				return nil
 			}
-
+			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Stop(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
-			defer rasaCtl.Spinner.Stop()
 			return nil
 		},
 	}

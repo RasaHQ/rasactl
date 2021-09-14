@@ -210,14 +210,13 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 
 // GetRasaXToken returns a Rasa X token that is stored in a Kubernetes secret.
 func (k *Kubernetes) GetRasaXToken() (string, error) {
-	var token string
 
 	secretName := fmt.Sprintf("%s-rasa", k.Helm.ReleaseName)
 	keyName := "rasaXToken"
 
 	secret, err := k.clientset.CoreV1().Secrets(k.Namespace).Get(context.TODO(), secretName, metav1.GetOptions{})
 	if err != nil {
-		return token, err
+		return "", err
 	}
 
 	return string(secret.Data[keyName]), nil
