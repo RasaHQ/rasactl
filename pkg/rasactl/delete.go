@@ -78,6 +78,9 @@ func (r *RasaCtl) Delete() error {
 
 	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
 		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaCtlLocalDomain)
+
+		r.Log.V(1).Info("Deleting a hostname from /etc/hosts", "host", host)
+
 		err := utils.DeleteHostToEtcHosts(host)
 		if err != nil && !force {
 			return err
@@ -92,7 +95,13 @@ func (r *RasaCtl) Delete() error {
 	}
 
 	if string(state[types.StateProjectPath]) != "" {
-		os.Remove(rasactlFile)
+		r.Log.V(1).Info("Deleting .rasactl file", "file", rasactlFile)
+		if err := os.Remove(rasactlFile); err != nil {
+			r.Log.V(1).Info("Can't remove .rasactl file",
+				"file", rasactlFile,
+				"error", err,
+			)
+		}
 	}
 
 	r.Spinner.Message("Done!")

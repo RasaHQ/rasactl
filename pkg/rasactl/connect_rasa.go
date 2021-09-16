@@ -32,12 +32,20 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/helm"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasa"
+	rxtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 // ConnectRasa connects a local rasa server to a given deployment.
 func (r *RasaCtl) ConnectRasa() error {
 	r.Spinner.Message("Connecting Rasa Server to Rasa X")
+	r.initRasaXClient()
+
+	version, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
 	rasaToken := uuid.New().String()
 	environmentName := "production-worker"
 
@@ -95,23 +103,34 @@ func (r *RasaCtl) ConnectRasa() error {
 		r.Log.V(1).Info("Merging values", "result", r.HelmClient.GetValues())
 	} else {
 		return errors.Errorf(
-			"It looks like you're not using kind as a backend for Kubernetes cluster, the connect rasa command is available only if you use kind.",
+			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind.",
 		)
 	}
 
 	r.Log.Info("Upgrading configuration for Rasa X deployment")
-	if err := r.HelmClient.Upgrade(); err != nil {
-		return err
-	}
 
-	r.Log.Info("Updating configuration for Rasa X")
-	if err := r.KubernetesClient.UpdateRasaXConfig(rasaToken); err != nil {
-		return err
-	}
+	if version.Enterprise && utils.RasaXVersionConstrains(version.RasaX, ">= 1.0.0") {
+		r.Log.Info("Rasa Enterprise is active, using the environment endpoint")
 
-	r.Log.Info("Restarting Rasa X pod")
-	if err := r.KubernetesClient.DeleteRasaXPods(); err != nil {
-		return err
+		if err := r.saveEnvironments(rasaToken); err != nil {
+			return err
+		}
+
+	} else {
+
+		if err := r.HelmClient.Upgrade(); err != nil {
+			return err
+		}
+		r.Log.Info("Updating configuration for Rasa X")
+		if err := r.KubernetesClient.UpdateRasaXConfig(rasaToken); err != nil {
+			return err
+		}
+
+		r.Log.Info("Restarting Rasa X pod")
+		if err := r.KubernetesClient.DeleteRasaXPods(); err != nil {
+			return err
+		}
+
 	}
 
 	if err := r.saveRasaCredentialsFile(fileCreds); err != nil {
@@ -298,4 +317,36 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 		return err
 	}
 	return ioutil.WriteFile(file, data, 0644)
+}
+
+func (r *RasaCtl) saveEnvironments(token string) error {
+	var productionPort int = r.Flags.ConnectRasa.Port
+	var workerPort int = r.Flags.ConnectRasa.Port
+
+	if r.Flags.ConnectRasa.RunSeparateWorker {
+		workerPort++
+	}
+	urlProduction := fmt.Sprintf("http://gateway.docker.internal:%d", productionPort)
+	urlWorker := fmt.Sprintf("http://gateway.docker.internal:%d", workerPort)
+
+	configSpec := []rxtypes.EnvironmentsEndpointRequest{
+		{
+			Name:  "production",
+			URL:   urlProduction,
+			Token: token,
+		},
+		{
+			Name:  "worker",
+			URL:   urlWorker,
+			Token: token,
+		},
+	}
+
+	token, err := r.getAuthToken()
+	if err != nil {
+		return err
+	}
+	r.RasaXClient.BearerToken = token
+
+	return r.RasaXClient.SaveEnvironments(configSpec)
 }

@@ -3,10 +3,9 @@ package status
 import (
 	"fmt"
 
-	"github.com/Masterminds/semver/v3"
-
 	"github.com/RasaHQ/rasactl/pkg/types"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 func checkVersionConstrains(version *rtypes.VersionEndpointResponse, flags *types.RasaCtlFlags) {
@@ -18,17 +17,8 @@ func checkVersionConstrains(version *rtypes.VersionEndpointResponse, flags *type
 
 func localProjectRasaXVersion(version *rtypes.VersionEndpointResponse) {
 	// Check if Rasa X version supports with the mount a local path feature
-	c, err := semver.NewConstraint(">= 1.0.0")
-	if err != nil {
-		return
-	}
 
-	v, err := semver.NewVersion(version.RasaX)
-	if err != nil {
-		return
-	}
-
-	if !c.Check(v) {
+	if !utils.RasaXVersionConstrains(version.RasaX, ">= 1.0.0") {
 		YellowBox(
 			"Notice",
 			fmt.Sprintf(

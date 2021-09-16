@@ -189,6 +189,11 @@ func (r *RasaCtl) useProject(projectPath string) error {
 		if err := r.writeStatusFile(projectPath); err != nil {
 			return err
 		}
+
+		if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
+			return err
+		}
+
 	}
 	return nil
 }
@@ -228,10 +233,6 @@ func (r *RasaCtl) startOrInstall() error {
 
 		// executes additional operations if a deployment uses a local Rasa project
 		if err := r.useProject(projectPath); err != nil {
-			return err
-		}
-
-		if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
 			return err
 		}
 

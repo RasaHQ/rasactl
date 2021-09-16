@@ -297,3 +297,21 @@ func HelmChartVersionConstrains(helmChartVersion string) error {
 
 	return nil
 }
+
+// RasaXVersionConstrains checks if Rasa X version is within constraints boundaries.
+func RasaXVersionConstrains(version string, constraint string) bool {
+
+	// containers, e.g >= 1.0
+	// ref: https://github.com/Masterminds/semver
+	c, err := semver.NewConstraint(constraint)
+	if err != nil {
+		return false
+	}
+
+	v, err := semver.NewVersion(version)
+	if err != nil {
+		return false
+	}
+
+	return c.Check(v)
+}
