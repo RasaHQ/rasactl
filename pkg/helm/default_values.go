@@ -115,6 +115,7 @@ func valuesNginxNodePort() map[string]interface{} {
 func valuesSetupLocalIngress(host string) map[string]interface{} {
 	values := map[string]interface{}{
 		"ingress": map[string]interface{}{
+			"enabled": true,
 			"hosts": []map[string]interface{}{
 				{
 					"host":  host,

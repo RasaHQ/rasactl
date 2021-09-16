@@ -24,6 +24,18 @@ import (
 // Stop stops a deployment.
 func (r *RasaCtl) Stop() error {
 	r.Spinner.Message("Stopping Rasa X")
+
+	r.initRasaXClient()
+
+	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
+	if err := r.KubernetesClient.UpdateSecretWithState(rasaXVersion); err != nil {
+		return err
+	}
+
 	if err := r.KubernetesClient.ScaleDown(); err != nil {
 		return err
 	}

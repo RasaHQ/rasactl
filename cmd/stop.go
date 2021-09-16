@@ -88,6 +88,7 @@ func stopCmd() *cobra.Command {
 				return nil
 			}
 			defer rasaCtl.Spinner.Stop()
+
 			if err := rasaCtl.Stop(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}

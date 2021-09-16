@@ -189,12 +189,12 @@ func (r *RasaCtl) useProject(projectPath string) error {
 		if err := r.writeStatusFile(projectPath); err != nil {
 			return err
 		}
-
-		if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
-			return err
-		}
-
 	}
+
+	if err := r.KubernetesClient.SaveSecretWithState(projectPath); err != nil {
+		return err
+	}
+
 	return nil
 }
 
