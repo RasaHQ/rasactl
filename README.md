@@ -69,10 +69,8 @@
     - [Deploy Rasa X in one of the public cloud providers](#deploy-rasa-x-in-one-of-the-public-cloud-providers)
   - [Development](#development)
     - [How to run it?](#how-to-run-it)
+    - [Run unit tests](#run-unit-tests)
     - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
-    - [Deploy Rasa X with mounted a local path](#deploy-rasa-x-with-mounted-a-local-path)
-    - [Open Rasa X in a web browser](#open-rasa-x-in-a-web-browser)
-    - [Deploy Rasa X with mounted a local path and a custom Docker image](#deploy-rasa-x-with-mounted-a-local-path-and-a-custom-docker-image)
   - [License](#license)
 
 ## Prerequisites
@@ -826,110 +824,59 @@ $ rasactl start
 
 ## Development
 
-ToDO: this section will be rewrite. It's waiting for `Makefile`.
-
 Below you can find a setup required for developing `rasactl` locally.
 
 ### How to run it?
 
-1. Install go
+1. Install go, e.g. by using brew
 
-```
+```text
 $ brew install go
 ```
 
 2. Compile it
 
-```
-$ go build
+```text
+$ make build
 ```
 
 3. Run it
 
-```
-$ ./rasactl
+```text
+$ ./dist/rasactl
 ```
 
-4. (optional) Make rasactl global
+### Run unit tests
 
-```
-$ sudo cp rasactl /usr/local/bin/
+```text
+make test
 ```
 
 ### Kind cluster for developing purposes
 
 1. Install kind and run it
 
-```
+```text
 brew install kind
 ```
 
 2. Prepare configuration for a kind cluster
 
-```
+```text
 $ bash kind/generate-config.sh > config.yaml
 ```
 
 3. Create a kind cluster
 
-```
+```text
 $ kind create cluster --config config.yaml
 ```
 
 After kind is ready, install ingress-nginx:
 
-```
+```text
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 $ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
-```
-
-### Deploy Rasa X with mounted a local path
-
-1. Go to a rasa project directory
-
-2. Deploy Rasa X
-
-```
-$ sudo ./rasactl start -p
-```
-
-### Open Rasa X in a web browser
-
-```
-$ ./rasactl open
-```
-
-### Deploy Rasa X with mounted a local path and a custom Docker image
-
-1. Create a namespace
-
-```
-$ kubectl create ns my-test
-```
-
-2. Generate a token
-
-```
-$ gcloud auth print-access-token
-```
-
-3. Create a secret
-```
-$ kubectl -n my-test create secret docker-registry gcr --docker-server=eu.gcr.io --docker-username=oauth2accesstoken --docker-password=<token>
-```
-
-4. Patch the default service account
-
-```
-$ kubectl -n my-test patch serviceaccount default -p '{"imagePullSecrets": [{"name": "gcr"}]}'
-```
-
-***Notice*** Token is valid for only one hour, after that time you have to delete the `gcr` secret (`kubectl -n my-test delete secret gcr`) and repeat the 2 and 3 steps.
-
-4. Create a deployment with a custom Docker image
-
-```
-$ ./rasactl start my-test -p --values-file testdata/test-image.yaml
 ```
 
 ## License
