@@ -22,6 +22,7 @@ linters:
     - unused
     - varcheck
     - errorlint
+    - bodyclose
 
 run:
   timeout: 5m
