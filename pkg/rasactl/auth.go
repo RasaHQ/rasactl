@@ -92,7 +92,7 @@ func (r *RasaCtl) getAuthToken() (string, error) {
 	r.Log.V(1).Info("Getting credentials from the store", "name", "rasactl-token", "namespace", r.Namespace)
 	_, token, err := credsStore.Get("rasactl-token")
 	if err != nil {
-		return token, fmt.Errorf("%s, use the 'rasa auth login' command", err)
+		return token, fmt.Errorf("%w, use the 'rasa auth login' command", err)
 	}
 
 	if !r.RasaXClient.ValidateToken(token) {
@@ -100,7 +100,7 @@ func (r *RasaCtl) getAuthToken() (string, error) {
 		r.Log.V(1).Info("Getting credentials from the store", "name", "rasactl-login", "namespace", r.Namespace)
 		username, password, err := credsStore.Get("rasactl-login")
 		if err != nil {
-			return "", fmt.Errorf("%s, use the 'rasa auth login' command", err)
+			return "", fmt.Errorf("%w, use the 'rasa auth login' command", err)
 		}
 
 		authRes, err := r.RasaXClient.Auth(username, password)

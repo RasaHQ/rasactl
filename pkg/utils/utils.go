@@ -56,12 +56,14 @@ func IsDebugOrVerboseEnabled() bool {
 }
 
 func CheckNetworkError(err error) (NetworkError, error) {
-	switch t := err.(type) {
-	case *url.Error:
-		if t.Op == "Get" {
+	var urlError url.Error
+
+	if errors.As(err, urlError) {
+		if urlError.Op == "Get" {
 			return NetworkErrorConnectionRefused, err
 		}
 	}
+
 	return "", err
 }
 

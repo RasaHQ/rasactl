@@ -16,6 +16,7 @@ limitations under the License.
 package helm
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
@@ -96,7 +97,7 @@ func (h *Helm) IsDeployed() (bool, error) {
 	client.Max = 1
 
 	_, err := client.Run(h.Configuration.ReleaseName)
-	if err == driver.ErrReleaseNotFound {
+	if errors.Is(err, driver.ErrReleaseNotFound) {
 		return false, nil
 	} else if err != nil {
 		return false, err

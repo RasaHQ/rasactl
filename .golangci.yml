@@ -21,6 +21,7 @@ linters:
     - unparam
     - unused
     - varcheck
+    - errorlint
 
 run:
   timeout: 5m

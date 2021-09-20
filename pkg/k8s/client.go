@@ -274,7 +274,7 @@ func (k *Kubernetes) CreateNamespace() error {
 		},
 	}
 	_, err := k.clientset.CoreV1().Namespaces().Create(context.TODO(), namespace, metav1.CreateOptions{})
-	switch t := err.(type) {
+	switch t := err.(type) { //nolint:errorlint
 	case *errors.StatusError:
 		if t.ErrStatus.Code == 409 {
 			k.Log.V(1).Info("Namespace already exists", "namespace", k.Namespace)
