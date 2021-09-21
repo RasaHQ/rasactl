@@ -189,8 +189,15 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 			return url, err
 		}
 		port := service.Spec.Ports[0].NodePort
+		ip := k.CloudProvider.ExternalIP
 
-		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, k.CloudProvider.ExternalIP, port)
+		if ip == "" {
+			ip = "127.0.0.1"
+			k.Log.Info("Can't get an external IP address, using localhost instead",
+				"externalIP", k.CloudProvider.ExternalIP)
+		}
+
+		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ip, port)
 	} else if ingressIsEnabled {
 		ingress, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).Get(context.TODO(), k.Helm.ReleaseName, metav1.GetOptions{})
 		if err != nil {
