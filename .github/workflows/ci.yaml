@@ -72,11 +72,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Create kind ${{ matrix.k8s }} cluster
+      - name: Generate kind config
+        run: bash kind/generate-config.sh > kind/config.yaml
 
+      - name: Create kind ${{ matrix.k8s }} cluster
         uses: helm/kind-action@2a525709fd0874b75d7ae842d257981b0e0f557d # v1.2.0
         with:
           node_image: kindest/node:${{ matrix.k8s }}
+          config: ./kind/config.yaml
+
+      - name: Deploy ingress-nginx
+        run: |
+          kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+          kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 
       - name: Set up Go
         uses: actions/setup-go@v2
