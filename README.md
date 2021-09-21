@@ -726,7 +726,7 @@ Python Path       :         /repos/rasa/.venv/bin/python3.7
 3. Connect a local rasa server to a Rasa X / Enterprise deployment.
 
 ```bash
-$ rasactl connect rasa funny-hopper
+$ rasactl connect rasa
 ●∙∙ Starting Rasa Server
 (production-worker) 2021-08-09 15:56:45 INFO     root  - Starting Rasa server on http://localhost:5005
 (production-worker) 2021-08-09 15:56:45 INFO     rasa.model  - Loading model models/20210804-105240.tar.gz...
@@ -740,7 +740,7 @@ $ rasactl connect rasa funny-hopper
 4. You can check the status of your deployment and see that Rasa version is the same as the rasa version installed locally.
 
 ```bash
-$ rasactl status funny-hopper
+$ rasactl status
 Name:                   	funny-hopper
 Status:                 	Running
 URL:                    	http://funny-hopper.rasactl.localhost
