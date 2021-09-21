@@ -35,7 +35,6 @@ func (r *RasaCtl) AuthLogin() error {
 		return err
 	}
 
-	r.Log.Info("Initializing Rasa X client")
 	r.initRasaXClient()
 
 	r.Log.Info("Getting a token")

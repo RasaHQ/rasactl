@@ -66,3 +66,8 @@ func addAuthLoginFlags(cmd *cobra.Command) {
 func configFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVar(&rasactlFlags.Config.CreateFile, "create-file", false, "create the configuration file if it doesn't exist")
 }
+
+func enterpriseActivateFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVar(&rasactlFlags.Enterprise.Activate.LicenseStdin, "license-stdin", false, "read an Enterprise license from stdin")
+	cmd.PersistentFlags().StringVarP(&rasactlFlags.Enterprise.Activate.License, "license", "l", "", "an Enterprise license")
+}

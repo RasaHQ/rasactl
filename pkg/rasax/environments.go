@@ -52,7 +52,7 @@ func (r *RasaX) SaveEnvironments(body []rtypes.EnvironmentsEndpointRequest) erro
 	defer resp.Body.Close()
 
 	switch resp.StatusCode {
-	case 200:
+	case 201:
 		return nil
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)

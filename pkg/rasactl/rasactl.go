@@ -282,6 +282,7 @@ func (r *RasaCtl) GetRasaXToken() (string, error) {
 }
 
 func (r *RasaCtl) initRasaXClient() {
+	r.Log.V(1).Info("Initializing Rasa X client")
 	url, _ := r.GetRasaXURL()
 	r.RasaXClient = &rasax.RasaX{
 		Log:            r.Log,

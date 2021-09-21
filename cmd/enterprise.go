@@ -19,26 +19,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func modelCmd() *cobra.Command {
+func enterpriseCmd() *cobra.Command {
 
-	// cmd represents the model command
+	// cmd represents the enterprise command
 	cmd := &cobra.Command{
-		Use:   "model",
-		Short: "manage models for Rasa X / Enterprise",
+		Use:   "enterprise",
+		Short: "manage Rasa Enterprise",
 		Args:  cobra.NoArgs,
 	}
 
-	cmd.AddCommand(modelUploadCmd())
-	cmd.AddCommand(modelListCmd())
-	cmd.AddCommand(modelDownloadCmd())
-	cmd.AddCommand(modelTagCmd())
-	cmd.AddCommand(modelDeleteCmd())
+	cmd.AddCommand(enterpriseActivateCmd())
+	cmd.AddCommand(enterpriseDeactivateCmd())
 
 	return cmd
 }
 
 func init() {
 
-	modelCmd := modelCmd()
-	rootCmd.AddCommand(modelCmd)
+	enterpriseCmd := enterpriseCmd()
+	rootCmd.AddCommand(enterpriseCmd)
 }

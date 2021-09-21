@@ -18,6 +18,7 @@ package types
 const RasaCtlLocalDomain string = "rasactl.localhost"
 
 type RasaCtlFlags struct {
+	Enterprise   RasaCtlEnterpriseFlags
 	StartUpgrade RasaCtlStartUpgradeFlags
 	Start        RasaCtlStartFlags
 	Delete       RasaCtlDeleteFlags
@@ -27,6 +28,13 @@ type RasaCtlFlags struct {
 	Auth         RasaCtlAuthFlags
 	Model        RasaCtlModelFlags
 	Config       RasaCtlConfigFlags
+}
+
+type RasaCtlEnterpriseFlags struct {
+	Activate struct {
+		License      string
+		LicenseStdin bool
+	}
 }
 
 type RasaCtlStartUpgradeFlags struct {

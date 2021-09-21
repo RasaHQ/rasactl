@@ -262,6 +262,31 @@ func ReadCredentials(flags *types.RasaCtlFlags) (string, string, error) {
 	return strings.TrimSpace(username), strings.TrimSpace(password), nil
 }
 
+// ReadLicense reads an Enterprise license from input.
+func ReadLicense(flags *types.RasaCtlFlags) (string, error) {
+	var license string
+
+	if flags.Enterprise.Activate.License != "" {
+		fmt.Println("WARNING! Using the --license flag is insecure. Use the --license-stdin flag.")
+		license = flags.Enterprise.Activate.License
+	} else if flags.Enterprise.Activate.LicenseStdin {
+		l, err := GetPasswordStdin()
+		if err != nil {
+			return "", err
+		}
+		license = l
+	} else {
+		fmt.Print("License: ")
+		byteLicense, err := term.ReadPassword(syscall.Stdin)
+		if err != nil {
+			return "", err
+		}
+		license = string(byteLicense)
+	}
+
+	return strings.TrimSpace(license), nil
+}
+
 // GetPasswordStdin reads a password from STDIN.
 func GetPasswordStdin() (string, error) {
 	reader := bufio.NewReader(os.Stdin)

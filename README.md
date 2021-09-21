@@ -55,6 +55,9 @@
     - [The `connect rasa` command](#the-connect-rasa-command)
     - [The `auth login` command](#the-auth-login-command)
     - [The `auth logout` command](#the-auth-logout-command)
+  - [Enterprise Management Commands](#enterprise-management-commands)
+    - [The `enterprise activate` command](#the-enterprise-activate-command)
+    - [The `enterprise deactivate` command](#the-enterprise-deactivate-command)
   - [Model Management Commands](#model-management-commands)
     - [The `model delete` command](#the-model-delete-command)
     - [The `model download` command](#the-model-download-command)
@@ -519,6 +522,74 @@ Examples:
 ```text
 Flags:
   -h, --help   help for logout
+```
+
+## Enterprise Management Commands
+
+You can manage an Enterprise license via `rasactl`.
+
+```text
+manage Rasa Enterprise
+
+Usage:
+  rasactl enterprise [command]
+
+Available Commands:
+  activate    activate an Enterprise license
+  deactivate  deactivate an Enterprise license
+```
+
+### The `enterprise activate` command
+
+Activate an Enterprise license.
+
+```text
+Usage:
+  rasactl enterprise activate [DEPLOYMENT-NAME] [flags]
+```
+
+```text
+Examples:
+  # Activate an Enterprise license (use the currently active deployment).
+  $ rasactl enterprise activate
+
+  # Activate an Enterprise license for the 'my-deployment' deployment.
+  $ rasactl enterprise activate my-deployment
+
+  # Provide an Enterprise license using STDIN.
+  # You can pass an Enterprise license non-interactively by using the --license-stdin flag to provide a license through STDIN.
+  # Using STDIN prevents the license from ending up in the shell’s history.
+  $ rasactl enterprise activate --license-stdin
+```
+
+```text
+Flags:
+  -h, --help             help for activate
+  -l, --license string   an Enterprise license
+      --license-stdin    read an Enterprise license from stdin
+```
+
+### The `enterprise deactivate` command
+
+Deactivate an Enterprise license.
+
+```text
+Usage:
+  rasactl enterprise deactivate [DEPLOYMENT-NAME] [flags]
+```
+
+```text
+Examples:
+  # Deactivate an Enterprise license (use the currently active deployment).
+  $ rasactl enterprise deactivate
+
+  # Deactivate an Enterprise license for the 'my-deployment' deployment.
+  $ rasactl enterprise deactivate my-deployment
+```
+
+```text
+Flags:
+  -h, --help   help for deactivate
 ```
 
 ## Model Management Commands
