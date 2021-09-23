@@ -207,6 +207,20 @@ func (mr *MockKubernetesInterfaceMockRecorder) GetKindControlPlaneNode() *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKindControlPlaneNode", reflect.TypeOf((*MockKubernetesInterface)(nil).GetKindControlPlaneNode))
 }
 
+// GetLogs mocks base method.
+func (m *MockKubernetesInterface) GetLogs(arg0 string) *rest.Request {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLogs", arg0)
+	ret0, _ := ret[0].(*rest.Request)
+	return ret0
+}
+
+// GetLogs indicates an expected call of GetLogs.
+func (mr *MockKubernetesInterfaceMockRecorder) GetLogs(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogs", reflect.TypeOf((*MockKubernetesInterface)(nil).GetLogs), arg0)
+}
+
 // GetNamespaces mocks base method.
 func (m *MockKubernetesInterface) GetNamespaces() ([]string, error) {
 	m.ctrl.T.Helper()
@@ -220,6 +234,21 @@ func (m *MockKubernetesInterface) GetNamespaces() ([]string, error) {
 func (mr *MockKubernetesInterfaceMockRecorder) GetNamespaces() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNamespaces", reflect.TypeOf((*MockKubernetesInterface)(nil).GetNamespaces))
+}
+
+// GetPod mocks base method.
+func (m *MockKubernetesInterface) GetPod(arg0 string) (*v1.Pod, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPod", arg0)
+	ret0, _ := ret[0].(*v1.Pod)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPod indicates an expected call of GetPod.
+func (mr *MockKubernetesInterfaceMockRecorder) GetPod(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPod", reflect.TypeOf((*MockKubernetesInterface)(nil).GetPod), arg0)
 }
 
 // GetPods mocks base method.

@@ -28,6 +28,14 @@ type RasaCtlFlags struct {
 	Auth         RasaCtlAuthFlags
 	Model        RasaCtlModelFlags
 	Config       RasaCtlConfigFlags
+	Logs         RasaCtlLogsFlags
+}
+
+type RasaCtlLogsFlags struct {
+	TailLines int64
+	Container string
+	Follow    bool
+	Previous  bool
 }
 
 type RasaCtlEnterpriseFlags struct {

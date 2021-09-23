@@ -71,3 +71,11 @@ func enterpriseActivateFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVar(&rasactlFlags.Enterprise.Activate.LicenseStdin, "license-stdin", false, "read an Enterprise license from stdin")
 	cmd.PersistentFlags().StringVarP(&rasactlFlags.Enterprise.Activate.License, "license", "l", "", "an Enterprise license")
 }
+
+func logsFlags(cmd *cobra.Command) {
+	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Logs.Follow, "follow", "f", false, "specify if the logs should be streamed")
+	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Logs.Previous, "previous", "p", false, "print the logs for the previous instance of "+
+		"the container in a pod if it exists")
+	cmd.PersistentFlags().Int64Var(&rasactlFlags.Logs.TailLines, "tail", -1, "lines of recent log file to display. Defaults to -1 showing all log lines")
+	cmd.PersistentFlags().StringVarP(&rasactlFlags.Logs.Container, "container", "c", "", "a container name")
+}

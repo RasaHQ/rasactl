@@ -68,6 +68,8 @@ type KubernetesInterface interface {
 	SetHelmReleaseName(release string)
 	GetCloudProvider() *cloud.Provider
 	LoadConfig() (*rest.Config, error)
+	GetLogs(pod string) *rest.Request
+	GetPod(pod string) (*v1.Pod, error)
 }
 
 // Kubernetes represents Kubernetes client.
@@ -348,4 +350,30 @@ func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
 	}
 
 	return 0, fmt.Errorf("can't determine a node port for the rabbitmq service")
+}
+
+// GetLogs returns the logs stream for a pod.
+func (k *Kubernetes) GetLogs(pod string) *rest.Request {
+
+	opts := v1.PodLogOptions{
+		Previous: k.Flags.Logs.Previous,
+		Follow:   k.Flags.Logs.Follow,
+	}
+
+	if k.Flags.Logs.TailLines > 0 {
+		opts.TailLines = &k.Flags.Logs.TailLines
+	}
+
+	if k.Flags.Logs.Container != "" {
+		opts.Container = k.Flags.Logs.Container
+	}
+
+	return k.clientset.CoreV1().
+		Pods(k.Namespace).
+		GetLogs(pod, &opts)
+}
+
+// GetPod returns a Pod object for a given pod.
+func (k *Kubernetes) GetPod(pod string) (*v1.Pod, error) {
+	return k.clientset.CoreV1().Pods(k.Namespace).Get(context.TODO(), pod, metav1.GetOptions{})
 }

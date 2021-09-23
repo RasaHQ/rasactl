@@ -55,6 +55,7 @@
     - [The `connect rasa` command](#the-connect-rasa-command)
     - [The `auth login` command](#the-auth-login-command)
     - [The `auth logout` command](#the-auth-logout-command)
+    - [The `logs` command](#the-logs-command)
   - [Enterprise Management Commands](#enterprise-management-commands)
     - [The `enterprise activate` command](#the-enterprise-activate-command)
     - [The `enterprise deactivate` command](#the-enterprise-deactivate-command)
@@ -140,14 +141,16 @@ Global Flags:
 
 ```text
 Available Commands:
-  add         add existing Rasa X deployment
+  add         add existing Rasa X deployment to rasactl
   auth        manage credentials for Rasa X / Enterprise
   completion  generate the autocompletion script for the specified shell
   config      modify the configuration file
   connect     connect a component (e.g. a Rasa OSS server) to Rasa X
   delete      delete Rasa X deployment
+  enterprise  manage Rasa Enterprise
   help        Help about any command
   list        list deployments
+  logs        print the logs for a container in a pod
   model       manage models for Rasa X / Enterprise
   open        open Rasa X in a web browser
   start       start a Rasa X deployment
@@ -522,6 +525,45 @@ Examples:
 ```text
 Flags:
   -h, --help   help for logout
+```
+
+### The `logs` command
+
+Print the logs for a container in a pod. If the pod has only one container, the container name is optional.
+
+```text
+Usage:
+  rasactl logs [DEPLOYMENT-NAME] [POD] [flags
+```
+
+```text
+Examples:
+  # Choose a pod and show logs for it (use the currently active deployment).
+  $ rasactl logs
+
+  # Show logs from pod rasa-x (use the currently active deployment).
+  $ rasactl logs rasa-x
+
+  # Show logs from pod rasa-x for the 'my-deployment' deployment.
+  $ rasactl logs my-deployment rasa-x
+
+  # Display only the most recent 10 lines of output in pod rasa-x
+  $ rasactl logs rasa-x --tail=10
+
+  # Return snapshot of previous terminated nginx container logs from pod rasa
+  $ rasactl logs -p -c nginx rasa
+
+  # Begin streaming the logs from pod rasa-x
+  $ rasactl logs -f rasa-x
+```
+
+```text
+Flags:
+  -c, --container string   a container name
+  -f, --follow             specify if the logs should be streamed
+  -h, --help               help for logs
+  -p, --previous           print the logs for the previous instance of the container in a pod if it exists
+      --tail int           lines of recent log file to display. Defaults to -1 showing all log lines (default -1)
 ```
 
 ## Enterprise Management Commands
