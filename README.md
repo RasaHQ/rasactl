@@ -533,7 +533,7 @@ Print the logs for a container in a pod. If the pod has only one container, the 
 
 ```text
 Usage:
-  rasactl logs [DEPLOYMENT-NAME] [POD] [flags
+  rasactl logs [DEPLOYMENT-NAME] [POD] [flags]
 ```
 
 ```text
