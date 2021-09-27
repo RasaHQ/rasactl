@@ -23,9 +23,9 @@ func modelCmd() *cobra.Command {
 
 	// cmd represents the model command
 	cmd := &cobra.Command{
-		Use:   "model",
-		Short: "manage models for Rasa X / Enterprise",
-		Args:  cobra.NoArgs,
+		Use:       "model",
+		Short:     "manage models for Rasa X / Enterprise",
+		ValidArgs: []string{"delete", "download", "list", "tag", "upload"},
 	}
 
 	cmd.AddCommand(modelUploadCmd())

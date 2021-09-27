@@ -23,9 +23,9 @@ func authCmd() *cobra.Command {
 
 	// cmd represents the auth command
 	cmd := &cobra.Command{
-		Use:   "auth",
-		Short: "manage credentials for Rasa X / Enterprise",
-		Args:  cobra.NoArgs,
+		Use:       "auth",
+		Short:     "manage credentials for Rasa X / Enterprise",
+		ValidArgs: []string{"login", "logout"},
 	}
 
 	cmd.AddCommand(authLoginCmd())

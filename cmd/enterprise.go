@@ -23,9 +23,9 @@ func enterpriseCmd() *cobra.Command {
 
 	// cmd represents the enterprise command
 	cmd := &cobra.Command{
-		Use:   "enterprise",
-		Short: "manage Rasa Enterprise",
-		Args:  cobra.NoArgs,
+		Use:       "enterprise",
+		Short:     "manage Rasa Enterprise",
+		ValidArgs: []string{"activate", "deactivate"},
 	}
 
 	cmd.AddCommand(enterpriseActivateCmd())
