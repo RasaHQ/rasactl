@@ -9,21 +9,9 @@ import (
 
 var _ = Describe("Utils", func() {
 
-	var hostname string = "unittest.rasactl.localhost"
-
 	It("check if the ls command exists - CommandExists", func() {
 		cmdExists := utils.CommandExists("ls")
 		Expect(cmdExists).To(Equal(true))
-	})
-
-	It("add a hostname to /etc/hosts - AddHostToEtcHosts", func() {
-		err := utils.AddHostToEtcHosts(hostname, "127.0.0.1")
-		Expect(err).To(BeNil())
-	})
-
-	It("delete a hostname from /etc/hosts - DeleteHostToEtcHosts", func() {
-		err := utils.DeleteHostToEtcHosts(hostname)
-		Expect(err).To(BeNil())
 	})
 
 	It("check if debug or verbose mode is enabled", func() {
