@@ -65,6 +65,7 @@ type RasaCtlDeleteFlags struct {
 
 type RasaCtlStatusFlags struct {
 	Details bool
+	Output  string
 }
 
 type RasaCtlConnectRasaFlags struct {

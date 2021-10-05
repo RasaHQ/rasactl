@@ -48,4 +48,10 @@ var _ = Describe("Utils", func() {
 		Expect(err).To(Not(BeNil()))
 	})
 
+	It("convert string slice to JSON", func() {
+		d := [][]string{{"test:", "test"}}
+		string, _ := utils.StringSliceToJSON(d)
+		Expect(string).To(Equal("{\"test\":\"test\"}"))
+	})
+
 })

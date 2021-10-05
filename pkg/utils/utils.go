@@ -17,6 +17,7 @@ package utils
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -341,4 +342,25 @@ func RasaXVersionConstrains(version string, constraint string) bool {
 	}
 
 	return c.Check(v)
+}
+
+// StringSliceToJSON converts [][]string{} to JSON.
+func StringSliceToJSON(d [][]string) (string, error) {
+
+	data := map[string]interface{}{}
+
+	for _, item := range d {
+		field := strings.ToLower(item[0])
+		field = strings.ReplaceAll(field, " ", "_")
+		field = strings.ReplaceAll(field, ":", "")
+
+		data[field] = item[1]
+	}
+
+	jsonByte, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+
+	return string(jsonByte), nil
 }

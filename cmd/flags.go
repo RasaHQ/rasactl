@@ -44,6 +44,8 @@ func addDeleteFlags(cmd *cobra.Command) {
 func addStatusFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Status.Details, "details", "d", false,
 		"show detailed information, such as running pods, helm chart status")
+	cmd.PersistentFlags().StringVarP(&rasactlFlags.Status.Output, "output", "o", "table",
+		"output format. One of: json|table")
 }
 
 func addAddFlags(cmd *cobra.Command) {

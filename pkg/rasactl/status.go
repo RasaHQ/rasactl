@@ -115,21 +115,24 @@ func (r *RasaCtl) Status() error {
 		}
 
 		if len(pods.Items) != 0 {
-			status.PrintTableNoHeader(d)
+			status.PrintOutput(d, r.Flags.Status.Output)
 
-			fmt.Println()
+			if r.Flags.Status.Output == "table" {
+				fmt.Println()
 
-			status.PrintTable(
-				[]string{"Name", "Condition", "Status"},
-				data,
-			)
-			fmt.Println()
+				status.PrintTable(
+					[]string{"Name", "Condition", "Status"},
+					data,
+				)
+				fmt.Println()
+			}
 		} else {
-			status.PrintTableNoHeader(d)
+			status.PrintOutput(d, r.Flags.Status.Output)
 		}
 		return nil
 	}
-	status.PrintTableNoHeader(d)
+
+	status.PrintOutput(d, r.Flags.Status.Output)
 
 	return nil
 }
