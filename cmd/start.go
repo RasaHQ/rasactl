@@ -17,13 +17,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
@@ -104,12 +102,12 @@ func startCmd() *cobra.Command {
 				}
 			}
 
-			isDeployed, isRunning, err := rasaCtl.CheckDeploymentStatus()
+			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			if !isDeployed {
+			/*if !isDeployed {
 				if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
 					rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
 					if os.Getuid() != 0 {
@@ -122,7 +120,7 @@ func startCmd() *cobra.Command {
 						)
 					}
 				}
-			}
+			}*/
 
 			if isRunning {
 				fmt.Printf("Rasa X for the %s namespace is running.\n", rasaCtl.HelmClient.GetNamespace())

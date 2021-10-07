@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"os"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -59,7 +57,7 @@ func deleteCmd() *cobra.Command {
 				return err
 			}
 
-			if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
+			/*if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
 				rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
 				if os.Getuid() != 0 {
 					return errors.Errorf(
@@ -70,7 +68,7 @@ func deleteCmd() *cobra.Command {
 						),
 					)
 				}
-			}
+			}*/
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err

@@ -104,4 +104,4 @@ jobs:
       - name: Check health endpoint
         run: |
           export URL=$(./dist/rasactl status -o json | jq -r .url)
-          curl $URL | jq .
+          curl $URL/api/health | jq .
