@@ -33,4 +33,4 @@ jobs:
           context: misc/coredns
           push: true
           # it's very simple configuration that's why the tag is hardcoded
-          tags: "ghcr.io/${{ github.repository }}:coredns-1.8.5"
+          tags: "ghcr.io/rasahq/rasactl:coredns-1.8.5"
