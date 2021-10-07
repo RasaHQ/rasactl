@@ -5,6 +5,10 @@ on:
     types: [opened, synchronize, labeled]
 
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 env:
   GO_VERSION: 1.17.1
 
