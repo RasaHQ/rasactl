@@ -32,6 +32,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
@@ -363,4 +364,14 @@ func StringSliceToJSON(d [][]string) (string, error) {
 	}
 
 	return string(jsonByte), nil
+}
+
+// CheckHelmChartDir checks if a local Helm chart direcotry exists.
+func CheckHelmChartDir() {
+	name := strings.TrimSpace(types.HelmChartNameRasaX)
+	yellowColor := color.New(color.FgYellow)
+
+	if _, err := os.Stat(name); err == nil {
+		yellowColor.Printf("WARNING: In your current working directory is located the %s directory, it'll be used as a source for the helm chart.\n", name)
+	}
 }

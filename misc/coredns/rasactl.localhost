@@ -1,6 +1,6 @@
 $ORIGIN rasactl.localhost.
-@	600 IN	SOA sns.dns.icann.org. noc.dns.icann.org. 2017042745 7200 3600 1209600 600
-	600 IN NS localhost.
+@	3600 IN	SOA rasactl.localhost. coredns.rasactl.localhost. 2017042745 7200 3600 1209600 3600
+	3600 IN NS localhost.
 
 @                         IN A     127.0.0.1
                           IN AAAA  ::1

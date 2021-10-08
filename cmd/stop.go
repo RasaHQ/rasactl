@@ -23,6 +23,7 @@ import (
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 const (
@@ -51,6 +52,7 @@ func stopCmd() *cobra.Command {
 		Example: templates.Examples(stopExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			utils.CheckHelmChartDir()
 			if err := checkIfDeploymentsExist(); err != nil {
 				return err
 			}

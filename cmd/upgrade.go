@@ -23,6 +23,7 @@ import (
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 const (
@@ -51,6 +52,7 @@ func upgradeCmd() *cobra.Command {
 		Example: templates.Examples(upgradeExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			utils.CheckHelmChartDir()
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}

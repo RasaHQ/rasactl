@@ -114,7 +114,7 @@ func New(client *Helm) (Interface, error) {
 	client.Settings = cli.New()
 	client.Settings.RepositoryCache = cachePath
 	client.Settings.RepositoryConfig = repositoryConfigPath
-	client.RasaXChartName = "rasa-x"
+	client.RasaXChartName = types.HelmChartNameRasaX
 	client.kubeConfig = viper.GetString("kubeconfig")
 
 	client.kubeContext = viper.GetString("kube-context")

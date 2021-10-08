@@ -69,6 +69,7 @@ func startCmd() *cobra.Command {
 		Example: templates.Examples(startExample),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
+			utils.CheckHelmChartDir()
 			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
 			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 
