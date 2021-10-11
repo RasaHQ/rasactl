@@ -3,16 +3,11 @@ name: Publish Docker image - CoreDNS
 on:
   release:
     types: [published]
-  pull_request:
-    types: [synchronize, labeled]
 
 jobs:
   push_to_registry:
     name: Push Docker image to the Container registry
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -30,10 +25,6 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: misc/coredns
-          push: false
+          push: true
           # it's very simple configuration that's why the tag is hardcoded
           tags: "rasa/rasactl:coredns-1.8.5"
-          load: true
-
-      - name: Push
-        run: docker push rasa/rasactl:coredns-1.8.5
