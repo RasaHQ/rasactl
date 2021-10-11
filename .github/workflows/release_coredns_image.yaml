@@ -30,6 +30,10 @@ jobs:
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: misc/coredns
-          push: true
+          push: false
           # it's very simple configuration that's why the tag is hardcoded
           tags: "rasa/rasactl:coredns-1.8.5"
+          load: true
+
+      - name: Push
+        run: docker push rasa/rasactl:coredns-1.8.5
