@@ -70,7 +70,6 @@ jobs:
     strategy:
       matrix:
         os:
-          - macos-11
           - ubuntu-20.04
         k8s:
           - v1.21.1
