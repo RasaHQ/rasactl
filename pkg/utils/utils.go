@@ -366,7 +366,7 @@ func StringSliceToJSON(d [][]string) (string, error) {
 	return string(jsonByte), nil
 }
 
-// CheckHelmChartDir checks if a local Helm chart direcotry exists.
+// CheckHelmChartDir checks if a local Helm chart directory exists.
 func CheckHelmChartDir() {
 	name := strings.TrimSpace(types.HelmChartNameRasaX)
 	yellowColor := color.New(color.FgYellow)
