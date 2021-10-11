@@ -4,7 +4,7 @@ on:
   release:
     types: [published]
   pull_request:
-    types: [opened, synchronize, labeled]
+    types: [synchronize, labeled]
 
 jobs:
   push_to_registry:
