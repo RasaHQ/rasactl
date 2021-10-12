@@ -76,17 +76,6 @@ func (r *RasaCtl) Delete() error {
 		}
 	}
 
-	/*if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal && r.CloudProvider.Name == types.CloudProviderUnknown {
-		host := fmt.Sprintf("%s.%s", r.Namespace, types.RasaCtlLocalDomain)
-
-		r.Log.V(1).Info("Deleting a hostname from /etc/hosts", "host", host)
-
-		err := utils.DeleteHostToEtcHosts(host)
-		if err != nil && !force {
-			return err
-		}
-	}*/
-
 	if prune {
 		r.Log.Info("Deleting namespace", "namespace", r.Namespace)
 		if err := r.KubernetesClient.DeleteNamespace(); err != nil && !force {

@@ -37,7 +37,6 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"github.com/txn2/txeh"
 	"golang.org/x/term"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -76,40 +75,6 @@ func MergeMaps(maps ...map[string]interface{}) map[string]interface{} {
 		mergo.Map(&result, m, mergo.WithOverride) //nolint:errcheck
 	}
 	return result
-}
-
-// AddHostToEtcHosts adds a host with a given IP address to /etc/hosts,
-// for Windows it is C:\Windows\System32\Drivers\etc\hosts.
-func AddHostToEtcHosts(host, ip string) error {
-	hosts, err := txeh.NewHostsDefault()
-	if err != nil {
-		return err
-	}
-
-	hosts.AddHost(ip, host)
-
-	if err := hosts.Save(); err != nil {
-		return errors.Errorf("Can't add a host, try to run the command as administrator, error: %s", err)
-	}
-
-	return nil
-}
-
-// DeleteHostToEtcHosts removes a host from /etc/hosts (linux, darwin), or
-// C:\Windows\System32\Drivers\etc\hosts (Windows).
-func DeleteHostToEtcHosts(host string) error {
-	hosts, err := txeh.NewHostsDefault()
-	if err != nil {
-		return err
-	}
-
-	hosts.RemoveHost(host)
-
-	if err := hosts.Save(); err != nil {
-		return errors.Errorf("Can't remove a host, try to run the command as administrator, error: %s", err)
-	}
-
-	return nil
 }
 
 func ValidateName(name string) error {
