@@ -27,18 +27,14 @@ import (
 const (
 	deleteDesc = `
 This command deletes a Rasa X deployment.
-
-In a case where a Rasa X deployment is using kind and is deployed locally, you have to run the command with administrator permissions (sudo).
-It's required because the command removes a hostname from /etc/hosts which was added during deployment creation.
-
 `
 
 	deleteExample = `
 	# Delete the 'my-example' deployment.
-	$ sudo rasactl delete my-example
+	$ rasactl delete my-example
 
 	# Prune the 'my-example' deployment, execute the command with the --prune flag deletes the whole namespace.
-	$ sudo rasactl delete my-example --prune
+	$ rasactl delete my-example --prune
 `
 )
 
@@ -56,19 +52,6 @@ func deleteCmd() *cobra.Command {
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
 				return err
 			}
-
-			/*if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
-				rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
-				if os.Getuid() != 0 {
-					return errors.Errorf(
-						warnPrint.Sprintf(
-							"Administrator permissions required, please run the command with sudo.\n%s needs "+
-								"administrator permissions to remove a hostname from /etc/hosts which was created during the creation of the deployment.",
-							cmd.CommandPath(),
-						),
-					)
-				}
-			}*/
 
 			if err := checkIfNamespaceExists(); err != nil {
 				return err

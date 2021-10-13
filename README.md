@@ -267,9 +267,6 @@ The `delete` command deletes a Rasa X / Enterprise deployment.
 
 You can use the `--prune` flag to remove a namespace where Rasa X deployment is located.
 
-In a case where a Rasa X deployment is using `kind` and is deployed locally, you have to run the command with administrator permissions (sudo).
-It's required because the command removes a hostname from `/etc/hosts` which was added during deployment creation.
-
 ***Notice*** If you want to free resources, or temporarily you don't need to run Rasa X deployment, you can stop a Rasa X / Enterprise deployment instead of deleting it. Stopping the Rasa X deployment will free resources, but keep the current configuration.
 
 ```text
@@ -283,10 +280,10 @@ Aliases:
 ```text
 Examples:
   # Delete the 'my-example' deployment.
-  $ sudo rasactl delete my-example
+  $ rasactl delete my-example
 
   # Prune the 'my-example' deployment, execute the command with the --prune flag deletes the whole namespace.
-  $ sudo rasactl delete my-example --prune
+  $ rasactl delete my-example --prune
 ```
 
 ```text
@@ -880,7 +877,7 @@ $ rasa init
 3. Start a new Rasa X / Enterprise deployment.
 
 ```bash
-$ sudo rasactl start --project
+$ rasactl start --project
 ```
 
 (The `rasa start --project` command has to be executed in a directory with rasa project. You can use the `--project-path` flag to pass an absolute path to a rasa project.)

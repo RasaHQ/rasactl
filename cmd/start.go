@@ -108,23 +108,8 @@ func startCmd() *cobra.Command {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
-			/*if !isDeployed {
-				if rasaCtl.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal &&
-					rasaCtl.KubernetesClient.GetCloudProvider().Name == types.CloudProviderUnknown {
-					if os.Getuid() != 0 {
-						return errors.Errorf(
-							warnPrint.Sprintf(
-								"Administrator permissions required, please run the command with sudo.\n%s needs "+
-									"administrator permissions to add a hostname to /etc/hosts so that a connection to your deployment is possible.",
-								cmd.CommandPath(),
-							),
-						)
-					}
-				}
-			}*/
-
 			if isRunning {
-				fmt.Printf("Rasa X for the %s namespace is running.\n", rasaCtl.HelmClient.GetNamespace())
+				fmt.Printf("A Rasa X is already running in the %s namespace.\n", rasaCtl.HelmClient.GetNamespace())
 				return nil
 			}
 			defer rasaCtl.Spinner.Stop()
