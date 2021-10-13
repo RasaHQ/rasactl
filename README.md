@@ -85,6 +85,8 @@
 
 - kind (for local mode)
 
+(You can use the [REI](https://github.com/RasaHQ/REI) to install all required components on your local machine or a VM.)
+
 ## Installation
 
 ### Linux / macOS
