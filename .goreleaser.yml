@@ -1,0 +1,99 @@
+changelog:
+  # Set it to true if you wish to skip the changelog generation.
+  # This may result in an empty release notes on GitHub/GitLab/Gitea.
+  skip: true
+
+  # Sorts the changelog by the commit's messages.
+  # Could either be asc, desc or empty
+  # Default is empty
+  sort: asc
+
+  filters:
+
+    # Commit messages matching the regexp listed here will be removed from
+    # the changelog
+    # Default is empty
+    exclude:
+      - '^docs:'
+      - typo
+      - (?i)foo
+
+
+builds:
+  - id: darwin
+    binary: rasactl
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CC=o64-clang
+      - CXX=o64-clang++
+    flags:
+      - -mod=readonly
+    ldflags:
+       - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+  - id: linux
+    binary: rasactl
+    goos:
+      - linux
+    goarch:
+      - amd64
+    flags:
+      - -mod=readonly
+    ldflags:
+      - -s -w -X "github.com/RasaHQ/rasactl/pkg/version.VERSION={{.Env.VERSION}}"
+
+archives:
+  - id: rasactl
+    builds:
+      - darwin
+      - linux
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    wrap_in_directory: true
+    files:
+      - README.md
+      - LICENSE
+      - completions/*
+
+before:
+  hooks:
+    - go mod tidy
+    - ./scripts/completions.sh
+
+brews:
+  - name: rasactl
+    tap:
+      owner: RasaHQ
+      name: homebrew-rasactl
+      token: "{{ .Env.RASABOT_GITHUB_TOKEN }}"
+
+    install: |-
+      bin.install "rasactl"
+      bash_completion.install "completions/rasactl.bash" => "rasactl"
+      zsh_completion.install "completions/rasactl.zsh" => "_rasactl"
+      fish_completion.install "completions/rasactl.fish"
+
+    test: |
+      system "#{bin}/rasactl --version"
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: rasabot
+      email: rasabot@rasa.com
+
+    folder: Formula
+
+    homepage: "https://github.com/RasaHQ/rasactl"
+
+    description: "rasactl deploys Rasa X / Enterprise on your local or remote Kubernetes cluster and manages Rasa X / Enterprise deployments."
+
+signs:
+  - artifacts: all
+    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+
+release:
+  footer: |
+    This release was signed with `59FD 4D71 6D9 EA15 7980 87A5 BC1A EDA3 1757 EA04E`.

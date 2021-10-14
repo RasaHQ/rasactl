@@ -1,0 +1,3 @@
+rasax:
+  podLabels:
+    rasactl: "true"

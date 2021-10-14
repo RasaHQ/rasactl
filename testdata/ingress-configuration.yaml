@@ -1,0 +1,14 @@
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts:
+    - host: rasa-x.example.com
+      paths:
+      - /
+  tls:
+    - secretName: rasa-x-tls
+      hosts:
+        - rasa-x.example.com
+nginx:
+  enabled: false

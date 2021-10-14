@@ -1,0 +1,8 @@
+$ORIGIN rasactl.localhost.
+@	3600 IN	SOA rasactl.localhost. coredns.rasactl.localhost. 2017042745 7200 3600 1209600 3600
+	3600 IN NS localhost.
+
+@                         IN A     127.0.0.1
+                          IN AAAA  ::1
+*.rasactl.localhost.      IN A     127.0.0.1
+                          IN AAAA  ::1

@@ -1,0 +1,24 @@
+rasa:
+  # versions of the Rasa container which are running
+  versions:
+    # rasaProduction is the container which serves the production environment
+    rasaProduction:
+
+      # Define if external Rasa OSS should be used.
+      external:
+        # enable external Rasa OSS
+        enabled: true
+
+        # URL address of external Rasa OSS deployment
+        url: "http://rasa:5005"
+
+    # rasaProduction is the container which serves the production environment
+    rasaWorker:
+
+      # Define if external Rasa OSS should be used.
+      external:
+        # enable external Rasa OSS
+        enabled: true
+
+        # URL address of external Rasa OSS deployment
+        url: "http://rasa:5005"

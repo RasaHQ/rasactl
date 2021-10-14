@@ -1,0 +1,10 @@
+rasax:
+  name: ""
+  tag: ""
+eventService:
+  name: ""
+  tag: ""
+dbMigrationService:
+  ignoreVersionCheck: true
+  name: ""
+  tag: ""
