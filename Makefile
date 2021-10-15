@@ -55,3 +55,14 @@ format: $(GOIMPORTS)
 
 clean:
 	rm -rf dist
+
+## Release
+.PHONY: changelog
+changelog:  ## Generate changelog
+	git-chglog --next-tag $(VERSION) -o CHANGELOG.md
+
+.PHONY: release
+release: changelog   ## Release a new tag
+	git add CHANGELOG.md
+	git commit -m "chore: update changelog for $(VERSION)"
+	git tag $(VERSION)

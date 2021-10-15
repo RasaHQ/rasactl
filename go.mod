@@ -29,7 +29,6 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/stretchr/testify v1.7.0
-	github.com/txn2/txeh v1.3.0
 	go.uber.org/zap v1.19.1
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210916214954-140adaaadfaf
