@@ -15,7 +15,11 @@ limitations under the License.
 */
 package types
 
-const RasaCtlLocalDomain string = "rasactl.localhost"
+const (
+	RasaCtlLocalDomain     string = "rasactl.localhost"
+	RasaCtlAuthUserEnv     string = "RASACTL_AUTH_USER"
+	RasaCtlAuthPasswordEnv string = "RASACTL_AUTH_PASSWORD" //nolint:golint,gosec
+)
 
 type RasaCtlFlags struct {
 	Enterprise   RasaCtlEnterpriseFlags
