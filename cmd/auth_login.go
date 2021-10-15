@@ -37,7 +37,6 @@ const (
 	- On Linux: pass
 	- On Windows: Microsoft Windows Credential Manager
 
-
 	You can pass credentials via environment variables:
 
 	- ` + types.RasaCtlAuthUserEnv + ` - username
