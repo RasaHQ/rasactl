@@ -420,6 +420,13 @@ Log in to Rasa X / Enterprise.
   *  On Linux: [pass](https://www.passwordstore.org/)
   *  On Windows: [Microsoft Windows Credential Manager](https://support.microsoft.com/en-us/windows/accessing-credential-manager-1b5c916a-6a16-889f-8581-fc16e8165ac0)
 
+ You can pass credentials via environment variables:
+
+  *  `RASACTL_AUTH_USER` - username
+  *  `RASACTL_AUTH_PASSWORD` - password
+
+ If the environment variables are used, credentials stored in a native keychain are not used.
+
 ```text
 Usage:
   rasactl auth login [DEPLOYMENT-NAME] [flags]

@@ -17,13 +17,21 @@ package rasactl
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/RasaHQ/rasactl/pkg/credentials"
 	"github.com/RasaHQ/rasactl/pkg/credentials/helpers"
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 func (r *RasaCtl) AuthLogin() error {
+
+	if user, password := r.getCredsFromEnv(); user != "" && password != "" {
+		r.Log.Info("Found credentials passed via environment variables")
+		fmt.Println("Using credentials passed via the environment variables.")
+		return nil
+	}
 
 	if r.isLogged() {
 		fmt.Println("Already logged.")
@@ -65,6 +73,12 @@ func (r *RasaCtl) AuthLogin() error {
 }
 
 func (r *RasaCtl) AuthLogout() error {
+
+	if user, password := r.getCredsFromEnv(); user != "" && password != "" {
+		r.Log.Info("Found credentials passed via environment variables")
+		return nil
+	}
+
 	r.initRasaXClient()
 
 	credsStore := credentials.Credentials{
@@ -83,6 +97,21 @@ func (r *RasaCtl) AuthLogout() error {
 func (r *RasaCtl) getAuthToken() (string, error) {
 	var token string
 
+	// First, check if credentials are passed via environment variables.
+	if user, password := r.getCredsFromEnv(); user != "" && password != "" {
+		r.Log.Info("Found credentials passed via environment variables")
+		r.initRasaXClient()
+
+		r.Log.Info("Getting a token")
+
+		authRes, err := r.RasaXClient.Auth(user, password)
+		if err != nil {
+			return "", err
+		}
+		return authRes.AccessToken, nil
+	}
+
+	// If credentials are not passed via env variables, use credential storage.
 	credsStore := credentials.Credentials{
 		Namespace: r.Namespace,
 		Helper:    helpers.Helper,
@@ -125,9 +154,19 @@ func (r *RasaCtl) isLogged() bool {
 	r.Log.Info("Storing credentials in the store", "name", "rasactl-login", "namespace", r.Namespace)
 	user, password, err := credsStore.Get("rasactl-login")
 	if err != nil {
-		r.Log.V(1).Error(err, "Can't get credentials from the store.")
+		r.Log.V(1).Error(err, "Can't get credentials from the store")
 		return false
 	}
 
 	return user != "" && password != ""
+}
+
+func (r *RasaCtl) getCredsFromEnv() (string, string) {
+
+	r.Log.V(1).Info("Getting credentials from environment variables")
+
+	user := os.Getenv(types.RasaCtlAuthUserEnv)
+	password := os.Getenv(types.RasaCtlAuthPasswordEnv)
+
+	return user, password
 }

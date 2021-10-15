@@ -36,6 +36,14 @@ const (
 	-	On macOS: Apple macOS Keychain Access
 	- On Linux: pass
 	- On Windows: Microsoft Windows Credential Manager
+
+
+	You can pass credentials via environment variables:
+
+	- ` + types.RasaCtlAuthUserEnv + ` - username
+	- ` + types.RasaCtlAuthPasswordEnv + ` - password
+
+	If the environment variables are used, credentials stored in a native keychain are not used.
 `
 
 	authLoginExample = `
