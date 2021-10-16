@@ -16,12 +16,17 @@ limitations under the License.
 package helm
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"text/template"
+
+	"github.com/Masterminds/sprig/v3"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
@@ -44,7 +49,14 @@ func (h *Helm) ReadValuesFile() error {
 		if err != nil {
 			return err
 		}
-		err = yaml.Unmarshal(valuesFile, &h.Values)
+
+		valuesBuffer := new(bytes.Buffer)
+		tpl := template.Must(template.New("base").Funcs(sprig.TxtFuncMap()).Parse(string(valuesFile)))
+		if err := tpl.Execute(valuesBuffer, ""); err != nil {
+			return fmt.Errorf("error during processing the value file: %s", err)
+		}
+
+		err = yaml.Unmarshal(valuesBuffer.Bytes(), &h.Values)
 		if err != nil {
 			return err
 		}

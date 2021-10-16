@@ -6,6 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/Delta456/box-cli-maker/v2 v2.2.2
 	github.com/Masterminds/semver/v3 v3.1.1
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/briandowns/spinner v1.16.0
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/docker/docker v20.10.8+incompatible
