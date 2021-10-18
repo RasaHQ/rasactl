@@ -43,6 +43,9 @@
   - [Installation](#installation)
     - [Linux / macOS](#linux--macos)
   - [Before you start](#before-you-start)
+  - [Configuration](#configuration)
+    - [Environment variables](#environment-variables)
+    - [Configuration file](#configuration-file)
   - [Global flags](#global-flags)
   - [Commands](#commands)
     - [The `add` command](#the-add-command)
@@ -124,6 +127,34 @@ Below you can find several things that are good to know and keep in mind when yo
 - `rasactl` uses the [`rasa-x-helm`](https://github.com/RasaHQ/rasa-x-helm) chart to deploy Rasa X / Enterprise.
 - `rasactl` deploys Rasa X / Enterprise without a Rasa Open Source server. It's up to you to connect Rasa OSS with Rasa X / Enterprise deployment.
 - `rasactl` uses a Kubernetes context from the kubeconfig file, if you want to switch Kubernetes cluster you have to use `kubectl` or other tools that change the active context for the kubeconfig.
+
+## Configuration
+
+### Environment variables
+
+|                  Name                  |                                                                                                                        Description                                                                                                                         |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RASACTL_AUTH_USER`                    | The username that is used to authorize to Rasa X / Enterprise                                                                                                                                                                                              |
+| `RASACTL_AUTH_PASSWORD`                | The password that is used to authorize to Rasa X / Enterprise                                                                                                                                                                                              |
+| `RASACTL_RASA_X_URL`                   | Set Rasa X / Enterprise URL. By default, the URL is detected automatically, but if you use a custom configuration and you wanna define Rasa X URL explicitly you can use the env variable. The RASACTL_RASA_X_URL overrides Rasa X URL for all deployment. |
+| `RASACTL_RASA_X_URL_<DEPLOYMENT_NAME>` | Set Rasa X / Enterprise URL for a given deployment, e.g. if a deployment name is `my-deployment`, then you can use the `RASACTL_RASA_X_URL_MY_DEPLOYMENT` environment variable to define the Rasa X URL for the `my-deployment`.                           |
+| `RASACTL_KUBECONFIG`                   | Absolute path to the kubeconfig file (default "$HOME/.kube/config")                                                                                                                                                                                        |
+
+### Configuration file
+
+Below you can find an example of the configuration file and parameters that can be defined, by default configuration file is located in `$HOME/.rasactl.yaml`.
+
+```yaml
+# Deployment name that is used as a current deployment (default).
+# You can use the `rasactl config use-deployment` command to set the current deployment.
+current-deployment: my-deployment
+
+# Name of the kubeconfig context to use
+kube-context: ""
+
+# Absolute path to the kubeconfig file
+kubeconfig: /home/user/.kube/config
+```
 
 ## Global flags
 
