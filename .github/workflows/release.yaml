@@ -35,7 +35,8 @@ jobs:
           brew tap git-chglog/git-chglog
           brew install git-chglog
 
-          git-chglog --output release_changelog.md --template .chglog/RELEASE_CHANGELOG.tpl.md ${VERSION}
+          git-chglog --output /home/runner/release_changelog.md --template .chglog/RELEASE_CHANGELOG.tpl.md ${VERSION}
+          cat /home/runner/release_changelog.md
 
       - name: Set up Go
         uses: actions/setup-go@v2
@@ -57,6 +58,7 @@ jobs:
             -e RASABOT_GITHUB_TOKEN=${{ secrets.RASABOT_GITHUB_TOKEN }} \
             -e GPG_FINGERPRINT=${{ steps.import_gpg.outputs.fingerprint }} \
             -v `pwd`:/go/src/rasactl \
+            -v /home/runner/release_changelog.md:/home/runner/release_changelog.md \
             -v /home/runner/.gnupg:/root/.gnupg \
             -w /go/src/rasactl \
-            ghcr.io/tczekajlo/golang-cross:v${{ env.GO_VERSION }} release --release-notes=/go/src/rasactl/release_changelog.md
+            ghcr.io/tczekajlo/golang-cross:v${{ env.GO_VERSION }} release --release-notes=/home/runner/release_changelog.md
