@@ -90,6 +90,10 @@ func init() {
 	rootCmd.PersistentFlags().String("kube-context", "", "name of the kubeconfig context to use")
 
 	//nolint:golint,errcheck
+	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+	//nolint:golint,errcheck
+	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	//nolint:golint,errcheck
 	viper.BindPFlag("kubeconfig", rootCmd.PersistentFlags().Lookup("kubeconfig"))
 	//nolint:golint,errcheck
 	viper.BindPFlag("kube-context", rootCmd.PersistentFlags().Lookup("kube-context"))
