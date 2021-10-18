@@ -95,10 +95,10 @@ func IsURLAccessible(address string) bool {
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
-		Timeout: time.Second * 3,
+		Timeout: time.Second * 9,
 		Transport: &http.Transport{
 			Dial: (&net.Dialer{
-				Timeout:   5 * time.Second,
+				Timeout:   10 * time.Second,
 				KeepAlive: 3 * time.Second,
 			}).Dial,
 		},
@@ -339,4 +339,24 @@ func CheckHelmChartDir() {
 	if _, err := os.Stat(name); err == nil {
 		yellowColor.Printf("WARNING: In your current working directory is located the %s directory, it'll be used as a source for the helm chart.\n", name)
 	}
+}
+
+// GetRasaXURLEnv returns Rasa X URL passed via environment variables.
+func GetRasaXURLEnv(namespace string) string {
+	var rasaXURLNamespace string
+
+	rasaXURL := viper.GetString("rasa_x_url")
+
+	if namespace != "" {
+		ns := strings.ReplaceAll(namespace, "-", "_")
+		rasaXURLNamespace = viper.GetString(fmt.Sprintf("rasa_x_url_%s", ns))
+	}
+
+	if rasaXURLNamespace != "" {
+		return rasaXURLNamespace
+	} else if rasaXURL != "" {
+		return rasaXURL
+	}
+
+	return ""
 }

@@ -1,8 +1,11 @@
 package utils_test
 
 import (
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/viper"
 
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
@@ -20,7 +23,7 @@ var _ = Describe("Utils", func() {
 	})
 
 	It("check if URL is accessible", func() {
-		IsURLAccessible := utils.IsURLAccessible("https://github.com")
+		IsURLAccessible := utils.IsURLAccessible("https://google.com")
 		Expect(IsURLAccessible).To(Equal(true))
 	})
 
@@ -50,8 +53,52 @@ var _ = Describe("Utils", func() {
 
 	It("convert string slice to JSON", func() {
 		d := [][]string{{"test:", "test"}}
-		string, _ := utils.StringSliceToJSON(d)
-		Expect(string).To(Equal("{\"test\":\"test\"}"))
+		str, _ := utils.StringSliceToJSON(d)
+		Expect(str).To(Equal("{\"test\":\"test\"}"))
 	})
 
+	Describe("read Rasa X URL from environment variables", func() {
+		viper.AutomaticEnv() // read in environment variables that match
+		viper.SetEnvPrefix("rasactl")
+
+		Context("no variable set", func() {
+			It("URL should be empty", func() {
+				url := utils.GetRasaXURLEnv("my-deployment")
+
+				Expect(url).To(BeEmpty())
+			})
+		})
+
+		Context("set environment variables", func() {
+			It("set the global env variable - RASACTL_RASA_X_URL", func() {
+				os.Setenv("RASACTL_RASA_X_URL", "http://test.localhost")
+				url := utils.GetRasaXURLEnv("my-deployment")
+
+				Expect(url).To(Equal("http://test.localhost"))
+			})
+
+			It("set variable for a specific namespace - RASACTL_RASA_X_URL_MY_DEPLOYMENT", func() {
+				os.Setenv("RASACTL_RASA_X_URL_MY_DEPLOYMENT", "http://my-deployment.test.localhost")
+				url := utils.GetRasaXURLEnv("my-deployment")
+
+				Expect(url).To(Equal("http://my-deployment.test.localhost"))
+			})
+
+			It("check if env variable for a namespace override the global variable", func() {
+				os.Setenv("RASACTL_RASA_X_URL", "http://test.localhost")
+				os.Setenv("RASACTL_RASA_X_URL_MY_DEPLOYMENT", "http://my-deployment.test.localhost")
+				url := utils.GetRasaXURLEnv("my-deployment")
+
+				Expect(url).To(Equal("http://my-deployment.test.localhost"))
+			})
+
+			It("check if the global variable is used in a case that an env variable for a namespace is not set", func() {
+				os.Setenv("RASACTL_RASA_X_URL", "http://test.localhost")
+				os.Setenv("RASACTL_RASA_X_URL_MY_DEPLOYMENT", "http://my-deployment.test.localhost")
+				url := utils.GetRasaXURLEnv("my-deployment-1")
+
+				Expect(url).To(Equal("http://test.localhost"))
+			})
+		})
+	})
 })

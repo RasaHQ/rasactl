@@ -39,11 +39,55 @@
 - [rasactl](#rasactl)
   - [Features](#features)
   - [Table of Contents](#table-of-contents)
+- [- Values File](#--values-file)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
     - [Linux / macOS](#linux--macos)
   - [Before you start](#before-you-start)
   - [Values File](#values-file)
+  - [Configuration](#configuration)
+    - [Environment variables](#environment-variables)
+    - [Configuration file](#configuration-file)
+  - [Global flags](#global-flags)
+  - [Commands](#commands)
+    - [The `add` command](#the-add-command)
+    - [The `start` command](#the-start-command)
+    - [The `stop` command](#the-stop-command)
+    - [The `delete` command](#the-delete-command)
+    - [The `list` command](#the-list-command)
+    - [The `status` command](#the-status-command)
+    - [The `config use-deployment` command](#the-config-use-deployment-command)
+    - [The `connect rasa` command](#the-connect-rasa-command)
+    - [The `auth login` command](#the-auth-login-command)
+    - [The `auth logout` command](#the-auth-logout-command)
+    - [The `logs` command](#the-logs-command)
+  - [Enterprise Management Commands](#enterprise-management-commands)
+    - [The `enterprise activate` command](#the-enterprise-activate-command)
+    - [The `enterprise deactivate` command](#the-enterprise-deactivate-command)
+  - [Model Management Commands](#model-management-commands)
+    - [The `model delete` command](#the-model-delete-command)
+    - [The `model download` command](#the-model-download-command)
+    - [The `model list` command](#the-model-list-command)
+    - [The `model tag` command](#the-model-tag-command)
+    - [The `model upload` command](#the-model-upload-command)
+    - [Upload a model to Rasa X](#upload-a-model-to-rasa-x)
+  - [Examples of usage](#examples-of-usage)
+    - [Run Rasa X / Enterprise with a local Rasa Server](#run-rasa-x--enterprise-with-a-local-rasa-server)
+    - [Run Rasa X / Enterprise with mounted a local Rasa project](#run-rasa-x--enterprise-with-mounted-a-local-rasa-project)
+    - [Upgrade Rasa X / Enterprise version](#upgrade-rasa-x--enterprise-version)
+    - [Deploy Rasa X in one of the public cloud providers](#deploy-rasa-x-in-one-of-the-public-cloud-providers)
+  - [Development](#development)
+    - [How to run it?](#how-to-run-it)
+    - [Run unit tests](#run-unit-tests)
+    - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
+  - [License](#license)
+<<<<<<< HEAD
+  - [Values File](#values-file)
+=======
+  - [Configuration](#configuration)
+    - [Environment variables](#environment-variables)
+    - [Configuration file](#configuration-file)
+>>>>>>> main
   - [Global flags](#global-flags)
   - [Commands](#commands)
     - [The `add` command](#the-add-command)
@@ -137,6 +181,34 @@ rasax:
     rasactl: "true"
     test_version: {{ env "RASACTL_TEST_VERSION" }}
     test_template: {{ coalesce 0 1 2 }}
+```
+
+## Configuration
+
+### Environment variables
+
+|                  Name                  |                                                                                                                        Description                                                                                                                         |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `RASACTL_AUTH_USER`                    | The username that is used to authorize to Rasa X / Enterprise                                                                                                                                                                                              |
+| `RASACTL_AUTH_PASSWORD`                | The password that is used to authorize to Rasa X / Enterprise                                                                                                                                                                                              |
+| `RASACTL_RASA_X_URL`                   | Set Rasa X / Enterprise URL. By default, the URL is detected automatically, but if you use a custom configuration and you wanna define Rasa X URL explicitly you can use the env variable. The RASACTL_RASA_X_URL overrides Rasa X URL for all deployment. |
+| `RASACTL_RASA_X_URL_<DEPLOYMENT_NAME>` | Set Rasa X / Enterprise URL for a given deployment, e.g. if a deployment name is `my-deployment`, then you can use the `RASACTL_RASA_X_URL_MY_DEPLOYMENT` environment variable to define the Rasa X URL for the `my-deployment`.                           |
+| `RASACTL_KUBECONFIG`                   | Absolute path to the kubeconfig file (default "$HOME/.kube/config")                                                                                                                                                                                        |
+
+### Configuration file
+
+Below you can find an example of the configuration file and parameters that can be defined, by default configuration file is located in `$HOME/.rasactl.yaml`.
+
+```yaml
+# Deployment name that is used as a current deployment (default).
+# You can use the `rasactl config use-deployment` command to set the current deployment.
+current-deployment: my-deployment
+
+# Name of the kubeconfig context to use
+kube-context: ""
+
+# Absolute path to the kubeconfig file
+kubeconfig: /home/user/.kube/config
 ```
 
 ## Global flags

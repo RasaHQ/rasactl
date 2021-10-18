@@ -27,6 +27,7 @@ import (
 	"k8s.io/client-go/rest"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -154,6 +155,11 @@ func (k *Kubernetes) GetCloudProvider() *cloud.Provider {
 
 // GetRasaXURL returns URL for a given deployment.
 func (k *Kubernetes) GetRasaXURL() (string, error) {
+	// Read URL from the environment variables
+	if url := utils.GetRasaXURLEnv(k.Namespace); url != "" {
+		k.Log.Info("Using Rasa X URL passed via the environment variables", "value", url)
+		return url, nil
+	}
 
 	if k.Helm.Values == nil {
 		return "", fmt.Errorf("helm client requires values, %#v", k.Helm)
