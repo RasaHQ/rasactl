@@ -43,6 +43,7 @@
   - [Installation](#installation)
     - [Linux / macOS](#linux--macos)
   - [Before you start](#before-you-start)
+  - [Values File](#values-file)
   - [Global flags](#global-flags)
   - [Commands](#commands)
     - [The `add` command](#the-add-command)
@@ -125,6 +126,19 @@ Below you can find several things that are good to know and keep in mind when yo
 - `rasactl` deploys Rasa X / Enterprise without a Rasa Open Source server. It's up to you to connect Rasa OSS with Rasa X / Enterprise deployment.
 - `rasactl` uses a Kubernetes context from the kubeconfig file, if you want to switch Kubernetes cluster you have to use `kubectl` or other tools that change the active context for the kubeconfig.
 
+## Values File
+
+The `rasactl` uses the [`rasa-x-helm` chart](https://github.com/RasaHQ/rasa-x-helm) to deploy Rasa X / Enterprise, which means you can use [the helm chart values](https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml) to configure deployment. The `rasactl` enable template usage for the values file so that it's possible to use the [Go template](https://pkg.go.dev/text/template#hdr-Actions) and [Sprig function](http://masterminds.github.io/sprig/) within the value file, e.g.
+
+```yaml
+# values.yaml
+rasax:
+  podLabels:
+    rasactl: "true"
+    test_version: {{ env "RASACTL_TEST_VERSION" }}
+    test_template: {{ coalesce 0 1 2 }}
+```
+
 ## Global flags
 
 Below you can find global flags that can be used with every command.
@@ -136,7 +150,7 @@ Global Flags:
   -h, --help                  help for rasactl
       --kube-context string   name of the kubeconfig context to use
       --kubeconfig string     absolute path to the kubeconfig file (default "$HOME/.kube/config")
-      --verbose               enable verbose outpu
+      --verbose               enable verbose output
 ```
 
 ## Commands
