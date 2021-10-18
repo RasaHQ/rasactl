@@ -128,7 +128,7 @@ Below you can find several things that are good to know and keep in mind when yo
 
 ## Values File
 
-The `rasactl` uses the [`rasa-x-helm` chart](https://github.com/RasaHQ/rasa-x-helm) to deploy Rasa X / Enterprise, which means you can use [the helm chart values](https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml) to configure deployment. The `rasactl` enable template usage for the values file so that it's possible to use the [Go template](https://pkg.go.dev/text/template#hdr-Actions) and [Sprig function](http://masterminds.github.io/sprig/) within the value file, e.g.
+The `rasactl` uses the [`rasa-x-helm` chart](https://github.com/RasaHQ/rasa-x-helm) to deploy Rasa X / Enterprise, which means you can use [the helm chart values](https://github.com/RasaHQ/rasa-x-helm/blob/main/charts/rasa-x/values.yaml) to configure deployment. The `rasactl` enables template usage for the values file so that it's possible to use the [Go template](https://pkg.go.dev/text/template#hdr-Actions) and [Sprig function](http://masterminds.github.io/sprig/) within the value file, e.g.
 
 ```yaml
 # values.yaml

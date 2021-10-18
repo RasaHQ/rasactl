@@ -53,7 +53,7 @@ func (h *Helm) ReadValuesFile() error {
 		valuesBuffer := new(bytes.Buffer)
 		tpl := template.Must(template.New("base").Funcs(sprig.TxtFuncMap()).Parse(string(valuesFile)))
 		if err := tpl.Execute(valuesBuffer, ""); err != nil {
-			return fmt.Errorf("error during processing the value file: %s", err)
+			return fmt.Errorf("error during processing the value file: %w", err)
 		}
 
 		err = yaml.Unmarshal(valuesBuffer.Bytes(), &h.Values)
