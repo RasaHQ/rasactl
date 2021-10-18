@@ -6,7 +6,7 @@ on:
       - '*'
 
 env:
-  GO_VERSION: 1.17.1
+  GO_VERSION: 1.17.2
 
 jobs:
   golangci:
@@ -30,6 +30,13 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
 
+      - name: Generate changelog
+        run: |
+          brew tap git-chglog/git-chglog
+          brew install git-chglog
+
+          git-chglog --output release_changelog.md --template .chglog/RELEASE_CHANGELOG.tpl.md ${VERSION}
+
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -52,4 +59,4 @@ jobs:
             -v `pwd`:/go/src/rasactl \
             -v /home/runner/.gnupg:/root/.gnupg \
             -w /go/src/rasactl \
-            ghcr.io/tczekajlo/golang-cross:v${{ env.GO_VERSION }}
+            ghcr.io/tczekajlo/golang-cross:v${{ env.GO_VERSION }} release --release-notes=/go/src/rasactl/release_changelog.md
