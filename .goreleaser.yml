@@ -1,24 +1,3 @@
-changelog:
-  # Set it to true if you wish to skip the changelog generation.
-  # This may result in an empty release notes on GitHub/GitLab/Gitea.
-  skip: true
-
-  # Sorts the changelog by the commit's messages.
-  # Could either be asc, desc or empty
-  # Default is empty
-  sort: asc
-
-  filters:
-
-    # Commit messages matching the regexp listed here will be removed from
-    # the changelog
-    # Default is empty
-    exclude:
-      - '^docs:'
-      - typo
-      - (?i)foo
-
-
 builds:
   - id: darwin
     binary: rasactl
@@ -95,5 +74,6 @@ signs:
     args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
 
 release:
+  prerelease: auto
   footer: |
     This release was signed with `59FD 4D71 6D9 EA15 7980 87A5 BC1A EDA3 1757 EA04E`.
