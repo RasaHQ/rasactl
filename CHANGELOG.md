@@ -1,4 +1,13 @@
 
+<a name="0.4.0"></a>
+## [0.4.0](https://github.com/RasaHQ/rasactl/compare/0.3.0...0.4.0) (2021-10-18)
+
+### Features
+
+* Enable template for the values file ([#9](https://github.com/RasaHQ/rasactl/issues/9))
+* Set Rasa X URL via environment variables  ([#8](https://github.com/RasaHQ/rasactl/issues/8))
+
+
 <a name="0.3.0"></a>
 ## [0.3.0](https://github.com/RasaHQ/rasactl/compare/0.2.0...0.3.0) (2021-10-15)
 
