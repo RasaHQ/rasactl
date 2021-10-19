@@ -377,8 +377,8 @@ Examples:
 
 ```text
 Flags:
-  -d, --details   show detailed information, such as running pods, helm chart status
-  -h, --help      help for status
+  -d, --details         show detailed information, such as running pods, helm chart status
+  -h, --help            help for status
   -o, --output string   output format. One of: json|table (default "table")
 ```
 
