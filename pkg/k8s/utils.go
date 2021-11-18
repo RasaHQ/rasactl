@@ -98,24 +98,23 @@ func (k *Kubernetes) IsNamespaceManageable() bool {
 // AddNamespaceLabels adds an extra label to a given namespace that indicates that the namespace
 // is managed by rasactl.
 func (k *Kubernetes) AddNamespaceLabel() error {
-	type patch struct {
-		Op    string `json:"op"`
-		Path  string `json:"path"`
-		Value string `json:"value"`
-	}
 
-	payload := []patch{{
-		Op:    "add",
-		Path:  "/metadata/labels/rasactl",
-		Value: "true",
-	}}
-
-	payloadBytes, _ := json.Marshal(payload)
-	k.Log.V(1).Info("Adding label", "namespace", k.Namespace, "payload", string(payloadBytes))
-	if _, err := k.clientset.CoreV1().Namespaces().Patch(context.TODO(), k.Namespace,
-		ktypes.JSONPatchType, payloadBytes, metav1.PatchOptions{}); err != nil {
+	ns, err := k.clientset.CoreV1().Namespaces().Get(context.TODO(), k.Namespace, metav1.GetOptions{})
+	if err != nil {
 		return err
 	}
+
+	var mergedLabels = make(map[string]string)
+	for key, value := range ns.Labels {
+		mergedLabels[key] = value
+	}
+	mergedLabels["rasactl"] = "true"
+	ns.Labels = mergedLabels
+
+	if _, err := k.clientset.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{}); err != nil {
+		return err
+	}
+
 	return nil
 }
 
