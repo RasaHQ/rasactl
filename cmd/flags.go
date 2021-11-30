@@ -7,7 +7,7 @@ import (
 )
 
 func addStartUpgradeFlags(cmd *cobra.Command) {
-	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*10, "time to wait for Rasa X to be ready")
+	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*15, "time to wait for Rasa X to be ready")
 	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
 	cmd.PersistentFlags().StringVar(&rasactlFlags.StartUpgrade.ValuesFile, "values-file", "", "absolute path to the values file")
 }

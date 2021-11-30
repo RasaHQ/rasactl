@@ -238,7 +238,7 @@ func (r *RasaCtl) startOrInstall() error {
 
 		r.Spinner.Message("Deploying Rasa X")
 		if err := r.HelmClient.Install(); err != nil {
-			return err
+			return helm.ErrorTimeoutWaitForCondition(err)
 		}
 	} else if !r.isRasaXRunning {
 		// starts a stopped deployment
