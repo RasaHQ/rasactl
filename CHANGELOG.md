@@ -1,4 +1,8 @@
 
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/RasaHQ/rasactl/compare/0.4.1...0.4.2) (2021-11-30)
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/RasaHQ/rasactl/compare/0.4.0...0.4.1) (2021-11-18)
 
