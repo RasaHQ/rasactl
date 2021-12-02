@@ -57,6 +57,10 @@ func deleteCmd() *cobra.Command {
 				return err
 			}
 
+			if !rasaCtl.KubernetesClient.IsNamespaceManageable() && !viper.GetBool("force") {
+				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
+			}
+
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
@@ -71,10 +75,6 @@ func deleteCmd() *cobra.Command {
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if !rasaCtl.KubernetesClient.IsNamespaceManageable() && !viper.GetBool("force") {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
-			}
-
 			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Delete(); err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
