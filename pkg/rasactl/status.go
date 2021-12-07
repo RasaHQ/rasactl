@@ -22,6 +22,15 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
+
+// func (r *RasaCtl) GetReleaseStatus() (string, error) {
+// 	release, err := r.HelmClient.GetStatus()
+// 	if err != nil {
+// 			return "No status", err
+// 	}
+// 	return release.Info.Status.String(), err
+// }
+
 // Status prints status for a given deployment.
 func (r *RasaCtl) Status() error {
 	var d = [][]string{}
@@ -29,7 +38,15 @@ func (r *RasaCtl) Status() error {
 	if err != nil {
 		return err
 	}
+
 	statusProject := "Stopped"
+
+	helmRelease, err := r.HelmClient.GetStatus()
+	if err != nil {
+		return err
+	}
+	statusProject = helmRelease.Info.Status.String()
+
 	if isRunning {
 		statusProject = "Running"
 	}
