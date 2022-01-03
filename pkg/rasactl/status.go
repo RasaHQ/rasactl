@@ -75,8 +75,8 @@ func (r *RasaCtl) Status() error {
 	if err != nil {
 		return err
 	}
-	statusProject, release, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
 
+	statusProject, release, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
 	if err != nil {
 		return nil
 	}
