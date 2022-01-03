@@ -22,7 +22,6 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
-
 // func (r *RasaCtl) GetReleaseStatus() (string, error) {
 // 	release, err := r.HelmClient.GetStatus()
 // 	if err != nil {
@@ -39,16 +38,13 @@ func (r *RasaCtl) Status() error {
 		return err
 	}
 
-	statusProject := "Stopped"
-
-	helmRelease, err := r.HelmClient.GetStatus()
-	if err != nil {
-		return err
-	}
-	statusProject = helmRelease.Info.Status.String()
-
-	if isRunning {
-		statusProject = "Running"
+	statusProject := "Running"
+	if !isRunning {
+		helmRelease, err := r.HelmClient.GetStatus()
+		if err != nil {
+			return err
+		}
+		statusProject = helmRelease.Info.Status.String()
 	}
 
 	stateData, err := r.KubernetesClient.ReadSecretWithState()
