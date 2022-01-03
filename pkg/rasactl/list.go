@@ -73,7 +73,7 @@ func (r *RasaCtl) List() error {
 				rasaWorkerVersion = "0.0.0"
 			}
 
-			data = append(data, []string{current, namespace, string(status),
+			data = append(data, []string{current, namespace, status,
 				rasaProductionVersion,
 				rasaWorkerVersion,
 				enterprise,
@@ -81,7 +81,7 @@ func (r *RasaCtl) List() error {
 			},
 			)
 		} else {
-			data = append(data, []string{current, namespace, string(status),
+			data = append(data, []string{current, namespace, status,
 				"0.0.0",
 				"0.0.0",
 				string(stateData[types.StateEnterprise]),
