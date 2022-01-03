@@ -23,17 +23,27 @@ import (
 	"helm.sh/helm/v3/pkg/release"
 )
 
-// Return project status, helm release, and err for a given helm release
-func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release, error) {
+type StatusProject string
 
-	statusProject := "Stopped"
+const (
+	StatusStopped    StatusProject = "Stopped"
+	StatusRunning    StatusProject = "Running"
+	StatusInstalling StatusProject = "Installing"
+	StatusUpgrading  StatusProject = "Upgrading"
+)
+
+// Return project status, helm release, and err for a given helm release
+func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (StatusProject, *release.Release, error) {
+
+	status := StatusStopped
+
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()
 	if err != nil {
-		return statusProject, nil, err
+		return status, nil, err
 	}
 
 	if isRunning {
-		statusProject = "Running"
+		status = StatusRunning
 	}
 
 	r.HelmClient.SetConfiguration(
@@ -46,17 +56,17 @@ func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release
 	release, err := r.HelmClient.GetStatus()
 
 	if err != nil {
-		return statusProject, release, err
+		return status, release, err
 	}
 
 	statusRelease := release.Info.Status.String()
 	if statusRelease == "pending-upgrade" {
-		statusProject = "Upgrading"
+		status = StatusUpgrading
 	}
 	if statusRelease == "pending-install" {
-		statusProject = "Installing"
+		status = StatusInstalling
 	}
-	return statusProject, release, err
+	return status, release, err
 }
 
 // Status prints status for a given deployment.
@@ -74,7 +84,7 @@ func (r *RasaCtl) Status() error {
 	}
 
 	d = append(d, []string{"Name:", r.Namespace})
-	d = append(d, []string{"Status:", statusProject})
+	d = append(d, []string{"Status:", string(statusProject)})
 
 	url, err := r.GetRasaXURL()
 	if err != nil {
