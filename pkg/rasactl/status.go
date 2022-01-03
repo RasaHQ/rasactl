@@ -22,29 +22,12 @@ import (
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
-// func (r *RasaCtl) GetReleaseStatus() (string, error) {
-// 	release, err := r.HelmClient.GetStatus()
-// 	if err != nil {
-// 			return "No status", err
-// 	}
-// 	return release.Info.Status.String(), err
-// }
-
 // Status prints status for a given deployment.
 func (r *RasaCtl) Status() error {
 	var d = [][]string{}
 	isRunning, err := r.KubernetesClient.IsRasaXRunning()
 	if err != nil {
 		return err
-	}
-
-	statusProject := "Running"
-	if !isRunning {
-		helmRelease, err := r.HelmClient.GetStatus()
-		if err != nil {
-			return err
-		}
-		statusProject = helmRelease.Info.Status.String()
 	}
 
 	stateData, err := r.KubernetesClient.ReadSecretWithState()
@@ -57,6 +40,23 @@ func (r *RasaCtl) Status() error {
 		},
 	)
 	r.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
+
+	release, err := r.HelmClient.GetStatus()
+	if err != nil {
+		return err
+	}
+	releaseStatus := release.Info.Status.String()
+
+	statusProject := "Stopped"
+	if isRunning {
+		statusProject = "Running"
+	}
+	if releaseStatus == "pending-upgrade" {
+		statusProject = "Upgrading"
+	}
+	if releaseStatus == "pending-install" {
+		statusProject = "Installing"
+	}
 
 	d = append(d, []string{"Name:", r.Namespace})
 	d = append(d, []string{"Status:", statusProject})
@@ -102,14 +102,9 @@ func (r *RasaCtl) Status() error {
 	d = append(d, []string{"Project path:", projectPath})
 
 	if r.Flags.Status.Details {
-
-		release, err := r.HelmClient.GetStatus()
-		if err != nil {
-			return err
-		}
 		d = append(d, []string{"Helm chart:", fmt.Sprintf("%s-%s", release.Chart.Name(), release.Chart.Metadata.Version)})
 		d = append(d, []string{"Helm release:", release.Name})
-		d = append(d, []string{"Helm release status:", release.Info.Status.String()})
+		d = append(d, []string{"Helm release status:", releaseStatus})
 
 		pods, err := r.KubernetesClient.GetPods()
 		if err != nil {
