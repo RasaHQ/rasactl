@@ -20,42 +20,57 @@ import (
 
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"helm.sh/helm/v3/pkg/release"
 )
+
+// Return project status, helm release, and err for a given helm release
+func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release, error) {
+
+	statusProject := "Stopped"
+	isRunning, err := r.KubernetesClient.IsRasaXRunning()
+	if err != nil {
+		return statusProject, nil, err
+	}
+
+	if isRunning {
+		statusProject = "Running"
+	}
+
+	r.HelmClient.SetConfiguration(
+		&types.HelmConfigurationSpec{
+			ReleaseName: string(releaseName),
+		},
+	)
+	r.KubernetesClient.SetHelmReleaseName(string(releaseName))
+
+	release, err := r.HelmClient.GetStatus()
+
+	if err != nil {
+		return statusProject, release, err
+	}
+
+	statusRelease := release.Info.Status.String()
+	if statusRelease == "pending-upgrade" {
+		statusProject = "Upgrading"
+	}
+	if statusRelease == "pending-install" {
+		statusProject = "Installing"
+	}
+	return statusProject, release, err
+}
 
 // Status prints status for a given deployment.
 func (r *RasaCtl) Status() error {
 	var d = [][]string{}
-	isRunning, err := r.KubernetesClient.IsRasaXRunning()
-	if err != nil {
-		return err
-	}
 
 	stateData, err := r.KubernetesClient.ReadSecretWithState()
 	if err != nil {
 		return err
 	}
-	r.HelmClient.SetConfiguration(
-		&types.HelmConfigurationSpec{
-			ReleaseName: string(stateData[types.StateHelmReleaseName]),
-		},
-	)
-	r.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
+	statusProject, release, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
 
-	release, err := r.HelmClient.GetStatus()
 	if err != nil {
-		return err
-	}
-	releaseStatus := release.Info.Status.String()
-
-	statusProject := "Stopped"
-	if isRunning {
-		statusProject = "Running"
-	}
-	if releaseStatus == "pending-upgrade" {
-		statusProject = "Upgrading"
-	}
-	if releaseStatus == "pending-install" {
-		statusProject = "Installing"
+		return nil
 	}
 
 	d = append(d, []string{"Name:", r.Namespace})
@@ -104,7 +119,7 @@ func (r *RasaCtl) Status() error {
 	if r.Flags.Status.Details {
 		d = append(d, []string{"Helm chart:", fmt.Sprintf("%s-%s", release.Chart.Name(), release.Chart.Metadata.Version)})
 		d = append(d, []string{"Helm release:", release.Name})
-		d = append(d, []string{"Helm release status:", releaseStatus})
+		d = append(d, []string{"Helm release status:", release.Info.Status.String()})
 
 		pods, err := r.KubernetesClient.GetPods()
 		if err != nil {
