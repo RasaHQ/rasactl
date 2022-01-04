@@ -20,30 +20,66 @@ import (
 
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
+	"helm.sh/helm/v3/pkg/release"
 )
+
+const (
+	StatusStopped    = "Stopped"
+	StatusRunning    = "Running"
+	StatusInstalling = "Installing"
+	StatusUpgrading  = "Upgrading"
+)
+
+// GetReleaseStatus returns project status, helm release, and err for a given helm release name
+func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release, error) {
+
+	status := StatusStopped
+
+	isRunning, err := r.KubernetesClient.IsRasaXRunning()
+	if err != nil {
+		return status, nil, err
+	}
+
+	if isRunning {
+		status = StatusRunning
+	}
+
+	r.HelmClient.SetConfiguration(
+		&types.HelmConfigurationSpec{
+			ReleaseName: string(releaseName),
+		},
+	)
+	r.KubernetesClient.SetHelmReleaseName(string(releaseName))
+
+	release, err := r.HelmClient.GetStatus()
+	if err != nil {
+		return status, release, err
+	}
+
+	statusRelease := release.Info.Status.String()
+	switch statusRelease {
+	case "pending-upgrade":
+		status = StatusUpgrading
+	case "pending-install":
+		status = StatusInstalling
+	}
+
+	return status, release, err
+}
 
 // Status prints status for a given deployment.
 func (r *RasaCtl) Status() error {
 	var d = [][]string{}
-	isRunning, err := r.KubernetesClient.IsRasaXRunning()
-	if err != nil {
-		return err
-	}
-	statusProject := "Stopped"
-	if isRunning {
-		statusProject = "Running"
-	}
 
 	stateData, err := r.KubernetesClient.ReadSecretWithState()
 	if err != nil {
 		return err
 	}
-	r.HelmClient.SetConfiguration(
-		&types.HelmConfigurationSpec{
-			ReleaseName: string(stateData[types.StateHelmReleaseName]),
-		},
-	)
-	r.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))
+
+	statusProject, release, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
+	if err != nil {
+		return nil
+	}
 
 	d = append(d, []string{"Name:", r.Namespace})
 	d = append(d, []string{"Status:", statusProject})
@@ -89,11 +125,6 @@ func (r *RasaCtl) Status() error {
 	d = append(d, []string{"Project path:", projectPath})
 
 	if r.Flags.Status.Details {
-
-		release, err := r.HelmClient.GetStatus()
-		if err != nil {
-			return err
-		}
 		d = append(d, []string{"Helm chart:", fmt.Sprintf("%s-%s", release.Chart.Name(), release.Chart.Metadata.Version)})
 		d = append(d, []string{"Helm release:", release.Name})
 		d = append(d, []string{"Helm release status:", release.Info.Status.String()})
