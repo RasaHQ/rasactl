@@ -1,4 +1,12 @@
 
+<a name="0.5.0"></a>
+## [0.5.0](https://github.com/RasaHQ/rasactl/compare/0.4.3...0.5.0) (2022-01-04)
+
+### Features
+
+* Add additional deployment statuses (upgrading & installing) ([#16](https://github.com/RasaHQ/rasactl/issues/16))
+
+
 <a name="0.4.3"></a>
 ## [0.4.3](https://github.com/RasaHQ/rasactl/compare/0.4.2...0.4.3) (2021-12-02)
 
