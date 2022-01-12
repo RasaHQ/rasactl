@@ -28,7 +28,7 @@
 
 - use a local Rasa project along Rasa X / Enterprise deployment
 
-  Use your local Rasa project along with Rasa X / Enterprise deployment. The `rasaxctl` provides an easy way to use your local Rasa project along with Rasa X / Enterprise.
+  Use your local Rasa project along with Rasa X / Enterprise deployment. The `rasactl` provides an easy way to use your local Rasa project along with Rasa X / Enterprise.
 
   This setup was previously referred to as "local mode" in older Rasa X versions.
 
