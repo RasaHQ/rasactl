@@ -13,7 +13,7 @@ require (
 	github.com/docker/docker-credential-helpers v0.6.4
 	github.com/fatih/color v1.13.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.2
 	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.3.0
 	github.com/imdario/mergo v0.3.12
