@@ -17,8 +17,13 @@ package types
 
 import "time"
 
-// HelmChartNameRasaX stores a name of helm chart used to deploy Rasa X / Enterprise.
-const HelmChartNameRasaX string = "rasa-x"
+const (
+	// HelmChartNameRasaX stores a name of helm chart used to deploy Rasa X / Enterprise.
+	HelmChartNameRasaX string = "rasa-x"
+
+	//HelmChartVersionRasaX storage a version of helm chart used to deploy Rasa X / Enterprise.
+	HelmChartVersionRasaX string = "4.0.0"
+)
 
 // RepositorySpec stores data related to a helm repository.
 type RepositorySpec struct {
