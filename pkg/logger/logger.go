@@ -32,10 +32,12 @@ func New(flags *types.RasaCtlFlags) logr.Logger {
 
 	if flags.Global.Debug {
 		opts.Level = zapcore.DebugLevel
+		opts.TimeEncoder = zapcore.ISO8601TimeEncoder
 	}
 
 	if flags.Global.Verbose {
 		opts.Level = zapcore.InfoLevel
+		opts.TimeEncoder = zapcore.ISO8601TimeEncoder
 	}
 
 	logger := zap.New(zap.UseFlagOptions(&opts))
