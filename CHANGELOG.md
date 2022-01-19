@@ -1,6 +1,18 @@
 
+<a name="1.0.0"></a>
+## [1.0.0](https://github.com/RasaHQ/rasactl/compare/0.5.0...1.0.0) (2022-01-19)
+
+### Breaking changes
+
+* Update default helm values ([#17](https://github.com/RasaHQ/rasactl/issues/17))
+
+### Bug Fixes
+
+* Update dependencies ([#18](https://github.com/RasaHQ/rasactl/issues/18))
+
+
 <a name="0.5.0"></a>
-## [0.5.0](https://github.com/RasaHQ/rasactl/compare/0.4.3...0.5.0) (2022-01-04)
+## [0.5.0](https://github.com/RasaHQ/rasactl/compare/0.4.3...0.5.0) (2022-01-05)
 
 ### Features
 
