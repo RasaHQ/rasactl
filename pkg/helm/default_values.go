@@ -181,7 +181,7 @@ func ValuesPostgreSQLNodePort() map[string]interface{} {
 func valuesRabbitMQErlangCookie() map[string]interface{} {
 	values := map[string]interface{}{
 		"rabbitmq": map[string]interface{}{
-			"rabbitmq": map[string]interface{}{
+			"auth": map[string]interface{}{
 				"erlangCookie": uuid.New().String(),
 			},
 		},
