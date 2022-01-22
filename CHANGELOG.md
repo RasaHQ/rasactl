@@ -1,4 +1,12 @@
 
+<a name="1.0.1"></a>
+## [1.0.1](https://github.com/RasaHQ/rasactl/compare/1.0.0...1.0.1) (2022-01-22)
+
+### Bug Fixes
+
+* Use correct Helm value path for rabbitmq credentials ([#23](https://github.com/RasaHQ/rasactl/issues/23))
+
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://github.com/RasaHQ/rasactl/compare/0.5.0...1.0.0) (2022-01-19)
 
