@@ -124,7 +124,7 @@ func (k *Kubernetes) GetRabbitMqCreds() (string, string, error) {
 		return "", "", err
 	}
 
-	username := k.Helm.Values["rabbitmq"].(map[string]interface{})["rabbitmq"].(map[string]interface{})["username"].(string)
+	username := k.Helm.Values["rabbitmq"].(map[string]interface{})["auth"].(map[string]interface{})["username"].(string)
 
 	return username, string(secret.Data["rabbitmq-password"]), nil
 }
