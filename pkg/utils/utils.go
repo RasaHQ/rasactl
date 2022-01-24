@@ -267,7 +267,7 @@ func GetPasswordStdin() (string, error) {
 // HelmChartVersionConstrains checks if the rasa-x-helm chart version
 // is within constraints boundaries.
 func HelmChartVersionConstrains(helmChartVersion string) error {
-	constraint := ">= 4.0.0, < 5.0.0"
+	constraint := fmt.Sprintf(">= %s, < 5.0.0", types.HelmChartVersionRasaX)
 
 	if helmChartVersion == "" {
 		return nil

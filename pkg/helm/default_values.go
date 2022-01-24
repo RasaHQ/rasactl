@@ -165,13 +165,37 @@ func ValuesRabbitMQNodePort() map[string]interface{} {
 	return values
 }
 
-// ValuesPostgreSQLNodePort return helm vales which set the postgresql service type to NodePort.
+// ValuesPostgreSQLNodePort returns helm values which set the postgresql service type to NodePort.
 func ValuesPostgreSQLNodePort() map[string]interface{} {
 	values := map[string]interface{}{
 		"postgresql": map[string]interface{}{
 			"service": map[string]interface{}{
 				"type": "NodePort",
 			},
+		},
+	}
+
+	return values
+}
+
+// ValuesRasaXNodePort returns helm values which set the rasa-x service type to NodePort.
+func ValuesRasaXNodePort() map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"service": map[string]interface{}{
+				"type": "NodePort",
+			},
+		},
+	}
+
+	return values
+}
+
+// ValuesSetRasaXHost returns helm values which set the RASA_X_HOST env variable for the rasa-x deployment.
+func ValuesSetRasaXHost(host string) map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"overrideHost": host,
 		},
 	}
 
