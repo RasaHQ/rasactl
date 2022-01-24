@@ -202,6 +202,24 @@ func ValuesSetRasaXHost(host string) map[string]interface{} {
 	return values
 }
 
+// ValuesSetRasaXHostAliases returns helm vales which set hostAliases for the rasa-x deployment.
+func ValuesSetRasaXHostAliases(ipAddress string) map[string]interface{} {
+	values := map[string]interface{}{
+		"rasax": map[string]interface{}{
+			"hostAliases": []map[string]interface{}{
+				{
+					"ip": ipAddress,
+					"hostnames": []string{
+						"host.docker.internal",
+					},
+				},
+			},
+		},
+	}
+
+	return values
+}
+
 func valuesRabbitMQErlangCookie() map[string]interface{} {
 	values := map[string]interface{}{
 		"rabbitmq": map[string]interface{}{
