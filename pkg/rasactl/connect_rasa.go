@@ -38,7 +38,6 @@ import (
 
 // ConnectRasa connects a local rasa server to a given deployment.
 func (r *RasaCtl) ConnectRasa() error {
-	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 	r.initRasaXClient()
 
 	version, err := r.RasaXClient.GetVersionEndpoint()
@@ -98,18 +97,24 @@ func (r *RasaCtl) ConnectRasa() error {
 
 	r.Log.Info("Connecting Rasa Server to Rasa X")
 	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal {
+
 		r.HelmClient.SetValues(
 			utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesRabbitMQNodePort(),
-				helm.ValuesPostgreSQLNodePort(), helm.ValuesHostNetworkRasaX()),
+				helm.ValuesPostgreSQLNodePort(), helm.ValuesRasaXNodePort(),
+			),
 		)
 		r.Log.V(1).Info("Merging values", "result", r.HelmClient.GetValues())
+
+		r.Log.Info("Upgrading configuration for Rasa X deployment", "phase", "set services type to NodePort")
+		if err := r.HelmClient.Upgrade(); err != nil {
+			return err
+		}
+
 	} else {
 		return errors.Errorf(
 			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind.",
 		)
 	}
-
-	r.Log.Info("Upgrading configuration for Rasa X deployment")
 
 	if version.Enterprise && utils.RasaXVersionConstrains(version.RasaX, ">= 1.0.0") {
 		r.Log.Info("Rasa Enterprise is active, using the environment endpoint")
@@ -119,10 +124,6 @@ func (r *RasaCtl) ConnectRasa() error {
 		}
 
 	} else {
-
-		if err := r.HelmClient.Upgrade(); err != nil {
-			return err
-		}
 		r.Log.Info("Updating configuration for Rasa X")
 		if err := r.KubernetesClient.UpdateRasaXConfig(rasaToken); err != nil {
 			return err
@@ -133,6 +134,23 @@ func (r *RasaCtl) ConnectRasa() error {
 			return err
 		}
 
+	}
+
+	r.Log.Info("Upgrading configuration for Rasa X deployment", "phase",
+		"set the RASA_X_HOST env variable for the rasa-x deployment")
+	r.Spinner.Message("Connecting Rasa Server to Rasa X")
+
+	rasaXHost, err := r.getRasaXNodePortURL()
+	if err != nil {
+		return err
+	}
+
+	r.HelmClient.SetValues(
+		utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesHostNetworkRasaX(), helm.ValuesSetRasaXHost(rasaXHost)),
+	)
+
+	if err := r.HelmClient.Upgrade(); err != nil {
+		return err
 	}
 
 	if err := r.saveRasaCredentialsFile(fileCreds); err != nil {
@@ -233,6 +251,16 @@ func (r *RasaCtl) runRasaServer(environment string, args []string, done chan boo
 
 }
 
+func (r *RasaCtl) getRasaXNodePortURL() (string, error) {
+	rasaXNodePort, err := r.KubernetesClient.GetRasaXSvcNodePort()
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("http://127.0.0.1:%d", rasaXNodePort)
+	return url, nil
+}
+
 func (r *RasaCtl) saveRasaCredentialsFile(file string) error {
 	url, err := r.GetRasaXURL()
 	if err != nil {
@@ -264,22 +292,22 @@ func (r *RasaCtl) saveRasaEndpointsFile(file string) error {
 
 	psqlNodePort, err := r.KubernetesClient.GetPostgreSQLSvcNodePort()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	rabbitNodePort, err := r.KubernetesClient.GetRabbitMqSvcNodePort()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	usernamePsql, passwordPsql, err := r.KubernetesClient.GetPostgreSQLCreds()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	usernameRabbit, passwordRabbit, err := r.KubernetesClient.GetRabbitMqCreds()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if err := r.GetAllHelmValues(); err != nil {

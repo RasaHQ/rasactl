@@ -328,6 +328,21 @@ func (mr *MockKubernetesInterfaceMockRecorder) GetRabbitMqSvcNodePort() *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRabbitMqSvcNodePort", reflect.TypeOf((*MockKubernetesInterface)(nil).GetRabbitMqSvcNodePort))
 }
 
+// GetRasaXSvcNodePort mocks base method.
+func (m *MockKubernetesInterface) GetRasaXSvcNodePort() (int32, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRasaXSvcNodePort")
+	ret0, _ := ret[0].(int32)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRasaXSvcNodePort indicates an expected call of GetRasaXSvcNodePort.
+func (mr *MockKubernetesInterfaceMockRecorder) GetRasaXSvcNodePort() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRasaXSvcNodePort", reflect.TypeOf((*MockKubernetesInterface)(nil).GetRasaXSvcNodePort))
+}
+
 // GetRasaXToken mocks base method.
 func (m *MockKubernetesInterface) GetRasaXToken() (string, error) {
 	m.ctrl.T.Helper()

@@ -42,6 +42,7 @@ type KubernetesInterface interface {
 	GetPods() (*v1.PodList, error)
 	DeleteRasaXPods() error
 	GetPostgreSQLSvcNodePort() (int32, error)
+	GetRasaXSvcNodePort() (int32, error)
 	GetRabbitMqSvcNodePort() (int32, error)
 	SaveSecretWithState(projectPath string) error
 	UpdateRasaXConfig(token string) error
@@ -329,6 +330,18 @@ func (k *Kubernetes) DeleteRasaXPods() error {
 func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
 
 	svcName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
+	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
+	if err != nil {
+		return 0, err
+	}
+
+	return svc.Spec.Ports[0].NodePort, nil
+}
+
+// GetRasaXSvcNodePort returns a node port for the postgresql service.
+func (k *Kubernetes) GetRasaXSvcNodePort() (int32, error) {
+
+	svcName := fmt.Sprintf("%s-rasa-x", k.Helm.ReleaseName)
 	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
 	if err != nil {
 		return 0, err
