@@ -7,10 +7,9 @@ package fake
 import (
 	reflect "reflect"
 
+	docker "github.com/RasaHQ/rasactl/pkg/docker"
 	container "github.com/docker/docker/api/types/container"
 	gomock "github.com/golang/mock/gomock"
-
-	docker "github.com/RasaHQ/rasactl/pkg/docker"
 )
 
 // MockInterface is a mock of Interface interface.
@@ -77,6 +76,21 @@ func (m *MockInterface) GetKind() docker.KindSpec {
 func (mr *MockInterfaceMockRecorder) GetKind() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKind", reflect.TypeOf((*MockInterface)(nil).GetKind))
+}
+
+// GetKindNetworkGatewayAddress mocks base method.
+func (m *MockInterface) GetKindNetworkGatewayAddress() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetKindNetworkGatewayAddress")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetKindNetworkGatewayAddress indicates an expected call of GetKindNetworkGatewayAddress.
+func (mr *MockInterfaceMockRecorder) GetKindNetworkGatewayAddress() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetKindNetworkGatewayAddress", reflect.TypeOf((*MockInterface)(nil).GetKindNetworkGatewayAddress))
 }
 
 // SetKind mocks base method.

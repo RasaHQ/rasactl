@@ -51,6 +51,7 @@ type Interface interface {
 	GetKind() KindSpec
 	SetKind(kind KindSpec)
 	SetProjectPath(path string)
+	GetKindNetworkGatewayAddress() (string, error)
 }
 
 // Docker represents a Docker client.
@@ -301,11 +302,10 @@ func (d *Docker) CreateKindNode(hostname string) (container.ContainerCreateCreat
 		Privileged:  true,
 		SecurityOpt: []string{"apparmor=unconfined", "seccomp=unconfined"},
 		Tmpfs:       map[string]string{"/run": "", "/tmp": ""},
-	}
-
-	hostConfig.ExtraHosts = []string{
-		"rasa.localhost:host-gateway",
-		"host.docker.internal:host-gateway",
+		RestartPolicy: container.RestartPolicy{
+			Name:              "on-failure",
+			MaximumRetryCount: 1,
+		},
 	}
 
 	hostConfig.Mounts = []mount.Mount{
@@ -418,8 +418,19 @@ func (d *Docker) SetProjectPath(path string) {
 	d.ProjectPath = path
 }
 
-func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
+// GetKindNetworkGatewayAddress returns a gateway address of the KinD network.
+func (d *Docker) GetKindNetworkGatewayAddress() (string, error) {
+	container, err := d.getKindControlPlaneInfo()
+	if err != nil {
+		return "", err
+	}
 
+	networkName := container.HostConfig.NetworkMode.NetworkName()
+
+	return container.NetworkSettings.Networks[networkName].Gateway, nil
+}
+
+func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
 	inspect, err := d.Client.ContainerInspect(d.Ctx, d.Kind.ControlPlaneHost)
 	if err != nil {
 		return types.ContainerJSON{}, err

@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -38,11 +39,11 @@ import (
 
 // ConnectRasa connects a local rasa server to a given deployment.
 func (r *RasaCtl) ConnectRasa() error {
-	r.initRasaXClient()
 
-	version, err := r.RasaXClient.GetVersionEndpoint()
-	if err != nil {
-		return err
+	if r.KubernetesClient.GetBackendType() != types.KubernetesBackendLocal {
+		return errors.Errorf(
+			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind.",
+		)
 	}
 
 	rasaToken := uuid.New().String()
@@ -96,60 +97,12 @@ func (r *RasaCtl) ConnectRasa() error {
 	}
 
 	r.Log.Info("Connecting Rasa Server to Rasa X")
-	if r.KubernetesClient.GetBackendType() == types.KubernetesBackendLocal {
 
-		r.HelmClient.SetValues(
-			utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesRabbitMQNodePort(),
-				helm.ValuesPostgreSQLNodePort(), helm.ValuesRasaXNodePort(),
-			),
-		)
-		r.Log.V(1).Info("Merging values", "result", r.HelmClient.GetValues())
-
-		r.Log.Info("Upgrading configuration for Rasa X deployment", "phase", "set services type to NodePort")
-		if err := r.HelmClient.Upgrade(); err != nil {
-			return err
-		}
-
-	} else {
-		return errors.Errorf(
-			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind.",
-		)
-	}
-
-	if version.Enterprise && utils.RasaXVersionConstrains(version.RasaX, ">= 1.0.0") {
-		r.Log.Info("Rasa Enterprise is active, using the environment endpoint")
-
-		if err := r.saveEnvironments(rasaToken); err != nil {
-			return err
-		}
-
-	} else {
-		r.Log.Info("Updating configuration for Rasa X")
-		if err := r.KubernetesClient.UpdateRasaXConfig(rasaToken); err != nil {
-			return err
-		}
-
-		r.Log.Info("Restarting Rasa X pod")
-		if err := r.KubernetesClient.DeleteRasaXPods(); err != nil {
-			return err
-		}
-
-	}
-
-	r.Log.Info("Upgrading configuration for Rasa X deployment", "phase",
-		"set the RASA_X_HOST env variable for the rasa-x deployment")
-	r.Spinner.Message("Connecting Rasa Server to Rasa X")
-
-	rasaXHost, err := r.getRasaXNodePortURL()
-	if err != nil {
+	if err := r.upgradeDeploymentConfiguration(); err != nil {
 		return err
 	}
 
-	r.HelmClient.SetValues(
-		utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesHostNetworkRasaX(), helm.ValuesSetRasaXHost(rasaXHost)),
-	)
-
-	if err := r.HelmClient.Upgrade(); err != nil {
+	if err := r.updateRasaXConfig(rasaToken); err != nil {
 		return err
 	}
 
@@ -356,8 +309,8 @@ func (r *RasaCtl) saveEnvironments(token string) error {
 	if r.Flags.ConnectRasa.RunSeparateWorker {
 		workerPort++
 	}
-	urlProduction := fmt.Sprintf("http://gateway.docker.internal:%d", productionPort)
-	urlWorker := fmt.Sprintf("http://gateway.docker.internal:%d", workerPort)
+	urlProduction := fmt.Sprintf("http://host.docker.internal:%d", productionPort)
+	urlWorker := fmt.Sprintf("http://host.docker.internal:%d", workerPort)
 
 	configSpec := []rxtypes.EnvironmentsEndpointRequest{
 		{
@@ -379,4 +332,77 @@ func (r *RasaCtl) saveEnvironments(token string) error {
 	r.RasaXClient.BearerToken = token
 
 	return r.RasaXClient.SaveEnvironments(configSpec)
+}
+
+func (r *RasaCtl) upgradeDeploymentConfiguration() error {
+
+	r.HelmClient.SetValues(
+		utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesRabbitMQNodePort(),
+			helm.ValuesPostgreSQLNodePort(), helm.ValuesRasaXNodePort(),
+		),
+	)
+	r.Log.V(1).Info("Merging values", "result", r.HelmClient.GetValues())
+
+	r.Log.V(1).Info("Upgrading configuration for Rasa X deployment", "step", "set services type to NodePort")
+	if err := r.HelmClient.Upgrade(); err != nil {
+		return err
+	}
+
+	r.Log.V(1).Info("Upgrading configuration for Rasa X deployment", "step",
+		"set the RASA_X_HOST env variable for the rasa-x deployment")
+	r.Spinner.Message("Connecting Rasa Server to Rasa X")
+
+	rasaXHost, err := r.getRasaXNodePortURL()
+	if err != nil {
+		return err
+	}
+
+	helmValues := utils.MergeMaps(r.HelmClient.GetValues(),
+		helm.ValuesHostNetworkRasaX(), helm.ValuesSetRasaXHost(rasaXHost))
+
+	if runtime.GOOS == "linux" {
+		kindNetworkGateway, err := r.DockerClient.GetKindNetworkGatewayAddress()
+		if err != nil {
+			return err
+		}
+		helmValues = utils.MergeMaps(helmValues, helm.ValuesSetRasaXHostAliases(kindNetworkGateway))
+
+		r.Log.V(1).Info("KinD network gateway", "address", kindNetworkGateway)
+	}
+
+	r.HelmClient.SetValues(helmValues)
+
+	return r.HelmClient.Upgrade()
+
+}
+
+func (r *RasaCtl) updateRasaXConfig(rasaToken string) error {
+	r.initRasaXClient()
+
+	version, err := r.RasaXClient.GetVersionEndpoint()
+	if err != nil {
+		return err
+	}
+
+	if version.Enterprise && utils.RasaXVersionConstrains(version.RasaX, ">= 1.0.0") {
+		r.Log.Info("Rasa Enterprise is active, using the environment endpoint")
+
+		if err := r.saveEnvironments(rasaToken); err != nil {
+			return err
+		}
+
+	} else {
+		r.Log.Info("Updating configuration for Rasa X")
+		if err := r.KubernetesClient.UpdateRasaXConfig(rasaToken); err != nil {
+			return err
+		}
+
+		r.Log.Info("Restarting Rasa X pod")
+		if err := r.KubernetesClient.DeleteRasaXPods(); err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }
