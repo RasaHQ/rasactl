@@ -66,7 +66,8 @@ func openCmd() *cobra.Command {
 			}
 
 			if err := browser.OpenURL(url); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("Can't open the URL %s in your web browser: %s", url, err))
+				fmt.Printf("Can't open the URL using a web browser, go to the URL manually: %s ", url)
+				return nil
 			}
 
 			fmt.Printf("The %s URL has been opened in your web browser\n", url)
