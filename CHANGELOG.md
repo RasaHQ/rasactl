@@ -1,4 +1,13 @@
 
+<a name="1.0.2"></a>
+## [1.0.2](https://github.com/RasaHQ/rasactl/compare/1.0.1...1.0.2) (2022-01-25)
+
+### Bug Fixes
+
+* Use hostAliases for rasa-x pod instead of extraHosts for docker ([#27](https://github.com/RasaHQ/rasactl/issues/27))
+* Use local RASA X URL if it connects to local Rasa OSS ([#26](https://github.com/RasaHQ/rasactl/issues/26))
+
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://github.com/RasaHQ/rasactl/compare/1.0.0...1.0.1) (2022-01-22)
 
