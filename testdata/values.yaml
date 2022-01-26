@@ -2,4 +2,4 @@ rasax:
   podLabels:
     rasactl: "true"
     test_version: {{ env "RASACTL_TEST_VERSION" }}
-    test_template: {{ coalesce 0 1 2 }}
+    test_template: "{{ coalesce 0 1 2 }}"

@@ -11,6 +11,7 @@ import (
 	cloud "github.com/RasaHQ/rasactl/pkg/utils/cloud"
 	gomock "github.com/golang/mock/gomock"
 	v1 "k8s.io/api/core/v1"
+	v10 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	rest "k8s.io/client-go/rest"
 )
 
@@ -373,6 +374,21 @@ func (mr *MockKubernetesInterfaceMockRecorder) GetRasaXURL() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRasaXURL", reflect.TypeOf((*MockKubernetesInterface)(nil).GetRasaXURL))
 }
 
+// GetServiceWithLabels mocks base method.
+func (m *MockKubernetesInterface) GetServiceWithLabels(arg0 v10.ListOptions) (*v1.ServiceList, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServiceWithLabels", arg0)
+	ret0, _ := ret[0].(*v1.ServiceList)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetServiceWithLabels indicates an expected call of GetServiceWithLabels.
+func (mr *MockKubernetesInterfaceMockRecorder) GetServiceWithLabels(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServiceWithLabels", reflect.TypeOf((*MockKubernetesInterface)(nil).GetServiceWithLabels), arg0)
+}
+
 // IsNamespaceExist mocks base method.
 func (m *MockKubernetesInterface) IsNamespaceExist(arg0 string) (bool, error) {
 	m.ctrl.T.Helper()
@@ -415,6 +431,20 @@ func (m *MockKubernetesInterface) IsRasaXRunning() (bool, error) {
 func (mr *MockKubernetesInterfaceMockRecorder) IsRasaXRunning() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsRasaXRunning", reflect.TypeOf((*MockKubernetesInterface)(nil).IsRasaXRunning))
+}
+
+// IsSecretWithStateExist mocks base method.
+func (m *MockKubernetesInterface) IsSecretWithStateExist() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsSecretWithStateExist")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsSecretWithStateExist indicates an expected call of IsSecretWithStateExist.
+func (mr *MockKubernetesInterfaceMockRecorder) IsSecretWithStateExist() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSecretWithStateExist", reflect.TypeOf((*MockKubernetesInterface)(nil).IsSecretWithStateExist))
 }
 
 // LoadConfig mocks base method.

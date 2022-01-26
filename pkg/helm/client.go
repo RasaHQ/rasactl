@@ -203,7 +203,7 @@ func (h *Helm) updateRepository() error {
 		re := re // create a new 're', https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
 			if _, err := re.DownloadIndexFile(); err != nil {
-				return errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s\n",
+				return errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s",
 					re.Config.Name, re.Config.URL, err)
 			}
 			return nil

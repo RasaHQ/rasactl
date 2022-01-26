@@ -203,3 +203,8 @@ func (k *Kubernetes) LoadConfig() (*rest.Config, error) {
 
 	return clientcmd.NewDefaultClientConfig(*rawConfig, nil).ClientConfig()
 }
+
+// GetServiceWithLabels returns a list of services with a given labels.
+func (k *Kubernetes) GetServiceWithLabels(opts metav1.ListOptions) (*v1.ServiceList, error) {
+	return k.clientset.CoreV1().Services(k.Namespace).List(context.TODO(), opts)
+}

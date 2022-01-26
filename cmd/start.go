@@ -22,6 +22,7 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/kubectl/pkg/util/templates"
 
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
@@ -70,8 +71,6 @@ func startCmd() *cobra.Command {
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 			utils.CheckHelmChartDir()
-			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
-			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 
 			if rasactlFlags.Start.RasaXPasswordStdin {
 				password, err := utils.GetPasswordStdin()
@@ -95,7 +94,7 @@ func startCmd() *cobra.Command {
 			}
 
 			// Check if namespace exists only if the number of namespaces >= 2
-			// and a new deployment wasn't not requested
+			// and a new deployment wasn't requested
 			if len(namespaces) != 0 && !rasactlFlags.Start.Create &&
 				!rasactlFlags.Start.Project && rasactlFlags.Start.ProjectPath == "" {
 				if err := checkIfNamespaceExists(); err != nil {
@@ -103,13 +102,25 @@ func startCmd() *cobra.Command {
 				}
 			}
 
+			if rasaCtl.KubernetesClient.IsSecretWithStateExist() {
+				stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
+				if err != nil {
+					return errors.Errorf(errorPrint.Sprintf("%s", err))
+				}
+
+				helmConfiguration.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			}
+
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
+			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
+
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if isRunning {
-				fmt.Printf("A Rasa X is already running in the %s namespace.\n", rasaCtl.HelmClient.GetNamespace())
+				fmt.Printf("Rasa X is already running in the %s namespace.\n", rasaCtl.HelmClient.GetNamespace())
 				return nil
 			}
 			defer rasaCtl.Spinner.Stop()
