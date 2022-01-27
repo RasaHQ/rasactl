@@ -18,10 +18,11 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/browser"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 func openCmd() *cobra.Command {

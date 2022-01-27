@@ -18,9 +18,10 @@ package rasactl
 import (
 	"fmt"
 
+	"helm.sh/helm/v3/pkg/release"
+
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"helm.sh/helm/v3/pkg/release"
 )
 
 const (

@@ -23,17 +23,16 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/RasaHQ/rasactl/pkg/logger"
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/RasaHQ/rasactl/pkg/version"
-
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/spf13/viper"
 )
 
 var (

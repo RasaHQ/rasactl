@@ -23,11 +23,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-
+	"golang.org/x/xerrors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/release"
 	"helm.sh/helm/v3/pkg/storage/driver"
@@ -53,7 +52,7 @@ func (h *Helm) ReadValuesFile() error {
 		valuesBuffer := new(bytes.Buffer)
 		tpl := template.Must(template.New("base").Funcs(sprig.TxtFuncMap()).Parse(string(valuesFile)))
 		if err := tpl.Execute(valuesBuffer, ""); err != nil {
-			return fmt.Errorf("error during processing the value file: %w", err)
+			return xerrors.Errorf("error during processing the value file: %w", err)
 		}
 
 		err = yaml.Unmarshal(valuesBuffer.Bytes(), &h.Values)
@@ -73,7 +72,7 @@ func (h *Helm) GetAllValues() (map[string]interface{}, error) {
 	client.AllValues = true
 
 	if h.Configuration == nil {
-		return nil, fmt.Errorf("helm client requires to define a release name: %#v", h)
+		return nil, xerrors.Errorf("helm client requires to define a release name: %#v", h)
 	}
 
 	values, err := client.Run(h.Configuration.ReleaseName)

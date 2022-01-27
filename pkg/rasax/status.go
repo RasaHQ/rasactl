@@ -20,9 +20,10 @@ import (
 	"fmt"
 	"time"
 
-	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
+
+	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
 // WaitForDatabaseMigration waits until Rasa X database migration is completed.

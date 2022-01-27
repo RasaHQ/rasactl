@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -9,6 +8,7 @@ import (
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
 	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
@@ -150,7 +150,7 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 		ns = args[0]
 		args = args[1:]
 	default:
-		return nil, fmt.Errorf("can't parse arguments")
+		return nil, xerrors.Errorf("can't parse arguments")
 
 	}
 	args = append([]string{ns}, args...)

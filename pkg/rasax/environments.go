@@ -22,6 +22,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"golang.org/x/xerrors"
+
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
 
@@ -56,6 +58,6 @@ func (r *RasaX) SaveEnvironments(body []rtypes.EnvironmentsEndpointRequest) erro
 		return nil
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("%s", content)
+		return xerrors.Errorf("%s", content)
 	}
 }

@@ -38,6 +38,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"golang.org/x/term"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
@@ -284,7 +285,7 @@ func HelmChartVersionConstrains(helmChartVersion string) error {
 	}
 
 	if !c.Check(v) {
-		return fmt.Errorf(
+		return xerrors.Errorf(
 			"the helm chart version is incorrect, the version that you want to use is %s"+
 				", use the helm chart in version %s", helmChartVersion, constraint)
 	}

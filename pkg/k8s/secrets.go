@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 
+	"golang.org/x/xerrors"
 	"helm.sh/helm/v3/pkg/release"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -73,7 +74,7 @@ func (k *Kubernetes) UpdateSecretWithState(data ...interface{}) error {
 			secret.Data[types.StateHelmReleaseStatus] = []byte(t.Info.Status)
 
 		default:
-			return fmt.Errorf("can't update a secret with state, unknown data type: %T", d)
+			return xerrors.Errorf("can't update a secret with state, unknown data type: %T", d)
 		}
 	}
 	k.Log.Info("Updating secret with the deployment state", "secret", secret.Name, "namespace", k.Namespace, "data", secret.Data)
