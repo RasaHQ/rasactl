@@ -3,8 +3,9 @@ package cmd
 import (
 	"time"
 
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/spf13/cobra"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 func addStartUpgradeFlags(cmd *cobra.Command) {

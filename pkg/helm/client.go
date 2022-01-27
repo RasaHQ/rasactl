@@ -21,9 +21,9 @@ import (
 	"os"
 
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/xerrors"
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
@@ -182,7 +182,7 @@ func (h *Helm) addRepository() ([]*repo.ChartRepository, error) {
 		}
 
 		if _, err := r.DownloadIndexFile(); err != nil {
-			err := errors.Wrapf(err, "looks like %q is not a valid chart repository or cannot be reached", rep.URL)
+			err := xerrors.Errorf("looks like %q is not a valid chart repository or cannot be reached: %w", rep.URL, err)
 			return nil, err
 		}
 		repos = append(repos, r)
@@ -203,7 +203,7 @@ func (h *Helm) updateRepository() error {
 		re := re // create a new 're', https://golang.org/doc/faq#closures_and_goroutines
 		g.Go(func() error {
 			if _, err := re.DownloadIndexFile(); err != nil {
-				return errors.Wrapf(err, "...Unable to get an update from the %q chart repository (%s):\n\t%s",
+				return xerrors.Errorf("...Unable to get an update from the %q chart repository (%s):\n\t%w",
 					re.Config.Name, re.Config.URL, err)
 			}
 			return nil

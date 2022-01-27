@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 
 	"github.com/schollz/progressbar/v3"
+	"golang.org/x/xerrors"
 
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
@@ -80,12 +81,12 @@ func (r *RasaX) ModelUpload() error {
 	case 201:
 		fmt.Println("Successfully uploaded.")
 	case 401:
-		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
+		return xerrors.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	case 409:
 		fmt.Println("A model with that name already exists.")
 	default:
 		content, _ := ioutil.ReadAll(response.Body)
-		return fmt.Errorf("%s", content)
+		return xerrors.Errorf("%s", content)
 	}
 
 	return nil
@@ -137,12 +138,12 @@ func (r *RasaX) ModelDownload() error {
 
 		fmt.Println("Model has been downloaded successfully.")
 	case 404:
-		return fmt.Errorf("model '%s' not found", r.Flags.Model.Download.Name)
+		return xerrors.Errorf("model '%s' not found", r.Flags.Model.Download.Name)
 	case 401:
-		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
+		return xerrors.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("%s", content)
+		return xerrors.Errorf("%s", content)
 	}
 	return nil
 }
@@ -177,10 +178,10 @@ func (r *RasaX) ModelList() (*rtypes.ModelsListEndpointResponse, error) {
 		}
 		return bodyData, nil
 	case 401:
-		return nil, fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
+		return nil, xerrors.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return nil, fmt.Errorf("%s", content)
+		return nil, xerrors.Errorf("%s", content)
 	}
 }
 
@@ -207,12 +208,12 @@ func (r *RasaX) ModelTag() error {
 		fmt.Println("Model has been tagged successfully.")
 		return nil
 	case 404:
-		return fmt.Errorf("model '%s' not found", r.Flags.Model.Tag.Model)
+		return xerrors.Errorf("model '%s' not found", r.Flags.Model.Tag.Model)
 	case 401:
-		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
+		return xerrors.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("%s", content)
+		return xerrors.Errorf("%s", content)
 	}
 }
 
@@ -239,11 +240,11 @@ func (r *RasaX) ModelDelete() error {
 		fmt.Println("Model has been deleted successfully.")
 		return nil
 	case 401:
-		return fmt.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
+		return xerrors.Errorf("unauthorized, use the 'rasactl auth login' command to authorized")
 	case 404:
-		return fmt.Errorf("model '%s' not found", r.Flags.Model.Delete.Name)
+		return xerrors.Errorf("model '%s' not found", r.Flags.Model.Delete.Name)
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("%s", content)
+		return xerrors.Errorf("%s", content)
 	}
 }

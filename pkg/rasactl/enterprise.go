@@ -18,6 +18,8 @@ package rasactl
 import (
 	"fmt"
 
+	"golang.org/x/xerrors"
+
 	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
@@ -36,7 +38,7 @@ func (r *RasaCtl) EnterpriseActivate() error {
 	}
 
 	if utils.RasaXVersionConstrains(version.RasaX, "< 1.0.0") {
-		return fmt.Errorf("this command is available for Rasa X 1.0.0 or newer")
+		return xerrors.Errorf("this command is available for Rasa X 1.0.0 or newer")
 	}
 
 	token, err := r.getAuthToken()
@@ -63,11 +65,11 @@ func (r *RasaCtl) EnterpriseDeactivate() error {
 	}
 
 	if !version.Enterprise {
-		return fmt.Errorf("an Enterprise license is not active")
+		return xerrors.Errorf("an Enterprise license is not active")
 	}
 
 	if utils.RasaXVersionConstrains(version.RasaX, "< 1.0.0") {
-		return fmt.Errorf("this command is available for Rasa X 1.0.0 or newer")
+		return xerrors.Errorf("this command is available for Rasa X 1.0.0 or newer")
 	}
 
 	token, err := r.getAuthToken()

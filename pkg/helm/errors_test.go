@@ -18,9 +18,10 @@ package helm_test
 import (
 	"errors"
 
-	"github.com/RasaHQ/rasactl/pkg/helm"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/RasaHQ/rasactl/pkg/helm"
 )
 
 var _ = Describe("Errors", func() {

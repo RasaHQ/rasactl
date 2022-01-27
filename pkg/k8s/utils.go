@@ -18,9 +18,10 @@ package k8s
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 
+	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,7 +30,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/spf13/viper"
 )
 
 func (k *Kubernetes) detectBackend() types.KubernetesBackendType {
@@ -190,11 +190,11 @@ func (k *Kubernetes) LoadConfig() (*rest.Config, error) {
 	}
 
 	if rawConfig.CurrentContext == "" {
-		return nil, fmt.Errorf("kubeconfig: the current context is empty, use the --kube-context flag or kubectl to set a context")
+		return nil, xerrors.Errorf("kubeconfig: the current context is empty, use the --kube-context flag or kubectl to set a context")
 	}
 
 	if _, ok := rawConfig.Contexts[context]; !ok && context != "" {
-		return nil, fmt.Errorf("kubeconfig: the %s context doesn't exist", context)
+		return nil, xerrors.Errorf("kubeconfig: the %s context doesn't exist", context)
 	}
 
 	if context != "" {

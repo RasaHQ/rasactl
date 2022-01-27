@@ -20,18 +20,19 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
+	"golang.org/x/xerrors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"k8s.io/client-go/rest"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/RasaHQ/rasactl/pkg/utils"
 	"github.com/RasaHQ/rasactl/pkg/utils/cloud"
-
-	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 type KubernetesInterface interface {
@@ -165,7 +166,7 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	}
 
 	if k.Helm.Values == nil {
-		return "", fmt.Errorf("helm client requires values, %#v", k.Helm)
+		return "", xerrors.Errorf("helm client requires values, %#v", k.Helm)
 	}
 
 	nginxValues := k.Helm.Values["nginx"]
@@ -430,7 +431,7 @@ func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
 		}
 	}
 
-	return 0, fmt.Errorf("can't determine a node port for the rabbitmq service")
+	return 0, xerrors.Errorf("can't determine a node port for the rabbitmq service")
 }
 
 // GetLogs returns the logs stream for a pod.

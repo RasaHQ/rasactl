@@ -21,6 +21,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/xerrors"
+
 	"github.com/RasaHQ/rasactl/pkg/status"
 )
 
@@ -33,7 +35,7 @@ func (r *RasaCtl) checkIfRasaOSSProductionIsConnected() error {
 	}
 
 	if resp.Rasa.Production == "0.0.0" || resp.Rasa.Production == "" {
-		return fmt.Errorf("rasa server is not connected to the production environment")
+		return xerrors.Errorf("rasa server is not connected to the production environment")
 	}
 
 	return nil
@@ -65,7 +67,7 @@ func (r *RasaCtl) ModelDelete() error {
 	}
 
 	if resp.Rasa.Production == "0.0.0" {
-		return fmt.Errorf("rasa server is not connected to the production environment")
+		return xerrors.Errorf("rasa server is not connected to the production environment")
 	}
 
 	token, err := r.getAuthToken()

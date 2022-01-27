@@ -18,12 +18,13 @@ package helm_test
 import (
 	"os"
 
-	"github.com/RasaHQ/rasactl/pkg/helm"
-	"github.com/RasaHQ/rasactl/pkg/logger"
-	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/go-logr/logr"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
+	"github.com/RasaHQ/rasactl/pkg/helm"
+	"github.com/RasaHQ/rasactl/pkg/logger"
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 var _ = Describe("Utils", func() {
