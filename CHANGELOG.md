@@ -1,4 +1,13 @@
 
+<a name="1.0.3"></a>
+## [1.0.3](https://github.com/RasaHQ/rasactl/compare/1.0.2...1.0.3) (2022-01-27)
+
+### Bug Fixes
+
+* Support for using different helm release name and versions ([#31](https://github.com/RasaHQ/rasactl/issues/31))
+* Return a URL if a web browser is not detected ([#29](https://github.com/RasaHQ/rasactl/issues/29))
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/RasaHQ/rasactl/compare/1.0.1...1.0.2) (2022-01-25)
 
