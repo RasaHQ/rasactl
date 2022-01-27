@@ -183,7 +183,7 @@ func (r *RasaCtl) useProject(projectPath string) error {
 			r.HelmClient.SetPersistanceVolumeClaimName(volume)
 
 		} else {
-			return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind.")
+			return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind")
 		}
 
 		if err := r.writeStatusFile(projectPath); err != nil {
@@ -301,8 +301,8 @@ func (r *RasaCtl) checkDeploymentStatus() error {
 	}
 
 	r.Log.Info("Rasa X is ready", "url", r.RasaXClient.URL, "password", r.Flags.Start.RasaXPassword)
-	r.Spinner.Message("Ready!")
 	r.Spinner.Stop()
+	fmt.Println("Ready!")
 
 	rasaXVersion, err := r.RasaXClient.GetVersionEndpoint()
 	if err != nil {

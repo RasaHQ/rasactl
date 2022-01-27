@@ -96,6 +96,17 @@ func (k *Kubernetes) ReadSecretWithState() (map[string][]byte, error) {
 	return secret.Data, nil
 }
 
+// IsSecretWithStateExist checks if a state secret exists.
+// If the secret exists then return 'true'.
+func (k *Kubernetes) IsSecretWithStateExist() bool {
+
+	if _, err := k.ReadSecretWithState(); err != nil {
+		return false
+	}
+
+	return true
+}
+
 // DeleteSecretWithState deletes the rasactl secret.
 func (k *Kubernetes) DeleteSecretWithState() error {
 	err := k.clientset.CoreV1().Secrets(k.Namespace).Delete(context.TODO(),

@@ -42,10 +42,11 @@ func (r *RasaCtl) ConnectRasa() error {
 
 	if r.KubernetesClient.GetBackendType() != types.KubernetesBackendLocal {
 		return errors.Errorf(
-			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind.",
+			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind",
 		)
 	}
 
+	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 	rasaToken := uuid.New().String()
 	environmentName := "production-worker"
 
@@ -336,6 +337,17 @@ func (r *RasaCtl) saveEnvironments(token string) error {
 
 func (r *RasaCtl) upgradeDeploymentConfiguration() error {
 
+	state, err := r.KubernetesClient.ReadSecretWithState()
+	if err != nil {
+		return err
+	}
+
+	// Set configuration for helm client
+	helmConfig := r.HelmClient.GetConfiguration()
+	helmConfig.Version = string(state[types.StateHelmChartVersion])
+	helmConfig.ReleaseName = string(state[types.StateHelmReleaseName])
+	r.HelmClient.SetConfiguration(helmConfig)
+
 	r.HelmClient.SetValues(
 		utils.MergeMaps(r.HelmClient.GetValues(), helm.ValuesRabbitMQNodePort(),
 			helm.ValuesPostgreSQLNodePort(), helm.ValuesRasaXNodePort(),
@@ -350,7 +362,6 @@ func (r *RasaCtl) upgradeDeploymentConfiguration() error {
 
 	r.Log.V(1).Info("Upgrading configuration for Rasa X deployment", "step",
 		"set the RASA_X_HOST env variable for the rasa-x deployment")
-	r.Spinner.Message("Connecting Rasa Server to Rasa X")
 
 	rasaXHost, err := r.getRasaXNodePortURL()
 	if err != nil {

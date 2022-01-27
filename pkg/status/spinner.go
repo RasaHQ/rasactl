@@ -53,7 +53,6 @@ func (s *SpinnerMessage) Message(msg string) {
 
 func (s *SpinnerMessage) Stop() {
 	if s.spinner.Active() {
-		s.spinner.FinalMSG = "\n"
 		s.spinner.Stop()
 	}
 }

@@ -54,6 +54,7 @@ type KubernetesInterface interface {
 	GetPostgreSQLCreds() (string, string, error)
 	GetRabbitMqCreds() (string, string, error)
 	IsNamespaceExist(namespace string) (bool, error)
+	IsSecretWithStateExist() bool
 	GetKindControlPlaneNode() (v1.Node, error)
 	IsNamespaceManageable() bool
 	AddNamespaceLabel() error
@@ -72,6 +73,7 @@ type KubernetesInterface interface {
 	LoadConfig() (*rest.Config, error)
 	GetLogs(pod string) *rest.Request
 	GetPod(pod string) (*v1.Pod, error)
+	GetServiceWithLabels(opts metav1.ListOptions) (*v1.ServiceList, error)
 }
 
 // Kubernetes represents Kubernetes client.
@@ -172,14 +174,19 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	ingressIsEnabled := ingressValues.(map[string]interface{})["enabled"].(bool)
 	nginxServiceType := nginxValues.(map[string]interface{})["service"].(map[string]interface{})["type"].(string)
 	rasaXScheme := k.Helm.Values["rasax"].(map[string]interface{})["scheme"].(string)
-	serviceName := fmt.Sprintf("%s-nginx", k.Helm.ReleaseName)
 
 	url := "UNKNOWN"
 
 	if nginxServiceType == "LoadBalancer" &&
 		nginxIsEnabled &&
 		(k.BackendType != types.KubernetesBackendLocal || k.CloudProvider.Name != types.CloudProviderUnknown) {
-		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
+
+		nginxService, err := k.getNginxService()
+		if err != nil {
+			return "", err
+		}
+
+		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), nginxService.Name, metav1.GetOptions{})
 		if err != nil {
 			return url, err
 		}
@@ -193,7 +200,13 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 		nginxIsEnabled &&
 		k.BackendType == types.KubernetesBackendLocal && k.CloudProvider.Name != types.CloudProviderUnknown {
 
-		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), serviceName, metav1.GetOptions{})
+		nginxService, err := k.getNginxService()
+		if err != nil {
+			return "", err
+		}
+
+		service, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(),
+			nginxService.Name, metav1.GetOptions{})
 		if err != nil {
 			return url, err
 		}
@@ -208,7 +221,22 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 
 		url = fmt.Sprintf("%s://%s:%d", rasaXScheme, ip, port)
 	} else if ingressIsEnabled {
-		ingress, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).Get(context.TODO(), k.Helm.ReleaseName, metav1.GetOptions{})
+		// If a release name is different than "rasa-x" then a ingress name has
+		// a different pattern (<release-name>-rasa-x).
+		// Use labels to be sure that the correct ingress is read.
+		labels := fmt.Sprintf("app.kubernetes.io/name=rasa-x,app.kubernetes.io/instance=%s",
+			k.Helm.ReleaseName)
+
+		ingresses, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).List(context.TODO(), metav1.ListOptions{
+			LabelSelector: labels,
+			Limit:         1,
+		})
+		if err != nil {
+			return url, err
+		}
+
+		ingress, err := k.clientset.NetworkingV1().Ingresses(k.Namespace).Get(context.TODO(),
+			ingresses.Items[0].Name, metav1.GetOptions{})
 		if err != nil {
 			return url, err
 		}
@@ -222,6 +250,21 @@ func (k *Kubernetes) GetRasaXURL() (string, error) {
 	}
 
 	return url, nil
+}
+
+func (k *Kubernetes) getNginxService() (v1.Service, error) {
+	labels := fmt.Sprintf("app.kubernetes.io/component=nginx,app.kubernetes.io/instance=%s",
+		k.Helm.ReleaseName)
+
+	svc, err := k.GetServiceWithLabels(metav1.ListOptions{
+		LabelSelector: labels,
+		Limit:         1,
+	})
+	if err != nil {
+		return v1.Service{}, err
+	}
+
+	return svc.Items[0], nil
 }
 
 // GetRasaXToken returns a Rasa X token that is stored in a Kubernetes secret.
@@ -329,6 +372,8 @@ func (k *Kubernetes) DeleteRasaXPods() error {
 // GetPostgreSQLSvcPort returns a node port for the postgresql service.
 func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
 
+	k.Log.V(1).Info("Getting a node port for the PostgreSQL service")
+
 	svcName := fmt.Sprintf("%s-postgresql", k.Helm.ReleaseName)
 	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
 	if err != nil {
@@ -341,8 +386,23 @@ func (k *Kubernetes) GetPostgreSQLSvcNodePort() (int32, error) {
 // GetRasaXSvcNodePort returns a node port for the postgresql service.
 func (k *Kubernetes) GetRasaXSvcNodePort() (int32, error) {
 
-	svcName := fmt.Sprintf("%s-rasa-x", k.Helm.ReleaseName)
-	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcName, metav1.GetOptions{})
+	k.Log.V(1).Info("Getting a node port for the Rasa X service")
+
+	// If a release name is different than "rasa-x" then a service name has
+	// a different pattern (<release-name>-rasa-x-rasa-x).
+	// Use labels to be sure that the correct service is read.
+	lables := fmt.Sprintf("app.kubernetes.io/component=rasa-x,app.kubernetes.io/instance=%s",
+		k.Helm.ReleaseName)
+
+	svcs, err := k.clientset.CoreV1().Services(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: lables,
+		Limit:         1,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	svc, err := k.clientset.CoreV1().Services(k.Namespace).Get(context.TODO(), svcs.Items[0].Name, metav1.GetOptions{})
 	if err != nil {
 		return 0, err
 	}
@@ -352,6 +412,8 @@ func (k *Kubernetes) GetRasaXSvcNodePort() (int32, error) {
 
 // GetRabbitMqNodePort returns a node port for the rabbitmq service.
 func (k *Kubernetes) GetRabbitMqSvcNodePort() (int32, error) {
+
+	k.Log.V(1).Info("Getting a node port for the RabbitMQ service")
 
 	helmValues := k.Helm.Values
 	rabbitPort := helmValues["rabbitmq"].(map[string]interface{})["service"].(map[string]interface{})["port"].(float64)

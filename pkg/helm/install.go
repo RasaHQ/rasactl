@@ -53,6 +53,7 @@ func (h *Helm) Install() error {
 	client.Wait = true
 	client.DryRun = false
 	client.Timeout = h.Configuration.Timeout
+	client.Version = h.Configuration.Version
 
 	h.Log.V(1).Info("Helm client settings", "settings", client)
 

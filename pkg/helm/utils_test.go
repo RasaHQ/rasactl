@@ -74,7 +74,7 @@ var _ = Describe("Utils", func() {
 					"rasax": map[string]interface{}{
 						"podLabels": map[string]interface{}{
 							"rasactl":       "true",
-							"test_template": float64(1),
+							"test_template": "1",
 							"test_version":  "0.0.0",
 						},
 					},

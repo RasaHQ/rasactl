@@ -18,6 +18,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/RasaHQ/rasactl/pkg/types"
 	"github.com/pkg/browser"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -43,7 +44,16 @@ func openCmd() *cobra.Command {
 			if err := checkIfNamespaceExists(); err != nil {
 				return err
 			}
-			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
+
+			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
+			if err != nil {
+				return errors.Errorf(errorPrint.Sprintf("%s", err))
+			}
+
+			helmReleaseName := string(stateData[types.StateHelmReleaseName])
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmReleaseName)
+
+			helmConfiguration.ReleaseName = helmReleaseName
 			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 
 			return nil
@@ -66,7 +76,7 @@ func openCmd() *cobra.Command {
 			}
 
 			if err := browser.OpenURL(url); err != nil {
-				fmt.Printf("Can't open the URL using a web browser, go to the URL manually: %s ", url)
+				fmt.Printf("Can't open the URL using a web browser, go to the URL manually: %s\n", url)
 				return nil
 			}
 

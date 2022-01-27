@@ -65,6 +65,11 @@ func upgradeCmd() *cobra.Command {
 			if err != nil {
 				return errors.Errorf(errorPrint.Sprintf("%s", err))
 			}
+
+			if helmConfiguration.Version == "" {
+				helmConfiguration.Version = string(stateData[types.StateHelmChartVersion])
+			}
+
 			helmConfiguration.ReleaseName = string(stateData[types.StateHelmReleaseName])
 			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
 			rasaCtl.KubernetesClient.SetHelmReleaseName(string(stateData[types.StateHelmReleaseName]))

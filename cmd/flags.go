@@ -9,12 +9,12 @@ import (
 
 func addStartUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().DurationVar(&helmConfiguration.Timeout, "wait-timeout", time.Minute*15, "time to wait for Rasa X to be ready")
-	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", types.HelmChartVersionRasaX, "a helm chart version to use")
 	cmd.PersistentFlags().StringVar(&rasactlFlags.StartUpgrade.ValuesFile, "values-file", "", "absolute path to the values file")
 }
 
 func addStartFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&helmConfiguration.ReleaseName, "rasa-x-release-name", "rasa-x", "a helm release name to manage")
+	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", types.HelmChartVersionRasaX, "a helm chart version to use")
 
 	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.ProjectPath, "project-path", "",
 		"absolute path to the project directory mounted in kind")
@@ -33,6 +33,7 @@ func addStartFlags(cmd *cobra.Command) {
 
 func addUpgradeFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolVar(&helmConfiguration.Atomic, "atomic", false, "if set, upgrade process rolls back changes made in case of failed upgrade")
+	cmd.Flags().StringVar(&helmConfiguration.Version, "rasa-x-chart-version", "", "a helm chart version to use")
 	cmd.Flags().BoolVar(&helmConfiguration.ReuseValues, "reuse-values", true,
 		"when upgrading, reuse the last release's values and merge in any overrides")
 }
