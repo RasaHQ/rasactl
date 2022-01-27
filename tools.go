@@ -1,3 +1,6 @@
+//go:build tools
+// +build tools
+
 /*
 Copyright © 2021 Rasa Technologies GmbH
 
@@ -13,21 +16,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package main
 
 import (
-	"os"
-	"os/signal"
-	"syscall"
-
-	"github.com/RasaHQ/rasactl/cmd"
+	_ "github.com/golang/mock/mockgen"
+	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
 )
-
-func main() {
-
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	go cmd.HandleSignals(sigs)
-
-	cmd.Execute()
-}
