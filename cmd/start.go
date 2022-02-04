@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -84,13 +84,13 @@ func startCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			// Get list of namespaces (deployments)
 			namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprint(err))
+				return xerrors.Errorf(errorPrint.Sprint(err))
 			}
 
 			// Check if namespace exists only if the number of namespaces >= 2
@@ -105,7 +105,7 @@ func startCmd() *cobra.Command {
 			if rasaCtl.KubernetesClient.IsSecretWithStateExist() {
 				stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 				if err != nil {
-					return errors.Errorf(errorPrint.Sprintf("%s", err))
+					return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 				}
 
 				helmConfiguration.ReleaseName = string(stateData[types.StateHelmReleaseName])
@@ -116,7 +116,7 @@ func startCmd() *cobra.Command {
 
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if isRunning {
@@ -125,7 +125,7 @@ func startCmd() *cobra.Command {
 			}
 			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Start(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			return nil
 		},

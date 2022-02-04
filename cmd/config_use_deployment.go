@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 )
 
@@ -45,7 +45,7 @@ func configUseDeploymentCmd() *cobra.Command {
 			}
 
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return checkIfNamespaceExists()
@@ -53,7 +53,7 @@ func configUseDeploymentCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if err := rasaCtl.ConfigUseDeployment(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			fmt.Printf("The current deployment has been set to %s.\n", rasaCtl.Namespace)

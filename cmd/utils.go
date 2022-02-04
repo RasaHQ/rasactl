@@ -7,7 +7,6 @@ import (
 
 	"github.com/docker/docker/pkg/namesgenerator"
 	"github.com/kyokomi/emoji"
-	"github.com/pkg/errors"
 	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -34,16 +33,16 @@ func runOnClose(signal os.Signal) {
 
 func checkIfNamespaceExists() error {
 	if namespace == "" {
-		return errors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
+		return xerrors.Errorf(errorPrint.Sprint("You have to pass a deployment name"))
 	}
 
 	isNamespaceExist, err := rasaCtl.KubernetesClient.IsNamespaceExist(rasaCtl.Namespace)
 	if err != nil {
-		return errors.Errorf(errorPrint.Sprintf("%s", err))
+		return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 	}
 
 	if !isNamespaceExist {
-		return errors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
+		return xerrors.Errorf(errorPrint.Sprintf("The %s deployment doesn't exist.\n", rasaCtl.Namespace))
 	}
 	return nil
 }
@@ -51,11 +50,11 @@ func checkIfNamespaceExists() error {
 func checkIfDeploymentsExist() error {
 	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 	if err != nil {
-		return errors.Errorf(errorPrint.Sprint(err))
+		return xerrors.Errorf(errorPrint.Sprint(err))
 	}
 
 	if len(namespaces) == 0 {
-		return errors.Errorf(errorPrint.Sprint("No deployments, use the 'rasactl start' command to create one."))
+		return xerrors.Errorf(errorPrint.Sprint("No deployments, use the 'rasactl start' command to create one."))
 	}
 	return nil
 }
@@ -69,7 +68,7 @@ func parseArgs(currentNamespace string, args []string, minArgs, maxArgs int, fla
 
 	namespaces, err := rasaCtl.KubernetesClient.GetNamespaces()
 	if err != nil {
-		return nil, errors.Errorf(errorPrint.Sprint(err))
+		return nil, xerrors.Errorf(errorPrint.Sprint(err))
 	}
 
 	numNamespaces := len(namespaces)

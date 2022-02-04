@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 )
 
 // EnterpriseActivate activates an Enterprise license via the /api/license endpoint.
@@ -56,11 +56,11 @@ func (r *RasaX) EnterpriseActivate(license string) error {
 		return nil
 
 	case 401:
-		return errors.Errorf("Unauthorized")
+		return xerrors.Errorf("Unauthorized")
 
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return errors.Errorf("The Rasa X license endpoint has returned status code %s, body: %s", resp.Status, content)
+		return xerrors.Errorf("The Rasa X license endpoint has returned status code %s, body: %s", resp.Status, content)
 	}
 }
 
@@ -89,10 +89,10 @@ func (r *RasaX) EnterpriseDeactivate() error {
 		return nil
 
 	case 401:
-		return errors.Errorf("Unauthorized")
+		return xerrors.Errorf("Unauthorized")
 
 	default:
 		content, _ := ioutil.ReadAll(resp.Body)
-		return errors.Errorf("The Rasa X license endpoint has returned status code %s, body: %s", resp.Status, content)
+		return xerrors.Errorf("The Rasa X license endpoint has returned status code %s, body: %s", resp.Status, content)
 	}
 }

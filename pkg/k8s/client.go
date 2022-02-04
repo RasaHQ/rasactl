@@ -284,7 +284,13 @@ func (k *Kubernetes) GetRasaXToken() (string, error) {
 
 // IsRasaXRunning checks if Rasa X deployment is running.
 func (k *Kubernetes) IsRasaXRunning() (bool, error) {
-	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	labels := fmt.Sprintf("app.kubernetes.io/instance=%s", k.Helm.ReleaseName)
+
+	k.Log.V(1).Info("Getting deployments list", "labels", labels)
+
+	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return false, err
 	}
@@ -301,7 +307,11 @@ func (k *Kubernetes) IsRasaXRunning() (bool, error) {
 		}
 	}
 
-	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	k.Log.V(1).Info("Getting statefulsets list", "labels", labels)
+
+	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return false, err
 	}
@@ -348,7 +358,11 @@ func (k *Kubernetes) CreateNamespace() error {
 
 // GetPods returns a list of pods for the active namespace.
 func (k *Kubernetes) GetPods() (*v1.PodList, error) {
-	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	labels := fmt.Sprintf("app.kubernetes.io/instance=%s", k.Helm.ReleaseName)
+
+	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -356,7 +370,11 @@ func (k *Kubernetes) GetPods() (*v1.PodList, error) {
 }
 
 func (k *Kubernetes) DeleteRasaXPods() error {
-	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: "app.kubernetes.io/component=rasa-x"})
+	labels := fmt.Sprintf("app.kubernetes.io/component=rasa-x,app.kubernetes.io/instance=%s", k.Helm.ReleaseName)
+
+	pods, err := k.clientset.CoreV1().Pods(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return err
 	}

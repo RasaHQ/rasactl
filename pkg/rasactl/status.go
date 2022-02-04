@@ -32,7 +32,7 @@ const (
 )
 
 // GetReleaseStatus returns project status, helm release, and err for a given helm release name
-func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release, error) {
+func (r *RasaCtl) GetReleaseStatus(releaseName string) (string, *release.Release, error) {
 
 	status := StatusStopped
 
@@ -47,10 +47,9 @@ func (r *RasaCtl) GetReleaseStatus(releaseName []byte) (string, *release.Release
 
 	r.HelmClient.SetConfiguration(
 		&types.HelmConfigurationSpec{
-			ReleaseName: string(releaseName),
+			ReleaseName: releaseName,
 		},
 	)
-	r.KubernetesClient.SetHelmReleaseName(string(releaseName))
 
 	release, err := r.HelmClient.GetStatus()
 	if err != nil {
@@ -77,7 +76,7 @@ func (r *RasaCtl) Status() error {
 		return err
 	}
 
-	statusProject, release, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
+	statusProject, release, err := r.GetReleaseStatus(string(stateData[types.StateHelmReleaseName]))
 	if err != nil {
 		return nil
 	}

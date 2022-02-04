@@ -19,8 +19,8 @@ import (
 	"fmt"
 
 	"github.com/pkg/browser"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
 )
@@ -39,7 +39,7 @@ func openCmd() *cobra.Command {
 			}
 
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
@@ -48,7 +48,7 @@ func openCmd() *cobra.Command {
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			helmReleaseName := string(stateData[types.StateHelmReleaseName])
@@ -63,7 +63,7 @@ func openCmd() *cobra.Command {
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
@@ -73,7 +73,7 @@ func openCmd() *cobra.Command {
 
 			url, err := rasaCtl.GetRasaXURL()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := browser.OpenURL(url); err != nil {

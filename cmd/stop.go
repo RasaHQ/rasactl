@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -67,7 +67,7 @@ func stopCmd() *cobra.Command {
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			rasaCtl.HelmClient.SetConfiguration(
 				&types.HelmConfigurationSpec{
@@ -82,7 +82,7 @@ func stopCmd() *cobra.Command {
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
@@ -92,7 +92,7 @@ func stopCmd() *cobra.Command {
 			defer rasaCtl.Spinner.Stop()
 
 			if err := rasaCtl.Stop(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			return nil
 		},

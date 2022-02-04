@@ -24,9 +24,9 @@ import (
 	"github.com/fatih/color"
 	"github.com/go-logr/logr"
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/logger"
 	"github.com/RasaHQ/rasactl/pkg/rasactl"
@@ -61,7 +61,7 @@ var rootCmd = &cobra.Command{
 
 		if !strings.Contains(cmd.CommandPath(), "help") && !strings.Contains(cmd.CommandPath(), "completion") {
 			if err := rasaCtl.InitClients(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 		}
 		return nil

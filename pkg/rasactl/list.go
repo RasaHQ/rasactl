@@ -45,10 +45,14 @@ func (r *RasaCtl) List() error {
 		if err != nil {
 			r.Log.Info("Can't read a secret with state", "namespace", namespace, "error", err)
 		}
-		status, _, err := r.GetReleaseStatus(stateData[types.StateHelmReleaseName])
+
+		releaseName := string(stateData[types.StateHelmReleaseName])
+		r.KubernetesClient.SetHelmReleaseName(releaseName)
+		status, _, err := r.GetReleaseStatus(releaseName)
 		if err != nil {
 			return err
 		}
+
 		current := ""
 		if namespace == r.Namespace {
 			current = "*"
