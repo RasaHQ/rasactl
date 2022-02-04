@@ -16,9 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
+
+	"github.com/RasaHQ/rasactl/pkg/types"
 )
 
 const (
@@ -59,11 +61,22 @@ func statusCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
+				return xerrors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
+			if rasaCtl.KubernetesClient.IsSecretWithStateExist() {
+				stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
+				if err != nil {
+					return xerrors.Errorf(errorPrint.Sprintf("%s", err))
+				}
+
+				helmConfiguration.ReleaseName = string(stateData[types.StateHelmReleaseName])
+			}
+			rasaCtl.KubernetesClient.SetHelmReleaseName(helmConfiguration.ReleaseName)
+			rasaCtl.HelmClient.SetConfiguration(helmConfiguration)
+
 			if err := rasaCtl.Status(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return nil

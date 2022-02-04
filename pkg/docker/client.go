@@ -33,7 +33,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha4"
@@ -263,7 +263,7 @@ func (d *Docker) joinKindNodeToKubernetesCluster(container container.ContainerCr
 		}
 		d.Log.Info("Waiting for kind node to join to the cluster", "container", container.ID, "running", status.Running, "exitCode", status.ExitCode)
 		if status.ExitCode != 0 {
-			return errors.Errorf("Can't join kind node to the cluster")
+			return xerrors.Errorf("Can't join kind node to the cluster")
 		}
 		if !status.Running {
 			break

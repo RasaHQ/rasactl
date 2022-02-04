@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -62,7 +62,7 @@ func connectRasaCmd() *cobra.Command {
 		PreRunE: func(cmd *cobra.Command, args []string) error {
 
 			if !utils.CommandExists("rasa") {
-				return errors.Errorf(
+				return xerrors.Errorf(
 					errorPrint.Sprint(
 						"The 'rasa' command doesn't exist. Check out the docs to learn how to install rasa, https://rasa.com/docs/rasa/installation/",
 					),
@@ -74,7 +74,7 @@ func connectRasaCmd() *cobra.Command {
 			}
 
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
@@ -83,7 +83,7 @@ func connectRasaCmd() *cobra.Command {
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			rasaCtl.HelmClient.SetConfiguration(
@@ -100,13 +100,13 @@ func connectRasaCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
+				return xerrors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
 			// Check if a Rasa X deployment is already installed and running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
@@ -115,7 +115,7 @@ func connectRasaCmd() *cobra.Command {
 			}
 
 			if err := rasaCtl.ConnectRasa(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return nil

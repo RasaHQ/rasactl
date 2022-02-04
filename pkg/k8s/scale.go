@@ -17,6 +17,7 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -24,7 +25,11 @@ import (
 
 // ScaleDown scales down all deployments and statefulsets for a given deployment.
 func (k *Kubernetes) ScaleDown() error {
-	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	labels := fmt.Sprintf("app.kubernetes.io/instance=%s", k.Helm.ReleaseName)
+
+	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return err
 	}
@@ -45,7 +50,9 @@ func (k *Kubernetes) ScaleDown() error {
 		}
 	}
 
-	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return err
 	}
@@ -71,7 +78,11 @@ func (k *Kubernetes) ScaleDown() error {
 
 // ScaleDown scales up all deployments and statefulsets for a given deployment.
 func (k *Kubernetes) ScaleUp() error {
-	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	labels := fmt.Sprintf("app.kubernetes.io/instance=%s", k.Helm.ReleaseName)
+
+	deployments, err := k.clientset.AppsV1().Deployments(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return err
 	}
@@ -96,7 +107,9 @@ func (k *Kubernetes) ScaleUp() error {
 		}
 	}
 
-	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{})
+	statefulsets, err := k.clientset.AppsV1().StatefulSets(k.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: labels,
+	})
 	if err != nil {
 		return err
 	}

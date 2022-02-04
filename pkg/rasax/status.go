@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/xerrors"
 
 	types "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
@@ -31,7 +31,7 @@ func (r *RasaX) WaitForDatabaseMigration(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			return errors.Errorf("Error while waiting for Rasa X Database migration status, error: %s", ctx.Err())
+			return xerrors.Errorf("Error while waiting for Rasa X Database migration status, error: %s", ctx.Err())
 		default:
 			healthStatus, err := r.GetHealthEndpoint()
 			if healthStatus == nil || err != nil {
@@ -64,7 +64,7 @@ func (r *RasaX) WaitForRasaServer(ctx context.Context, environment string) error
 	for {
 		select {
 		case <-ctx.Done():
-			return errors.Errorf("Error while waiting for Rasa worker status, error: %s", ctx.Err())
+			return xerrors.Errorf("Error while waiting for Rasa worker status, error: %s", ctx.Err())
 		default:
 
 			healthStatus, err := r.GetHealthEndpoint()

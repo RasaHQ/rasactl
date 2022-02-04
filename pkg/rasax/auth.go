@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 
 	rtypes "github.com/RasaHQ/rasactl/pkg/types/rasax"
 )
@@ -60,10 +60,10 @@ func (r *RasaX) Auth(username, password string) (*rtypes.AuthEndpointResponse, e
 		return bodyData, nil
 
 	case 401:
-		return nil, errors.Errorf("Unauthorized")
+		return nil, xerrors.Errorf("Unauthorized")
 
 	default:
-		return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
+		return nil, xerrors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 	}
 }
 

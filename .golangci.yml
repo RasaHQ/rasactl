@@ -42,6 +42,7 @@ linters-settings:
       - '^errors\.Wrap$'
       - '^errors\.Wrapf$'
       - '^fmt\.Errorf$'
+      - '^errors\.Errorf$'
 
   gci:
     local-prefixes: github.com/RasaHQ/rasactl

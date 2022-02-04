@@ -16,8 +16,8 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -49,11 +49,11 @@ func listCmd() *cobra.Command {
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := parseArgs(namespace, args, 0, 0, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := rasaCtl.List(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return nil

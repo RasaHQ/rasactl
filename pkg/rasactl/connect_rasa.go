@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 	"gopkg.in/yaml.v2"
 
 	"github.com/RasaHQ/rasactl/pkg/helm"
@@ -41,7 +41,7 @@ import (
 func (r *RasaCtl) ConnectRasa() error {
 
 	if r.KubernetesClient.GetBackendType() != types.KubernetesBackendLocal {
-		return errors.Errorf(
+		return xerrors.Errorf(
 			"It looks like you're not using kind as a backend for Kubernetes cluster, this command is available only if you use kind",
 		)
 	}

@@ -16,9 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -58,12 +58,12 @@ func deleteCmd() *cobra.Command {
 			}
 
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() && !viper.GetBool("force") {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
+				return xerrors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			rasaCtl.HelmClient.SetConfiguration(
 				&types.HelmConfigurationSpec{
@@ -77,7 +77,7 @@ func deleteCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			defer rasaCtl.Spinner.Stop()
 			if err := rasaCtl.Delete(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			return nil
 		},

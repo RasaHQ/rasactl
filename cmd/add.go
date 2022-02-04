@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 )
 
@@ -57,7 +57,7 @@ func addCmd() *cobra.Command {
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if _, err := parseArgs(namespace, args, 1, 1, rasactlFlags); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
@@ -70,7 +70,7 @@ func addCmd() *cobra.Command {
 			}
 
 			if err := rasaCtl.Add(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return nil

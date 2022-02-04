@@ -20,7 +20,7 @@ import (
 	"os"
 
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/docker"
 	"github.com/RasaHQ/rasactl/pkg/helm"
@@ -157,7 +157,7 @@ func (r *RasaCtl) useProject(projectPath string) error {
 					if os.IsNotExist(err) {
 						return err
 					} else if !path.IsDir() {
-						return errors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
+						return xerrors.Errorf("The %s path can't point to a file, it has to be a directory", projectPath)
 					}
 					return err
 				}
@@ -183,7 +183,7 @@ func (r *RasaCtl) useProject(projectPath string) error {
 			r.HelmClient.SetPersistanceVolumeClaimName(volume)
 
 		} else {
-			return errors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind")
+			return xerrors.Errorf("It looks like you don't use kind as a current Kubernetes context, the project-path flag is supported only with kind")
 		}
 
 		if err := r.writeStatusFile(projectPath); err != nil {

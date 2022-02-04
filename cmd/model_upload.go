@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/xerrors"
 	"k8s.io/kubectl/pkg/util/templates"
 
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -55,7 +55,7 @@ func modelUploadCmd() *cobra.Command {
 
 			args, err := parseArgs(namespace, args, 1, 2, rasactlFlags)
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if err := checkIfNamespaceExists(); err != nil {
@@ -66,7 +66,7 @@ func modelUploadCmd() *cobra.Command {
 
 			stateData, err := rasaCtl.KubernetesClient.ReadSecretWithState()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 			rasaCtl.HelmClient.SetConfiguration(
 				&types.HelmConfigurationSpec{
@@ -81,7 +81,7 @@ func modelUploadCmd() *cobra.Command {
 			// Check if a Rasa X deployment is running
 			_, isRunning, err := rasaCtl.CheckDeploymentStatus()
 			if err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			if !isRunning {
@@ -90,11 +90,11 @@ func modelUploadCmd() *cobra.Command {
 			}
 
 			if !rasaCtl.KubernetesClient.IsNamespaceManageable() {
-				return errors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
+				return xerrors.Errorf(errorPrint.Sprintf("The %s namespace exists but is not managed by rasactl, can't continue :(", rasaCtl.Namespace))
 			}
 
 			if err := rasaCtl.ModelUpload(); err != nil {
-				return errors.Errorf(errorPrint.Sprintf("%s", err))
+				return xerrors.Errorf(errorPrint.Sprintf("%s", err))
 			}
 
 			return nil

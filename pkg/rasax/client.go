@@ -24,7 +24,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/pkg/errors"
+	"golang.org/x/xerrors"
 
 	"github.com/RasaHQ/rasactl/pkg/status"
 	"github.com/RasaHQ/rasactl/pkg/types"
@@ -107,7 +107,7 @@ func (r *RasaX) GetHealthEndpoint() (*rtypes.HealthEndpointsResponse, error) {
 		return bodyData, nil
 
 	}
-	return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
+	return nil, xerrors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 }
 
 func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
@@ -135,5 +135,5 @@ func (r *RasaX) GetVersionEndpoint() (*rtypes.VersionEndpointResponse, error) {
 		return bodyData, nil
 
 	}
-	return nil, errors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
+	return nil, xerrors.Errorf("The Rasa X health endpoint has returned status code %s", resp.Status)
 }
