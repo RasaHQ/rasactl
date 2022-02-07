@@ -21,8 +21,8 @@ const (
 	// HelmChartNameRasaX stores a name of helm chart used to deploy Rasa X / Enterprise.
 	HelmChartNameRasaX string = "rasa-x"
 
-	//HelmChartVersionRasaX storage a version of helm chart used to deploy Rasa X / Enterprise.
-	HelmChartVersionRasaX string = "4.3.1"
+	// HelmChartVersionRasaX storage a version of helm chart used to deploy Rasa X / Enterprise.
+	HelmChartVersionRasaX string = "4.3.3"
 )
 
 // RepositorySpec stores data related to a helm repository.
