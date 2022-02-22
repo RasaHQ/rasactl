@@ -23,7 +23,7 @@ func addStartFlags(cmd *cobra.Command) {
 	cmd.PersistentFlags().BoolVarP(&rasactlFlags.Start.Project, "project", "p", false,
 		"use the current working directory as a project directory, the flag is ignored if --project-path is used")
 
-	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.RasaXPassword, "rasa-x-password", "rasaxlocal", "Rasa X password")
+	cmd.PersistentFlags().StringVar(&rasactlFlags.Start.RasaXPassword, "rasa-x-password", "", "Rasa X password")
 	cmd.PersistentFlags().BoolVar(&rasactlFlags.Start.RasaXPasswordStdin, "rasa-x-password-stdin", false, "read the Rasa X password from stdin")
 	cmd.Flags().BoolVar(&rasactlFlags.Start.UseEdgeRelease, "rasa-x-edge-release", false, "use the latest edge release of Rasa X")
 	cmd.Flags().BoolVar(&rasactlFlags.Start.Create, "create", false,

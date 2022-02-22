@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -263,6 +264,24 @@ func GetPasswordStdin() (string, error) {
 		return line, err
 	}
 	return strings.TrimSuffix(line, "\n"), nil
+}
+
+// GenerateRandomPassword generates random ASCII password
+func GenerateRandomPassword(length int) string {
+	rand.Seed(time.Now().UnixNano())
+	const (
+		lowerLetters = "abcdefghijklmnopqrstuvwxyz"
+		upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		digits       = "0123456789"
+		symbols      = "!@#$&*()_+-="
+		all          = lowerLetters + upperLetters + digits + symbols
+	)
+	password := make([]byte, length)
+	for i := range password {
+		password[i] = all[rand.Intn(len(all))]
+	}
+
+	return string(password)
 }
 
 // HelmChartVersionConstrains checks if the rasa-x-helm chart version

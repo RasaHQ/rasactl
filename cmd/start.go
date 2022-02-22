@@ -80,6 +80,11 @@ func startCmd() *cobra.Command {
 				rasactlFlags.Start.RasaXPassword = password
 			}
 
+			if rasactlFlags.Start.RasaXPassword == "" {
+				password := utils.GenerateRandomPassword(14)
+				rasactlFlags.Start.RasaXPassword = password
+			}
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
