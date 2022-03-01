@@ -26,16 +26,6 @@ func (r *RasaCtl) Start() error {
 		return err
 	}
 
-	dockerVersion, err := r.DockerClient.GetServerVersion()
-	if err != nil {
-		return err
-	}
-	if err := utils.DockerVersionConstrains(
-		dockerVersion,
-	); err != nil {
-		return err
-	}
-
 	r.Log.V(1).Info("Validating namespace name", "namespace", r.Namespace)
 	if err := utils.ValidateName(r.HelmClient.GetNamespace()); err != nil {
 		return err

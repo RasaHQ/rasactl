@@ -40,6 +40,7 @@ import (
 
 	"github.com/RasaHQ/rasactl/pkg/status"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types"
+	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 type Interface interface {
@@ -78,15 +79,9 @@ type KindSpec struct {
 const (
 	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
+	// Env var used for warning on/off
+	DockerVersionWarningEnv string = "DOCKER_VERSION_WARNING_ENABLED"
 )
-
-func (d *Docker) GetServerVersion() (string, error) {
-	version, err := d.Client.ServerVersion(d.Ctx)
-	if err != nil {
-		return "", err
-	}
-	return version.Version, nil
-}
 
 // New initializes Docker client.
 func New(c *Docker) (Interface, error) {
@@ -98,7 +93,30 @@ func New(c *Docker) (Interface, error) {
 	}
 	c.Client = cli
 
+	c.Log.Info("Checking Docker engine version")
+	if err := c.checkDockerVersionConstrains(); err != nil {
+		return nil, err
+	}
+
 	return c, nil
+}
+
+func (d *Docker) checkDockerVersionConstrains() error {
+	if enabled := os.Getenv(DockerVersionWarningEnv); enabled == "false" {
+		d.Log.Info("Skipping check Docker engine version")
+		return nil
+	}
+
+	dockerVersion, err := d.GetServerVersion()
+	if err != nil {
+		return err
+	}
+	if err := utils.DockerVersionConstrains(
+		dockerVersion,
+	); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *Docker) prepareKindJoinConfiguration() (string, error) {
@@ -446,4 +464,12 @@ func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
 	}
 
 	return inspect, nil
+}
+
+func (d *Docker) GetServerVersion() (string, error) {
+	version, err := d.Client.ServerVersion(d.Ctx)
+	if err != nil {
+		return "", err
+	}
+	return version.Version, nil
 }
