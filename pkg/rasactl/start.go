@@ -17,11 +17,21 @@ package rasactl
 
 import "github.com/RasaHQ/rasactl/pkg/utils"
 
-// Start starts a Rasa X / Enterprise deployment.
+// Start a Rasa X / Enterprise deployment.
 func (r *RasaCtl) Start() error {
 
 	if err := utils.HelmChartVersionConstrains(
 		r.HelmClient.GetConfiguration().Version,
+	); err != nil {
+		return err
+	}
+
+	dockerVersion, err := r.DockerClient.GetServerVersion()
+	if err != nil {
+		return err
+	}
+	if err := utils.DockerVersionConstrains(
+		dockerVersion,
 	); err != nil {
 		return err
 	}

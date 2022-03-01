@@ -286,8 +286,36 @@ func HelmChartVersionConstrains(helmChartVersion string) error {
 
 	if !c.Check(v) {
 		return xerrors.Errorf(
-			"the helm chart version is incorrect, the version that you want to use is %s"+
+			"The helm chart version is incorrect, the version that you want to use is %s"+
 				", use the helm chart in version %s", helmChartVersion, constraint)
+	}
+
+	return nil
+}
+
+// DockerVersionConstrains checks if the Docker CLI version is
+// within constrains boundaries.
+func DockerVersionConstrains(dockerVersion string) error {
+	constraint := ">= 20.10.0"
+
+	if dockerVersion == "" {
+		return nil
+	}
+
+	c, err := semver.NewConstraint(constraint)
+	if err != nil {
+		return err
+	}
+
+	v, err := semver.NewVersion(dockerVersion)
+	if err != nil {
+		return err
+	}
+
+	if !c.Check(v) {
+		return xerrors.Errorf(
+			"The Docker CLI version is incompatible with rasactl. The version you have is %s"+
+				", but rasactl requires Docker CLI version %s", dockerVersion, constraint)
 	}
 
 	return nil

@@ -52,6 +52,7 @@ type Interface interface {
 	SetKind(kind KindSpec)
 	SetProjectPath(path string)
 	GetKindNetworkGatewayAddress() (string, error)
+	GetServerVersion() (string, error)
 }
 
 // Docker represents a Docker client.
@@ -78,6 +79,14 @@ const (
 	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
 )
+
+func (d *Docker) GetServerVersion() (string, error) {
+	version, err := d.Client.ServerVersion(d.Ctx)
+	if err != nil {
+		return "", err
+	}
+	return version.Version, nil
+}
 
 // New initializes Docker client.
 func New(c *Docker) (Interface, error) {
