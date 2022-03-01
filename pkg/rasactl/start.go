@@ -17,7 +17,7 @@ package rasactl
 
 import "github.com/RasaHQ/rasactl/pkg/utils"
 
-// Start a Rasa X / Enterprise deployment.
+// Start starts a Rasa X / Enterprise deployment.
 func (r *RasaCtl) Start() error {
 
 	if err := utils.HelmChartVersionConstrains(
