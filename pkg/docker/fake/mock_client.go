@@ -157,3 +157,12 @@ func (mr *MockInterfaceMockRecorder) StopKindNode(arg0 interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopKindNode", reflect.TypeOf((*MockInterface)(nil).StopKindNode), arg0)
 }
+
+// GetServerVersion mocks base method.
+func (m *MockInterface) GetServerVersion() (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServerVersion")
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
