@@ -33,6 +33,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
+	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -80,7 +81,7 @@ const (
 	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
 	// Env var used for warning on/off
-	DockerVersionWarningEnv string = "DOCKER_VERSION_WARNING_ENABLED"
+	DockerVersionWarningEnv string = "RASACTL_SKIP_DOCKER_VERSION_CHECK"
 )
 
 // New initializes Docker client.
