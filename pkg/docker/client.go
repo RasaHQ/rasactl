@@ -81,7 +81,7 @@ const (
 	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
 	// Env var used for warning on/off
-	DockerVersionWarningEnv string = "RASACTL_SKIP_DOCKER_VERSION_CHECK"
+	dockerVersionWarningEnv string = "skip_docker_version_check"
 )
 
 // New initializes Docker client.
@@ -103,8 +103,8 @@ func New(c *Docker) (Interface, error) {
 }
 
 func (d *Docker) checkDockerVersionConstrains() error {
-	if viper.GetBool(DockerVersionWarningEnv) {
-		d.Log.Info("Skipping check Docker engine version")
+	if viper.GetBool(dockerVersionWarningEnv) {
+		d.Log.Info("Skipping Docker version check")
 		return nil
 	}
 
