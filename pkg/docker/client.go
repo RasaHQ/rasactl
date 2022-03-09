@@ -111,12 +111,9 @@ func (d *Docker) checkDockerVersionConstrains() error {
 	if err != nil {
 		return err
 	}
-	if err := utils.DockerVersionConstrains(
+	return utils.DockerVersionConstrains(
 		dockerVersion,
-	); err != nil {
-		return err
-	}
-	return nil
+	)
 }
 
 func (d *Docker) prepareKindJoinConfiguration() (string, error) {
