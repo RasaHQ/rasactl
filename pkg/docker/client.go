@@ -102,7 +102,7 @@ func New(c *Docker) (Interface, error) {
 }
 
 func (d *Docker) checkDockerVersionConstrains() error {
-	if enabled := os.Getenv(DockerVersionWarningEnv); enabled == "false" {
+	if viper.GetBool(DockerVersionWarningEnv) {
 		d.Log.Info("Skipping check Docker engine version")
 		return nil
 	}
