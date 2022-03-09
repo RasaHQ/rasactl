@@ -299,7 +299,9 @@ func DockerVersionConstrains(dockerVersion string) error {
 	constraint := ">= 20.10.0"
 
 	if dockerVersion == "" {
-		return nil
+		return xerrors.Errorf(
+			"Rasactl has an issue reading Docker version. Are you sure Docker is properly installed?",
+		)
 	}
 
 	c, err := semver.NewConstraint(constraint)
@@ -315,7 +317,7 @@ func DockerVersionConstrains(dockerVersion string) error {
 	if !c.Check(v) {
 		return xerrors.Errorf(
 			"The Docker version is incompatible with rasactl. The version you use is %s"+
-				", but rasactl requires Docker CLI version %s", dockerVersion, constraint)
+				", but rasactl requires Docker %s", dockerVersion, constraint)
 	}
 
 	return nil
