@@ -95,14 +95,14 @@ func New(c *Docker) (Interface, error) {
 	c.Client = cli
 
 	c.Log.Info("Checking Docker engine version")
-	if err := c.checkDockerVersionConstrains(); err != nil {
+	if err := c.checkVersionConstrains(); err != nil {
 		return nil, err
 	}
 
 	return c, nil
 }
 
-func (d *Docker) checkDockerVersionConstrains() error {
+func (d *Docker) checkVersionConstrains() error {
 	if viper.GetBool(dockerVersionWarningEnv) {
 		d.Log.Info("Skipping Docker version check")
 		return nil

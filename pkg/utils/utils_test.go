@@ -46,11 +46,6 @@ var _ = Describe("Utils", func() {
 		Expect(version).To(Equal(false))
 	})
 
-	It("check Docker version constrains", func() {
-		err := utils.DockerVersionConstrains("20.9.0")
-		Expect(err).To(Not(BeNil()))
-	})
-
 	It("validate namespace name", func() {
 		err := utils.ValidateName("name!-space")
 		Expect(err).To(Not(BeNil()))
