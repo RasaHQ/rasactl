@@ -16,9 +16,13 @@ limitations under the License.
 package docker_test
 
 import (
-	"github.com/RasaHQ/rasactl/pkg/docker"
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/viper"
+
+	"github.com/RasaHQ/rasactl/pkg/docker"
 )
 
 var _ = Describe("Utils", func() {
@@ -32,6 +36,30 @@ var _ = Describe("Utils", func() {
 		It("Should not error", func() {
 			err := docker.VersionConstrains("20.10.1")
 			Expect(err).To(BeNil())
+		})
+	})
+
+	Context("Check skip Docker version check", func() {
+		viper.AutomaticEnv() // read in environment variables that match
+		viper.SetEnvPrefix("rasactl")
+
+		It("Shoud skip", func() {
+			os.Setenv("RASACTL_SKIP_DOCKER_VERSION_CHECK", "true")
+
+			skip := docker.SkipVersionConstrainsCheck()
+			Expect(skip).To(BeTrue())
+		})
+
+		It("Should not skip when env var sets to false", func() {
+			os.Setenv("RASACTL_SKIP_DOCKER_VERSION_CHECK", "false")
+
+			skip := docker.SkipVersionConstrainsCheck()
+			Expect(skip).To(BeFalse())
+		})
+
+		It("Should not skip when env var does not set", func() {
+			skip := docker.SkipVersionConstrainsCheck()
+			Expect(skip).To(BeFalse())
 		})
 	})
 })

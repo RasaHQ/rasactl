@@ -33,7 +33,6 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
-	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,7 +40,6 @@ import (
 
 	"github.com/RasaHQ/rasactl/pkg/status"
 	rtypes "github.com/RasaHQ/rasactl/pkg/types"
-	"github.com/RasaHQ/rasactl/pkg/utils"
 )
 
 type Interface interface {
@@ -80,8 +78,6 @@ type KindSpec struct {
 const (
 	// Prefix used for kind images
 	kindImagePrefix string = "kindest/node:"
-	// Env var used for warning on/off
-	dockerVersionWarningEnv string = "skip_docker_version_check"
 )
 
 // New initializes Docker client.
@@ -103,8 +99,8 @@ func New(c *Docker) (Interface, error) {
 }
 
 func (d *Docker) checkVersionConstrains() error {
-	if viper.GetBool(dockerVersionWarningEnv) {
-		d.Log.Info("Skipping Docker version check")
+	if SkipVersionConstrainsCheck() {
+		d.Log.Info("Skipping Docker version constrains check")
 		return nil
 	}
 
@@ -112,7 +108,7 @@ func (d *Docker) checkVersionConstrains() error {
 	if err != nil {
 		return err
 	}
-	return utils.DockerVersionConstrains(
+	return VersionConstrains(
 		dockerVersion,
 	)
 }

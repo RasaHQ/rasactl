@@ -26,10 +26,3 @@ func TestDocker(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Docker Suite")
 }
-
-// TODO: add test for env var
-// func TestCheckVersionConstrains(t *testing.T) {
-// 	os.Setenv("RASACTL_SKIP_DOCKER_VERSION_CHECK", "true")
-
-// 	}
-// }

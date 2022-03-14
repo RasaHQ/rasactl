@@ -17,7 +17,13 @@ package docker
 
 import (
 	"github.com/Masterminds/semver/v3"
+	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
+)
+
+const (
+	// Env var used for warning on/off
+	dockerVersionWarningEnv string = "skip_docker_version_check"
 )
 
 // DockerVersionConstrains checks if the Docker CLI version is
@@ -48,4 +54,8 @@ func VersionConstrains(dockerVersion string) error {
 	}
 
 	return nil
+}
+
+func SkipVersionConstrainsCheck() bool {
+	return viper.GetBool(dockerVersionWarningEnv)
 }
