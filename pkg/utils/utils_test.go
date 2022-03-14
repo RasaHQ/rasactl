@@ -57,6 +57,15 @@ var _ = Describe("Utils", func() {
 		Expect(str).To(Equal("{\"test\":\"test\"}"))
 	})
 
+	It("check password length", func() {
+		length := 14
+
+		password, err := utils.GenerateRandomPassword(length)
+		Expect(password).To(HaveLen(length))
+		Expect(password).To(BeAssignableToTypeOf("string"))
+		Expect(err).To(BeNil())
+	})
+
 	Describe("read Rasa X URL from environment variables", func() {
 		viper.AutomaticEnv() // read in environment variables that match
 		viper.SetEnvPrefix("rasactl")
