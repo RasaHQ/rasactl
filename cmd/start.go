@@ -81,7 +81,10 @@ func startCmd() *cobra.Command {
 			}
 
 			if rasactlFlags.Start.RasaXPassword == "" {
-				password := utils.GenerateRandomPassword(14)
+				password, err := utils.GenerateRandomPassword(14)
+				if err != nil {
+					return err
+				}
 				rasactlFlags.Start.RasaXPassword = password
 			}
 

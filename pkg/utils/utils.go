@@ -17,11 +17,12 @@ package utils
 
 import (
 	"bufio"
+	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math/rand"
+	"math/big"
 	"net"
 	"net/http"
 	"net/url"
@@ -267,8 +268,7 @@ func GetPasswordStdin() (string, error) {
 }
 
 // GenerateRandomPassword generates random ASCII password
-func GenerateRandomPassword(length int) string {
-	rand.Seed(time.Now().UnixNano())
+func GenerateRandomPassword(length int) (string, error) {
 	const (
 		lowerLetters = "abcdefghijklmnopqrstuvwxyz"
 		upperLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -276,12 +276,27 @@ func GenerateRandomPassword(length int) string {
 		symbols      = "!@#$&*()_+-="
 		all          = lowerLetters + upperLetters + digits + symbols
 	)
-	password := make([]byte, length)
-	for i := range password {
-		password[i] = all[rand.Intn(len(all))]
+	var password string
+	for i := 0; i < length; i++ {
+		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(all))))
+		if err != nil {
+			return "", err
+		}
+		newchar := string(all[n.Int64()])
+		if password == "" {
+			password = newchar
+		}
+		if i < length-1 {
+			n, err = rand.Int(rand.Reader, big.NewInt(int64(len(password)+1)))
+			if err != nil {
+				return "", err
+			}
+			j := n.Int64()
+			password = password[0:j] + newchar + password[j:]
+		}
 	}
 
-	return string(password)
+	return password, nil
 }
 
 // HelmChartVersionConstrains checks if the rasa-x-helm chart version
