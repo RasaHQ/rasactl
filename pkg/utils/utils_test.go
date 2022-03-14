@@ -57,7 +57,7 @@ var _ = Describe("Utils", func() {
 		Expect(str).To(Equal("{\"test\":\"test\"}"))
 	})
 
-	It("check password length", func() {
+	It("check password generator", func() {
 		length := 14
 
 		password, err := utils.GenerateRandomPassword(length)
