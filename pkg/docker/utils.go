@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	// Env var used for warning on/off
+	// Environment variable name used for disabling warning message
+	// related to incorrect Docker version.
 	dockerVersionWarningEnv string = "skip_docker_version_check"
 )
 
