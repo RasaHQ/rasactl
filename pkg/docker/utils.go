@@ -57,7 +57,7 @@ func VersionConstrains(dockerVersion string) error {
 }
 
 // SkipVersionConstrainsCheck skips Docker version check
-// if the env var `RASACTL_SKIP_DOCKER_VERSION_CHECK` sets to true
+// if the `RASACTL_SKIP_DOCKER_VERSION_CHECK` environment variable is set to `true`.
 func SkipVersionConstrainsCheck() bool {
 	viper.SetDefault(dockerVersionWarningEnv, "false")
 	return viper.GetBool(dockerVersionWarningEnv)
