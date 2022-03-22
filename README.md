@@ -161,7 +161,7 @@ rasax:
 | `RASACTL_RASA_X_URL`                   | Set Rasa X / Enterprise URL. By default, the URL is detected automatically, but if you use a custom configuration and you wanna define Rasa X URL explicitly you can use the env variable. The `RASACTL_RASA_X_URL` overrides Rasa X URL for all deployment. |
 | `RASACTL_RASA_X_URL_<DEPLOYMENT_NAME>` | Set Rasa X / Enterprise URL for a given deployment, e.g. if a deployment name is `my-deployment`, then you can use the `RASACTL_RASA_X_URL_MY_DEPLOYMENT` environment variable to define the Rasa X URL for the `my-deployment`.                             |
 | `RASACTL_KUBECONFIG`                   | Absolute path to the kubeconfig file (default "`$HOME/.kube/config`")                                                                                                                                                                                        |
-| `RASACTL_SKIP_DOCKER_VERSION_CHECK` | Don't check if the Docker engine version is incompatible with rasactl. Default is `false`. |
+| `RASACTL_SKIP_DOCKER_VERSION_CHECK`    | Don't check if the Docker engine version is incompatible with rasactl. Default is `false`.                                                                                                                                                                   |
 
 ### Configuration file
 

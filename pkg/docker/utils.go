@@ -51,7 +51,7 @@ func VersionConstrains(dockerVersion string) error {
 	if !c.Check(v) {
 		return xerrors.Errorf(
 			"The Docker version is incompatible with rasactl. The version you use is %s"+
-				", but rasactl requires Docker %s", dockerVersion, constraint)
+				", rasactl requires Docker %s", dockerVersion, constraint)
 	}
 
 	return nil
