@@ -286,7 +286,7 @@ func HelmChartVersionConstrains(helmChartVersion string) error {
 
 	if !c.Check(v) {
 		return xerrors.Errorf(
-			"the helm chart version is incorrect, the version that you want to use is %s"+
+			"The helm chart version is incorrect, the version that you want to use is %s"+
 				", use the helm chart in version %s", helmChartVersion, constraint)
 	}
 

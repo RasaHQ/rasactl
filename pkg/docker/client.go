@@ -52,6 +52,7 @@ type Interface interface {
 	SetKind(kind KindSpec)
 	SetProjectPath(path string)
 	GetKindNetworkGatewayAddress() (string, error)
+	GetServerVersion() (string, error)
 }
 
 // Docker represents a Docker client.
@@ -89,7 +90,27 @@ func New(c *Docker) (Interface, error) {
 	}
 	c.Client = cli
 
+	c.Log.Info("Checking Docker engine version")
+	if err := c.checkVersionConstrains(); err != nil {
+		return nil, err
+	}
+
 	return c, nil
+}
+
+func (d *Docker) checkVersionConstrains() error {
+	if SkipVersionConstrainsCheck() {
+		d.Log.Info("Skipping Docker version constrains check")
+		return nil
+	}
+
+	dockerVersion, err := d.GetServerVersion()
+	if err != nil {
+		return err
+	}
+	return VersionConstrains(
+		dockerVersion,
+	)
 }
 
 func (d *Docker) prepareKindJoinConfiguration() (string, error) {
@@ -437,4 +458,12 @@ func (d *Docker) getKindControlPlaneInfo() (types.ContainerJSON, error) {
 	}
 
 	return inspect, nil
+}
+
+func (d *Docker) GetServerVersion() (string, error) {
+	version, err := d.Client.ServerVersion(d.Ctx)
+	if err != nil {
+		return "", err
+	}
+	return version.Version, nil
 }
