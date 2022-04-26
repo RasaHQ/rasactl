@@ -80,6 +80,7 @@
     - [How to run it?](#how-to-run-it)
     - [Run unit tests](#run-unit-tests)
     - [Kind cluster for developing purposes](#kind-cluster-for-developing-purposes)
+  - [Create a new release](#create-a-new-release)
   - [License](#license)
 
 ## Prerequisites
@@ -1051,6 +1052,39 @@ After kind is ready, install ingress-nginx:
 ```text
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
 $ kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+```
+
+## Create a new release
+
+Below you can find steps to prepare a new release.
+
+1. Create a release branch.
+
+```text
+git checkout -b prepare_release_<VERSION> main
+
+# e.g. git checkout -b prepare_release_1.5.6 main
+```
+
+2. Update `CHANGELOG.md`.
+
+```
+VERSION=1.5.6 make release
+```
+
+3. Push the release branch and create a PR
+
+```
+git push origin prepare_release_<VERSION>
+```
+
+4. After the PR is merged create a tag and push it.
+
+```
+git checkout main
+git pull
+git tag <VERSION> -m "<VERSION>"
+git push origin <VERSION>
 ```
 
 ## License
