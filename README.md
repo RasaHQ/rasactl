@@ -1,3 +1,9 @@
+# Project Status
+
+**rasactl is not maintained anymore**.
+
+See [Rasa X Community Edition - Deprecation Notice](https://forum.rasa.com/t/changes-to-the-rasa-x-community-edition-free-version/53650) for more information.
+
 # rasactl
 
 `rasactl` deploys Rasa X / Enterprise on your local or remote Kubernetes cluster and manages Rasa X / Enterprise deployments.
